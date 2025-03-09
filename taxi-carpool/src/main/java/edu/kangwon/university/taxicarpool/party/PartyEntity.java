@@ -93,4 +93,31 @@ public class PartyEntity {
     public Long getId() {
         return id;
     }
+
+
+
+
+
+    // service계층에 만들면, setter, getter 사용해서돼서 일단 entity에 만듦.
+    public PartyEntity updateParty(
+            String name,
+            boolean isDeleted,
+            LocalDateTime startDate,
+            LocalDateTime endDate) {
+        this.name = name;
+        this.isDeleted = isDeleted;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        return this;
+    }
+
+    public boolean isExpired() {
+        return this.endDate.isBefore(LocalDateTime.now());
+    }
+
+    public boolean isActive() {
+        return Boolean.FALSE.equals(isDeleted);
+    }
+
+
 }
