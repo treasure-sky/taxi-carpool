@@ -2,6 +2,9 @@ package edu.kangwon.university.taxicarpool.party;
 
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Component
 public class PartyMapper {
 
@@ -15,6 +18,13 @@ public class PartyMapper {
             partyEntity.getEndDate()
         );
     }
+
+    public List<PartyDTO> convertToDTOList(List<PartyEntity> partyEntities) {
+        return partyEntities.stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+    }
+
 
 
 }
