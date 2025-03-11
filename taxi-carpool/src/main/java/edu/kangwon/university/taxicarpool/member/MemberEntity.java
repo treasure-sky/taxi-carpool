@@ -5,6 +5,7 @@ import jakarta.persistence.Id;
 
 @Entity(name = "member")
 public class MemberEntity {
+
     @Id
     private Long id;
 

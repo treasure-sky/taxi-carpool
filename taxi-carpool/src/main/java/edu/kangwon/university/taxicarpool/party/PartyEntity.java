@@ -5,6 +5,7 @@ import jakarta.persistence.Id;
 
 @Entity(name = "party")
 public class PartyEntity {
+
     @Id
     private Long id;
 
