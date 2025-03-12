@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PartyDTO {
+
     private Long id;
     private String name;
     private boolean isDeleted;
@@ -16,11 +17,11 @@ public class PartyDTO {
 
 
     public PartyDTO(Long id,
-                    String name,
-                    boolean isDeleted,
-                    List<MemberEntity> memberEntities,
-                    LocalDateTime startDate,
-                    LocalDateTime endDate) {
+        String name,
+        boolean isDeleted,
+        List<MemberEntity> memberEntities,
+        LocalDateTime startDate,
+        LocalDateTime endDate) {
         this.id = id;
         this.name = name;
         this.isDeleted = isDeleted;

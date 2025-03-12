@@ -21,10 +21,9 @@ public class PartyMapper {
 
     public List<PartyDTO> convertToDTOList(List<PartyEntity> partyEntities) {
         return partyEntities.stream()
-                .map(this::convertToDTO)
-                .collect(Collectors.toList());
+            .map(this::convertToDTO)
+            .collect(Collectors.toList());
     }
-
 
 
 }

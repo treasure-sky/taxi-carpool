@@ -10,13 +10,14 @@ import java.util.List;
 @Entity(name = "party")
 public class PartyEntity {
 
-    public PartyEntity() {}
+    public PartyEntity() {
+    }
 
     public PartyEntity(
-            String name,
-            List<MemberEntity> memberEntities,
-            LocalDateTime startDate,
-            LocalDateTime endDate) {
+        String name,
+        List<MemberEntity> memberEntities,
+        LocalDateTime startDate,
+        LocalDateTime endDate) {
         this.name = name;
         this.isDeleted = false;
         MemberEntities = memberEntities;
@@ -43,7 +44,6 @@ public class PartyEntity {
 
     @Column(name = "end_date")
     private LocalDateTime endDate;
-
 
 
     public void setId(Long id) {
@@ -95,15 +95,12 @@ public class PartyEntity {
     }
 
 
-
-
-
     // service계층에 만들면, setter, getter 사용해서돼서 일단 entity에 만듦.
     public PartyEntity updateParty(
-            String name,
-            boolean isDeleted,
-            LocalDateTime startDate,
-            LocalDateTime endDate) {
+        String name,
+        boolean isDeleted,
+        LocalDateTime startDate,
+        LocalDateTime endDate) {
         this.name = name;
         this.isDeleted = isDeleted;
         this.startDate = startDate;

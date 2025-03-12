@@ -14,7 +14,7 @@ public class PartyService {
 
     @Autowired
     PartyService(PartyRepository partyRepository,
-                 PartyMapper partyMapper) {
+        PartyMapper partyMapper) {
         this.partyRepository = partyRepository;
         this.partyMapper = partyMapper;
     }
@@ -29,10 +29,17 @@ public class PartyService {
         return partyMapper.convertToDTOList(partyEntities);
     }
 
-
-
-
-
+//    public PartyDTO createParty() {
+//
+//    }
+//
+//    public PartyDTO updateParty() {
+//
+//    }
+//
+//    public PartyDTO deleteParty() {
+//
+//    }
 
 
 }
