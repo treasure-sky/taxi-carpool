@@ -12,10 +12,9 @@ import jakarta.validation.constraints.NotNull;
 @Entity
 public class MemberEntity {
 
-    public MemberEntity(String email, Gender gender, Long id, String nickname, String password) {
+    public MemberEntity(String email, Gender gender, String nickname, String password) {
         this.email = email;
         this.gender = gender;
-        this.id = id;
         this.nickname = nickname;
         this.password = password;
     }
@@ -44,6 +43,10 @@ public class MemberEntity {
 
     public Long getId() {
         return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getEmail() {
