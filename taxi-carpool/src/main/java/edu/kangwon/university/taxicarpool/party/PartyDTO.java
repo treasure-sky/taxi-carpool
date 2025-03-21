@@ -1,80 +1,219 @@
 package edu.kangwon.university.taxicarpool.party;
 
 import edu.kangwon.university.taxicarpool.member.MemberEntity;
-
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 public class PartyDTO {
 
-    private Long id;
-    private String name;
-    private boolean isDeleted;
-    private List<MemberEntity> MemberEntities = new ArrayList<>();
-    private LocalDateTime startDate;
-    private LocalDateTime endDate;
+    public static class PartyResponseDTO {
 
+        private Long id;
+        private String name;
+        private boolean isDeleted;
+        private List<MemberEntity> memberEntities = new ArrayList<>();
+        private Long hostMemberId;
+        private LocalDateTime endDate;
 
-    public PartyDTO(Long id,
-        String name,
-        boolean isDeleted,
-        List<MemberEntity> memberEntities,
-        LocalDateTime startDate,
-        LocalDateTime endDate) {
-        this.id = id;
-        this.name = name;
-        this.isDeleted = isDeleted;
-        MemberEntities = memberEntities;
-        this.startDate = startDate;
-        this.endDate = endDate;
+        public PartyResponseDTO(Long id,
+            String name,
+            boolean isDeleted,
+            List<MemberEntity> memberEntities,
+            Long hostMemberId,
+            LocalDateTime endDate) {
+            this.id = id;
+            this.name = name;
+            this.isDeleted = isDeleted;
+            this.memberEntities = memberEntities;
+            this.hostMemberId = hostMemberId;
+            this.endDate = endDate;
+        }
+
+        public Long getId() {
+            return id;
+        }
+
+        public void setId(Long id) {
+            this.id = id;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public boolean isDeleted() {
+            return isDeleted;
+        }
+
+        public void setDeleted(boolean deleted) {
+            isDeleted = deleted;
+        }
+
+        public List<MemberEntity> getMemberEntities() {
+            return memberEntities;
+        }
+
+        public void setMemberEntities(List<MemberEntity> memberEntities) {
+            this.memberEntities = memberEntities;
+        }
+
+        public Long getHostMemberId() {
+            return hostMemberId;
+        }
+
+        public void setHostMemberId(Long hostMemberId) {
+            this.hostMemberId = hostMemberId;
+        }
+
+        public LocalDateTime getEndDate() {
+            return endDate;
+        }
+
+        public void setEndDate(LocalDateTime endDate) {
+            this.endDate = endDate;
+        }
     }
 
-    public Long getId() {
-        return id;
+    public static class PartyCreateRequestDTO {
+        private Long id;
+        private String name;
+        private boolean isDeleted;
+        private List<MemberEntity> memberEntities = new ArrayList<>();
+        private Long hostMemberId;
+        private LocalDateTime endDate;
+
+        public PartyCreateRequestDTO(Long id, String name, boolean isDeleted,
+            List<MemberEntity> memberEntities,
+            Long hostMemberId,
+            LocalDateTime endDate) {
+            this.id = id;
+            this.name = name;
+            this.isDeleted = isDeleted;
+            this.memberEntities = memberEntities;
+            this.hostMemberId = hostMemberId;
+            this.endDate = endDate;
+        }
+
+        public Long getId() {
+            return id;
+        }
+
+        public void setId(Long id) {
+            this.id = id;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public boolean isDeleted() {
+            return isDeleted;
+        }
+
+        public void setDeleted(boolean deleted) {
+            isDeleted = deleted;
+        }
+
+        public List<MemberEntity> getMemberEntities() {
+            return memberEntities;
+        }
+
+        public void setMemberEntities(List<MemberEntity> memberEntities) {
+            this.memberEntities = memberEntities;
+        }
+
+        public Long getHostMemberId() {
+            return hostMemberId;
+        }
+
+        public void setHostMemberId(Long hostMemberId) {
+            this.hostMemberId = hostMemberId;
+        }
+
+        public LocalDateTime getEndDate() {
+            return endDate;
+        }
+
+        public void setEndDate(LocalDateTime endDate) {
+            this.endDate = endDate;
+        }
     }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+    public static class PartyUpdateRequestDTO {
+        private Long id;
+        private String name;
+        private boolean isDeleted;
+        private List<MemberEntity> memberEntities = new ArrayList<>();
+        private Long hostMemberId;
+        private LocalDateTime endDate;
 
-    public String getName() {
-        return name;
-    }
+        public PartyUpdateRequestDTO(Long id, String name, boolean isDeleted,
+            List<MemberEntity> memberEntities,
+            Long hostMemberId,
+            LocalDateTime endDate) {
+            this.id = id;
+            this.name = name;
+            this.isDeleted = isDeleted;
+            this.memberEntities = memberEntities;
+            this.hostMemberId = hostMemberId;
+            this.endDate = endDate;
+        }
 
-    public void setName(String name) {
-        this.name = name;
-    }
+        public Long getId() {
+            return id;
+        }
 
-    public boolean isDeleted() {
-        return isDeleted;
-    }
+        public void setId(Long id) {
+            this.id = id;
+        }
 
-    public void setDeleted(boolean deleted) {
-        isDeleted = deleted;
-    }
+        public String getName() {
+            return name;
+        }
 
-    public List<MemberEntity> getMemberEntities() {
-        return MemberEntities;
-    }
+        public void setName(String name) {
+            this.name = name;
+        }
 
-    public void setMemberEntities(List<MemberEntity> memberEntities) {
-        MemberEntities = memberEntities;
-    }
+        public boolean isDeleted() {
+            return isDeleted;
+        }
 
-    public LocalDateTime getStartDate() {
-        return startDate;
-    }
+        public void setDeleted(boolean deleted) {
+            isDeleted = deleted;
+        }
 
-    public void setStartDate(LocalDateTime startDate) {
-        this.startDate = startDate;
-    }
+        public List<MemberEntity> getMemberEntities() {
+            return memberEntities;
+        }
 
-    public LocalDateTime getEndDate() {
-        return endDate;
-    }
+        public void setMemberEntities(List<MemberEntity> memberEntities) {
+            this.memberEntities = memberEntities;
+        }
 
-    public void setEndDate(LocalDateTime endDate) {
-        this.endDate = endDate;
+        public Long getHostMemberId() {
+            return hostMemberId;
+        }
+
+        public void setHostMemberId(Long hostMemberId) {
+            this.hostMemberId = hostMemberId;
+        }
+
+        public LocalDateTime getEndDate() {
+            return endDate;
+        }
+
+        public void setEndDate(LocalDateTime endDate) {
+            this.endDate = endDate;
+        }
     }
 }
