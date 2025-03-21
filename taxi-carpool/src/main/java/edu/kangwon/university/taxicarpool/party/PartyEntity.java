@@ -2,6 +2,7 @@ package edu.kangwon.university.taxicarpool.party;
 
 import edu.kangwon.university.taxicarpool.member.MemberEntity;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -35,6 +36,7 @@ public class PartyEntity {
     @Column(name = "party_id")
     private Long id;
 
+    @NotNull
     @Column(name = "name")
     private String name;
 
