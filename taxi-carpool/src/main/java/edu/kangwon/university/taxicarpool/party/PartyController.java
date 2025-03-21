@@ -21,7 +21,6 @@ public class PartyController {
         this.partyService = partyService;
     }
 
-    // 파티방 단일 조회
     @GetMapping("/{partyId}")
     public ResponseEntity<PartyResponseDTO> getParty(
         @PathVariable("partyId") Long partyId
@@ -31,7 +30,6 @@ public class PartyController {
             .orElse(ResponseEntity.notFound().build());
     }
 
-    // 파티방 전체 조회
     @GetMapping
     public ResponseEntity<Page<PartyResponseDTO>> getPartyList(
         @RequestParam(defaultValue = "0") int page,
@@ -40,7 +38,6 @@ public class PartyController {
         return ResponseEntity.ok(partyService.getPartyList(page, size));
     }
 
-    // 파티방 생성
     @PostMapping
     public ResponseEntity<PartyResponseDTO> createParty(
         @RequestBody PartyCreateRequestDTO createRequestDTO
@@ -48,7 +45,6 @@ public class PartyController {
         return ResponseEntity.ok(partyService.createParty(createRequestDTO));
     }
 
-    // 파티방 수정
     @PutMapping("/{partyId}")
     public ResponseEntity<PartyResponseDTO> updateParty(
         @RequestBody PartyUpdateRequestDTO updateRequestDTO,
@@ -57,7 +53,6 @@ public class PartyController {
         return ResponseEntity.ok(partyService.updateParty(partyId, updateRequestDTO));
     }
 
-    // 파티방 삭제
     // ResponseEntity<Map<String, Object>>로 수정
     @DeleteMapping("/{partyId}")
     public ResponseEntity<Map<String, Object>> deleteParty(
