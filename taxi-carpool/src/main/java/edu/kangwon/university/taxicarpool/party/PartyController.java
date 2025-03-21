@@ -1,10 +1,14 @@
 package edu.kangwon.university.taxicarpool.party;
 
+import edu.kangwon.university.taxicarpool.party.PartyDTO.PartyCreateRequestDTO;
+import edu.kangwon.university.taxicarpool.party.PartyDTO.PartyResponseDTO;
+import edu.kangwon.university.taxicarpool.party.PartyDTO.PartyUpdateRequestDTO;
+import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/party")
@@ -17,8 +21,9 @@ public class PartyController {
         this.partyService = partyService;
     }
 
+    // 파티방 단일 조회
     @GetMapping("/{partyId}")
-    public ResponseEntity<PartyDTO> getParty(
+    public ResponseEntity<PartyResponseDTO> getParty(
         @PathVariable("partyId") Long partyId
     ) {
         return partyService.getParty(partyId)
@@ -26,24 +31,39 @@ public class PartyController {
             .orElse(ResponseEntity.notFound().build());
     }
 
+    // 파티방 전체 조회
     @GetMapping
-    public List<PartyDTO> getPartyList() {
-        return partyService.getPartyList();
+    public ResponseEntity<Page<PartyResponseDTO>> getPartyList(
+        @RequestParam(defaultValue = "0") int page,
+        @RequestParam(defaultValue = "10") int size
+    ) {
+        return ResponseEntity.ok(partyService.getPartyList(page, size));
     }
 
+    // 파티방 생성
     @PostMapping
-    public PartyDTO createParty() {
-        return partyService.createParty();
+    public ResponseEntity<PartyResponseDTO> createParty(
+        @RequestBody PartyCreateRequestDTO createRequestDTO
+    ) {
+        return ResponseEntity.ok(partyService.createParty(createRequestDTO));
     }
 
+    // 파티방 수정
     @PutMapping("/{partyId}")
-    public PartyDTO updateParty() {
-        return partyService.updateParty();
+    public ResponseEntity<PartyResponseDTO> updateParty(
+        @RequestBody PartyUpdateRequestDTO updateRequestDTO,
+        @PathVariable Long partyId
+    ) {
+        return ResponseEntity.ok(partyService.updateParty(partyId, updateRequestDTO));
     }
 
+    // 파티방 삭제
+    // ResponseEntity<Map<String, Object>>로 수정
     @DeleteMapping("/{partyId}")
-    public PartyDTO deleteParty() {
-        return partyService.deleteParty();
+    public ResponseEntity<Map<String, Object>> deleteParty(
+        @PathVariable Long partyId
+    ) {
+        return ResponseEntity.ok(partyService.deleteParty(partyId));
     }
 
 
