@@ -24,5 +24,10 @@ public class AuthController {
         return ResponseEntity.ok(response);
     }
 
-    // 추후 로그인, 토큰 재발급 등 인증 관련 기능 추가 가능구현해야함.
+    @PostMapping("/login")
+    public ResponseEntity<LoginDTO.LoginResponse> login(
+        @Validated @RequestBody LoginDTO.LoginRequest loginRequest) {
+        LoginDTO.LoginResponse response = authService.login(loginRequest);
+        return ResponseEntity.ok(response);
+    }
 }

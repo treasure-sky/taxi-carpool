@@ -11,14 +11,18 @@ public class AuthService {
 
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtUtil jwtUtil;
 
     @Autowired
     public AuthService(MemberRepository memberRepository,
-        PasswordEncoder passwordEncoder) {
+        PasswordEncoder passwordEncoder,
+        JwtUtil jwtUtil) {
         this.memberRepository = memberRepository;
         this.passwordEncoder = passwordEncoder;
+        this.jwtUtil = jwtUtil;
     }
 
+    // 회원가입
     public SignUpDTO.SignUpResponseDTO signUp(SignUpDTO.SignUpRequestDTO request) {
         // 이메일 중복 체크
         // 예외처리 대충 해놓음.
@@ -44,6 +48,25 @@ public class AuthService {
             savedMember.getNickname(),
             savedMember.getGender()
         );
+    }
+
+    // 로그인
+    public LoginDTO.LoginResponse login(LoginDTO.LoginRequest request) {
+        // 예외처리 일단 대충만 해놓음
+        MemberEntity member = memberRepository.findByEmail(request.getEmail())
+            .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 이메일입니다."));
+
+        if (!passwordEncoder.matches(request.getPassword(), member.getPassword())) {
+            throw new IllegalArgumentException("비밀번호가 올바르지 않습니다.");
+        }
+
+        // 회원가입 DB를 거쳐서 회원임이 검증된 이후.
+        // JWT 토큰 생성
+        String token = jwtUtil.generateToken(member.getEmail());
+
+        // 응답 DTO
+        // 일단 토큰이랑 이메일까지 리턴해주는 것으로 구현함.
+        return new LoginDTO.LoginResponse(token, member.getEmail());
     }
 
 }
