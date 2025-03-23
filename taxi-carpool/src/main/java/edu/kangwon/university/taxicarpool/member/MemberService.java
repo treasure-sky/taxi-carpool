@@ -45,8 +45,22 @@ public class MemberService {
         return responseDTO;
     }
 
-    public MemberResponseDTO updateMember(MemberUpdateDTO memberUpdateDTO) {
-        return null;
+    public MemberResponseDTO updateMember(Long memberId, MemberUpdateDTO updateDTO) {
+        MemberEntity existing = memberRepository.findById(memberId)
+            .orElseThrow(() -> new MemberNotFoundException("회원을 찾을 수 없습니다: " + memberId));
+
+        existing.setPassword(updateDTO.getNewPassword());
+        existing.setNickname(updateDTO.getNewNickname());
+
+        MemberEntity updated = memberRepository.save(existing);
+
+        MemberResponseDTO responseDTO = new MemberResponseDTO();
+        responseDTO.setId(updated.getId());
+        responseDTO.setEmail(updated.getEmail());
+        responseDTO.setNickname(updated.getNickname());
+        responseDTO.setGender(updated.getGender());
+
+        return responseDTO;
     }
 
     public MemberResponseDTO deleteMember(Long memberId) {
