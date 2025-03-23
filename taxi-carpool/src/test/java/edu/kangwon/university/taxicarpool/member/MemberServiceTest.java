@@ -11,6 +11,8 @@ import static org.mockito.Mockito.when;
 import edu.kangwon.university.taxicarpool.member.dto.MemberCreateDTO;
 import edu.kangwon.university.taxicarpool.member.dto.MemberResponseDTO;
 import edu.kangwon.university.taxicarpool.member.exception.DuplicatedEmailException;
+import edu.kangwon.university.taxicarpool.member.exception.MemberNotFoundException;
+import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -80,4 +82,42 @@ class MemberServiceTest {
         verify(memberRepository, never()).save(any(MemberEntity.class));
     }
 
+    @Test
+    void 멤버_조회_성공() {
+        // given
+        Long memberId = 1L;
+        MemberEntity entity = new MemberEntity();
+        entity.setId(memberId);
+        entity.setEmail("test@example.com");
+        entity.setNickname("testNickname");
+        entity.setGender(Gender.MALE);
+
+        when(memberRepository.findById(memberId)).thenReturn(Optional.of(entity));
+
+        // when
+        MemberResponseDTO response = memberService.getMember(memberId);
+
+        // then
+        assertThat(response).isNotNull();
+        assertThat(response.getId()).isEqualTo(memberId);
+        assertThat(response.getEmail()).isEqualTo("test@example.com");
+        assertThat(response.getNickname()).isEqualTo("testNickname");
+        assertThat(response.getGender()).isEqualTo(Gender.MALE);
+
+        verify(memberRepository, times(1)).findById(memberId);
+    }
+
+    @Test
+    void 존재하지_않는_멤버_조회시_에러() {
+        // given
+        Long memberId = 100L;
+        when(memberRepository.findById(memberId)).thenReturn(Optional.empty());
+
+        // when & then
+        assertThatThrownBy(() -> memberService.getMember(memberId))
+            .isInstanceOf(MemberNotFoundException.class)
+            .hasMessageContaining("회원을 찾을 수 없습니다");
+
+        verify(memberRepository, times(1)).findById(memberId);
+    }
 }

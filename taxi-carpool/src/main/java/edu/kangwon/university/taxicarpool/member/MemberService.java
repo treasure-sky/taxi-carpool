@@ -4,6 +4,7 @@ import edu.kangwon.university.taxicarpool.member.dto.MemberCreateDTO;
 import edu.kangwon.university.taxicarpool.member.dto.MemberResponseDTO;
 import edu.kangwon.university.taxicarpool.member.dto.MemberUpdateDTO;
 import edu.kangwon.university.taxicarpool.member.exception.DuplicatedEmailException;
+import edu.kangwon.university.taxicarpool.member.exception.MemberNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -53,6 +54,16 @@ public class MemberService {
     }
 
     public MemberResponseDTO getMember(Long memberId) {
-        return null;
+
+        MemberEntity entity = memberRepository.findById(memberId)
+            .orElseThrow(() -> new MemberNotFoundException("회원을 찾을 수 없습니다: " + memberId));
+
+        MemberResponseDTO responseDTO = new MemberResponseDTO();
+        responseDTO.setId(entity.getId());
+        responseDTO.setEmail(entity.getEmail());
+        responseDTO.setNickname(entity.getNickname());
+        responseDTO.setGender(entity.getGender());
+
+        return responseDTO;
     }
 }
