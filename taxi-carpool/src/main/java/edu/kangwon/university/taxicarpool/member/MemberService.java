@@ -6,16 +6,19 @@ import edu.kangwon.university.taxicarpool.member.dto.MemberUpdateDTO;
 import edu.kangwon.university.taxicarpool.member.exception.DuplicatedEmailException;
 import edu.kangwon.university.taxicarpool.member.exception.MemberNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
 public class MemberService {
 
     private final MemberRepository memberRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public MemberService(MemberRepository memberRepository) {
+    public MemberService(MemberRepository memberRepository, PasswordEncoder passwordEncoder) {
         this.memberRepository = memberRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public MemberResponseDTO createMember(MemberCreateDTO memberCreateDTO) {
@@ -28,9 +31,12 @@ public class MemberService {
         // MemberEntity 생성
         MemberEntity entity = new MemberEntity();
         entity.setEmail(memberCreateDTO.getEmail());
-        entity.setPassword(memberCreateDTO.getPassword());
         entity.setNickname(memberCreateDTO.getNickname());
         entity.setGender(memberCreateDTO.getGender());
+
+        // password 암호화
+        String encodedPassword = passwordEncoder.encode(memberCreateDTO.getPassword());
+        entity.setPassword(encodedPassword);
 
         // DB 저장
         MemberEntity saved = memberRepository.save(entity);
@@ -49,8 +55,10 @@ public class MemberService {
         MemberEntity existing = memberRepository.findById(memberId)
             .orElseThrow(() -> new MemberNotFoundException("회원을 찾을 수 없습니다: " + memberId));
 
-        existing.setPassword(updateDTO.getNewPassword());
         existing.setNickname(updateDTO.getNewNickname());
+
+        String encodedPassword = passwordEncoder.encode(updateDTO.getNewPassword());
+        existing.setPassword(encodedPassword);
 
         MemberEntity updated = memberRepository.save(existing);
 

@@ -19,9 +19,13 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 @ExtendWith(MockitoExtension.class)
 class MemberServiceTest {
+
+    @Mock
+    private PasswordEncoder passwordEncoder;
 
     @Mock
     private MemberRepository memberRepository;
@@ -38,15 +42,16 @@ class MemberServiceTest {
         dto.setNickname("testNickname");
         dto.setGender(Gender.MALE);
 
-        // 반환될 entity
+        when(passwordEncoder.encode("testPassword")).thenReturn("encodedPassword");
+        when(memberRepository.existsByEmail(dto.getEmail())).thenReturn(false);
+
         MemberEntity savedEntity = new MemberEntity();
         savedEntity.setId(1L);
         savedEntity.setEmail(dto.getEmail());
         savedEntity.setNickname(dto.getNickname());
-        savedEntity.setPassword(dto.getPassword());
+        savedEntity.setPassword("encodedPassword");
         savedEntity.setGender(dto.getGender());
 
-        when(memberRepository.existsByEmail(dto.getEmail())).thenReturn(false);
         when(memberRepository.save(any(MemberEntity.class))).thenReturn(savedEntity);
 
         // when
@@ -60,6 +65,7 @@ class MemberServiceTest {
         assertThat(response.getGender()).isEqualTo(Gender.MALE);
 
         verify(memberRepository, times(1)).existsByEmail(dto.getEmail());
+        verify(passwordEncoder, times(1)).encode("testPassword");
         verify(memberRepository, times(1)).save(any(MemberEntity.class));
     }
 
@@ -138,12 +144,13 @@ class MemberServiceTest {
         updateDto.setNewPassword("newPassword");
 
         when(memberRepository.findById(memberId)).thenReturn(Optional.of(existedEntity));
+        when(passwordEncoder.encode("newPassword")).thenReturn("encodedNewPassword");
 
         MemberEntity updatedEntity = new MemberEntity();
         updatedEntity.setId(memberId);
         updatedEntity.setEmail("test@example.com");
         updatedEntity.setNickname("newNickname");
-        updatedEntity.setPassword("newPassword");
+        updatedEntity.setPassword("encodedNewPassword");
         updatedEntity.setGender(Gender.MALE);
 
         when(memberRepository.save(any(MemberEntity.class))).thenReturn(updatedEntity);
@@ -158,6 +165,7 @@ class MemberServiceTest {
         assertThat(response.getEmail()).isEqualTo("test@example.com");
 
         verify(memberRepository, times(1)).findById(memberId);
+        verify(passwordEncoder, times(1)).encode("newPassword");
         verify(memberRepository, times(1)).save(any(MemberEntity.class));
     }
 
