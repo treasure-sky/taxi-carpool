@@ -34,7 +34,7 @@ public class AuthService {
             request.getGender()
         );
 
-        // DB 저장(일단 레포지토리에 직접 저장해놓았는데, 추후에 merger되면 memberService로 바꿔서 해도 괜찮을듯..?)
+        // DB 저장(일단 레포지토리에 직접 저장해놓았는데, 추후에 merge되면 memberService로 바꿔서 해도 괜찮을듯..?)
         MemberEntity savedMember = memberRepository.save(member);
 
         // 응답 DTO 만들기
