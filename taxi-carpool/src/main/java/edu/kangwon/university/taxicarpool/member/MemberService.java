@@ -64,7 +64,18 @@ public class MemberService {
     }
 
     public MemberResponseDTO deleteMember(Long memberId) {
-        return null;
+        MemberEntity entity = memberRepository.findById(memberId)
+            .orElseThrow(() -> new MemberNotFoundException("회원을 찾을 수 없습니다: " + memberId));
+
+        memberRepository.delete(entity);
+
+        MemberResponseDTO responseDTO = new MemberResponseDTO();
+        responseDTO.setId(entity.getId());
+        responseDTO.setEmail(entity.getEmail());
+        responseDTO.setNickname(entity.getNickname());
+        responseDTO.setGender(entity.getGender());
+
+        return responseDTO;
     }
 
     public MemberResponseDTO getMember(Long memberId) {

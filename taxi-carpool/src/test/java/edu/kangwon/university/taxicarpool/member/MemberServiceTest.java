@@ -179,4 +179,45 @@ class MemberServiceTest {
         verify(memberRepository, times(1)).findById(memberId);
         verify(memberRepository, never()).save(any(MemberEntity.class));
     }
+
+    @Test
+    void 멤버_삭제_성공() {
+        // given
+        Long memberId = 1L;
+        MemberEntity existedEntity = new MemberEntity();
+        existedEntity.setId(memberId);
+        existedEntity.setEmail("test@example.com");
+        existedEntity.setNickname("testNickname");
+        existedEntity.setPassword("testPassword");
+        existedEntity.setGender(Gender.MALE);
+
+        when(memberRepository.findById(memberId)).thenReturn(Optional.of(existedEntity));
+
+        // when
+        MemberResponseDTO response = memberService.deleteMember(memberId);
+
+        // then
+        assertThat(response).isNotNull();
+        assertThat(response.getId()).isEqualTo(memberId);
+        assertThat(response.getEmail()).isEqualTo("test@example.com");
+        assertThat(response.getNickname()).isEqualTo("testNickname");
+
+        verify(memberRepository, times(1)).findById(memberId);
+        verify(memberRepository, times(1)).delete(existedEntity);
+    }
+
+    @Test
+    void 존재하지_않는_멤버_삭제시_에러() {
+        // given
+        Long memberId = 100L;
+        when(memberRepository.findById(memberId)).thenReturn(Optional.empty());
+
+        // when & then
+        assertThatThrownBy(() -> memberService.deleteMember(memberId))
+            .isInstanceOf(MemberNotFoundException.class)
+            .hasMessageContaining("회원을 찾을 수 없습니다");
+
+        verify(memberRepository, times(1)).findById(memberId);
+        verify(memberRepository, never()).delete(any(MemberEntity.class));
+    }
 }
