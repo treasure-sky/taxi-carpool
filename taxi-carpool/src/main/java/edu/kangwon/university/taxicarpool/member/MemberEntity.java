@@ -34,6 +34,7 @@ public class MemberEntity {
     private String password;
 
     @NotNull
+    @Column(unique = true)
     private String nickname;
 
     @NotNull

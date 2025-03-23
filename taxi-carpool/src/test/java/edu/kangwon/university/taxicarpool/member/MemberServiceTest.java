@@ -12,6 +12,7 @@ import edu.kangwon.university.taxicarpool.member.dto.MemberCreateDTO;
 import edu.kangwon.university.taxicarpool.member.dto.MemberResponseDTO;
 import edu.kangwon.university.taxicarpool.member.dto.MemberUpdateDTO;
 import edu.kangwon.university.taxicarpool.member.exception.DuplicatedEmailException;
+import edu.kangwon.university.taxicarpool.member.exception.DuplicatedNicknameException;
 import edu.kangwon.university.taxicarpool.member.exception.MemberNotFoundException;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
@@ -86,6 +87,28 @@ class MemberServiceTest {
             .hasMessageContaining("이미 사용 중인 이메일");
 
         verify(memberRepository, times(1)).existsByEmail(dto.getEmail());
+        verify(memberRepository, never()).save(any(MemberEntity.class));
+    }
+
+    @Test
+    void 중복된_닉네임으로_멤버_생성시_에러() {
+        // given
+        MemberCreateDTO dto = new MemberCreateDTO();
+        dto.setEmail("test@example.com");
+        dto.setPassword("testPassword");
+        dto.setNickname("duplicateNickname");
+        dto.setGender(Gender.MALE);
+
+        when(memberRepository.existsByEmail(dto.getEmail())).thenReturn(false);
+        when(memberRepository.existsByNickname(dto.getNickname())).thenReturn(true);
+
+        // when & then
+        assertThatThrownBy(() -> memberService.createMember(dto))
+            .isInstanceOf(DuplicatedNicknameException.class)
+            .hasMessageContaining("이미 사용 중인 닉네임");
+
+        verify(memberRepository, times(1)).existsByEmail(dto.getEmail());
+        verify(memberRepository, times(1)).existsByNickname(dto.getNickname());
         verify(memberRepository, never()).save(any(MemberEntity.class));
     }
 
@@ -185,6 +208,38 @@ class MemberServiceTest {
             .hasMessageContaining("회원을 찾을 수 없습니다");
 
         verify(memberRepository, times(1)).findById(memberId);
+        verify(memberRepository, never()).save(any(MemberEntity.class));
+    }
+
+    @Test
+    void 존재하는_닉네임으로_변경시_에러() {
+        // given
+        Long memberId = 1L;
+        String oldNickname = "oldNickname";
+        String newNickname = "duplicateNickname";
+
+        // 이미 존재하는 회원
+        MemberEntity existedEntity = new MemberEntity();
+        existedEntity.setId(memberId);
+        existedEntity.setEmail("test@example.com");
+        existedEntity.setNickname(oldNickname);
+        existedEntity.setPassword("oldPassword");
+        existedEntity.setGender(Gender.MALE);
+
+        MemberUpdateDTO updateDto = new MemberUpdateDTO();
+        updateDto.setNewNickname(newNickname);
+        updateDto.setNewPassword("newPassword");
+
+        when(memberRepository.findById(memberId)).thenReturn(Optional.of(existedEntity));
+        when(memberRepository.existsByNickname(newNickname)).thenReturn(true);
+
+        // when & then
+        assertThatThrownBy(() -> memberService.updateMember(memberId, updateDto))
+            .isInstanceOf(DuplicatedNicknameException.class)
+            .hasMessageContaining("이미 사용 중인 닉네임");
+
+        verify(memberRepository, times(1)).findById(memberId);
+        verify(memberRepository, times(1)).existsByNickname(newNickname);
         verify(memberRepository, never()).save(any(MemberEntity.class));
     }
 

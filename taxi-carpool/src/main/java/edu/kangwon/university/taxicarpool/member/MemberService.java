@@ -4,6 +4,7 @@ import edu.kangwon.university.taxicarpool.member.dto.MemberCreateDTO;
 import edu.kangwon.university.taxicarpool.member.dto.MemberResponseDTO;
 import edu.kangwon.university.taxicarpool.member.dto.MemberUpdateDTO;
 import edu.kangwon.university.taxicarpool.member.exception.DuplicatedEmailException;
+import edu.kangwon.university.taxicarpool.member.exception.DuplicatedNicknameException;
 import edu.kangwon.university.taxicarpool.member.exception.MemberNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -26,6 +27,12 @@ public class MemberService {
         // 이미 이메일이 존재하면 예외 처리
         if (memberRepository.existsByEmail(memberCreateDTO.getEmail())) {
             throw new DuplicatedEmailException("이미 사용 중인 이메일입니다: " + memberCreateDTO.getEmail());
+        }
+
+        // 이미 닉네임이 존재하면 예외 처리
+        if (memberRepository.existsByNickname(memberCreateDTO.getNickname())) {
+            throw new DuplicatedNicknameException(
+                "이미 사용 중인 닉네임입니다: " + memberCreateDTO.getNickname());
         }
 
         // MemberEntity 생성
@@ -55,6 +62,11 @@ public class MemberService {
         MemberEntity existing = memberRepository.findById(memberId)
             .orElseThrow(() -> new MemberNotFoundException("회원을 찾을 수 없습니다: " + memberId));
 
+        // 기존 닉네임으로 변경시에는 예외처리하지 않음
+        if (!existing.getNickname().equals(updateDTO.getNewNickname())
+            && memberRepository.existsByNickname(updateDTO.getNewNickname())) {
+            throw new DuplicatedNicknameException("이미 사용 중인 닉네임입니다: " + updateDTO.getNewNickname());
+        }
         existing.setNickname(updateDTO.getNewNickname());
 
         String encodedPassword = passwordEncoder.encode(updateDTO.getNewPassword());
