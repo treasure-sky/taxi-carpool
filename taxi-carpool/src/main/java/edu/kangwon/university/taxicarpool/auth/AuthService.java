@@ -110,4 +110,21 @@ public class AuthService {
         return new LoginDTO.RefreshResponseDTO(newAccessToken, tokenEntity.getRefreshToken());
     }
 
+    public void logout(String email) {
+        // 1) 이메일로 Member 조회
+        MemberEntity member = memberRepository.findByEmail(email)
+            .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 이메일입니다."));
+
+        // 2) 리프레쉬 토큰 엔티티 조회
+        Optional<RefreshTokenEntity> optionalToken = refreshTokenRepository.findByMember(member);
+        if (optionalToken.isPresent()) {
+            RefreshTokenEntity tokenEntity = optionalToken.get();
+
+            // 만료시간을 현재 시각으로 세팅하여 무효화시키기 (걍 레포지토리에서 delete해도 되긴함)
+            tokenEntity.setExpiryDate(LocalDateTime.now());
+            refreshTokenRepository.save(tokenEntity);
+        }
+        // 토큰 엔티티가 없으면(로그인 안 했거나 이미 로그아웃 처리됨), 어케해야하지? 추가구현 필요하나..?
+    }
+
 }
