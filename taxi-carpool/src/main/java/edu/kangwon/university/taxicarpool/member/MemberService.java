@@ -58,21 +58,22 @@ public class MemberService {
         return responseDTO;
     }
 
+
     public MemberResponseDTO updateMember(Long memberId, MemberUpdateDTO updateDTO) {
-        MemberEntity existing = memberRepository.findById(memberId)
+        MemberEntity existedEntity = memberRepository.findById(memberId)
             .orElseThrow(() -> new MemberNotFoundException("회원을 찾을 수 없습니다: " + memberId));
 
         // 기존 닉네임으로 변경시에는 예외처리하지 않음
-        if (!existing.getNickname().equals(updateDTO.getNewNickname())
+        if (!existedEntity.getNickname().equals(updateDTO.getNewNickname())
             && memberRepository.existsByNickname(updateDTO.getNewNickname())) {
             throw new DuplicatedNicknameException("이미 사용 중인 닉네임입니다: " + updateDTO.getNewNickname());
         }
-        existing.setNickname(updateDTO.getNewNickname());
+        existedEntity.setNickname(updateDTO.getNewNickname());
 
         String encodedPassword = passwordEncoder.encode(updateDTO.getNewPassword());
-        existing.setPassword(encodedPassword);
+        existedEntity.setPassword(encodedPassword);
 
-        MemberEntity updated = memberRepository.save(existing);
+        MemberEntity updated = memberRepository.save(existedEntity);
 
         MemberResponseDTO responseDTO = new MemberResponseDTO();
         responseDTO.setId(updated.getId());
