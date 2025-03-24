@@ -2,6 +2,8 @@ package edu.kangwon.university.taxicarpool.auth;
 
 import edu.kangwon.university.taxicarpool.member.MemberEntity;
 import edu.kangwon.university.taxicarpool.member.MemberRepository;
+import java.time.LocalDateTime;
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -12,14 +14,17 @@ public class AuthService {
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
+    private final RefreshTokenRepository refreshTokenRepository; // 추가
 
     @Autowired
     public AuthService(MemberRepository memberRepository,
         PasswordEncoder passwordEncoder,
-        JwtUtil jwtUtil) {
+        JwtUtil jwtUtil,
+        RefreshTokenRepository refreshTokenRepository) {
         this.memberRepository = memberRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtUtil = jwtUtil;
+        this.refreshTokenRepository = refreshTokenRepository;
     }
 
     // 회원가입
@@ -61,12 +66,48 @@ public class AuthService {
         }
 
         // 회원가입 DB를 거쳐서 회원임이 검증된 이후.
-        // JWT 토큰 생성
-        String token = jwtUtil.generateToken(member.getEmail());
+        // 엑세스 토큰, 리프래쉬 토큰 생성
+        String accessToken = jwtUtil.generateAccessToken(member.getEmail());
+        String refreshToken = jwtUtil.generateRefreshToken(member.getEmail());
+
+        // 리프래쉬 토큰 만료 시점 (1주) generateRefreshToken()에서 생성한 거 말고
+        // 이중으로 하나 더 넣어둔 것임.(로그아웃 로직도 관리해야돼서)
+        LocalDateTime refreshExpiry = LocalDateTime.now().plusDays(7);
+
+        // DB에 리프래쉬 토큰 저장(이미 있으면 업데이트)
+        Optional<RefreshTokenEntity> optionalToken = refreshTokenRepository.findByMember(member);
+        if (optionalToken.isPresent()) {
+            RefreshTokenEntity tokenEntity = optionalToken.get();
+            tokenEntity.updateRefreshToken(refreshToken, refreshExpiry);
+            refreshTokenRepository.save(tokenEntity);
+        } else {
+            RefreshTokenEntity newToken = new RefreshTokenEntity(member, refreshToken, refreshExpiry);
+            refreshTokenRepository.save(newToken);
+        }
 
         // 응답 DTO
-        // 일단 토큰이랑 이메일까지 리턴해주는 것으로 구현함.
-        return new LoginDTO.LoginResponse(token, member.getEmail());
+        // 일단 액세스 토큰, 리프래쉬 토큰, 이메일 리턴
+        return new LoginDTO.LoginResponse(accessToken, refreshToken, member.getEmail());
+    }
+
+    // 리프래쉬 토큰으로 액세스 토큰 재발급
+    public LoginDTO.RefreshResponseDTO refresh(LoginDTO.RefreshRequestDTO request) {
+        // DB에서 리프래쉬 토큰 조회
+        RefreshTokenEntity tokenEntity = refreshTokenRepository.findByRefreshToken(request.getRefreshToken())
+            .orElseThrow(() -> new IllegalArgumentException("유효하지 않은 리프래쉬 토큰입니다."));
+
+        // 리프래쉬 토큰이 만료됐는지 확인
+        // 리프래쉬도 만료되면 재로그인 요청해야함.
+        if (tokenEntity.getExpiryDate().isBefore(LocalDateTime.now())) {
+            throw new IllegalArgumentException("리프래쉬 토큰이 만료되었습니다. 다시 로그인해주세요.");
+        }
+
+        // 새 액세스 토큰 발급
+        String email = tokenEntity.getMember().getEmail();
+        String newAccessToken = jwtUtil.generateAccessToken(email);
+
+        // 응답 DTO
+        return new LoginDTO.RefreshResponseDTO(newAccessToken, tokenEntity.getRefreshToken());
     }
 
 }
