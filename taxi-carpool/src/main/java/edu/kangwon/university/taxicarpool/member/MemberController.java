@@ -3,6 +3,7 @@ package edu.kangwon.university.taxicarpool.member;
 import edu.kangwon.university.taxicarpool.member.dto.MemberCreateDTO;
 import edu.kangwon.university.taxicarpool.member.dto.MemberResponseDTO;
 import edu.kangwon.university.taxicarpool.member.dto.MemberUpdateDTO;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,7 +25,8 @@ public class MemberController {
     }
 
     @PostMapping
-    public ResponseEntity<MemberResponseDTO> createMember(@RequestBody MemberCreateDTO createDTO) {
+    public ResponseEntity<MemberResponseDTO> createMember(
+        @RequestBody @Valid MemberCreateDTO createDTO) {
         MemberResponseDTO created = memberService.createMember(createDTO);
         return ResponseEntity.ok(created);
     }
@@ -38,7 +40,7 @@ public class MemberController {
     @PutMapping("/{memberId}")
     public ResponseEntity<MemberResponseDTO> updateMember(
         @PathVariable Long memberId,
-        @RequestBody MemberUpdateDTO updateDTO
+        @RequestBody @Valid MemberUpdateDTO updateDTO
     ) {
         MemberResponseDTO updated = memberService.updateMember(memberId, updateDTO);
         return ResponseEntity.ok(updated);
