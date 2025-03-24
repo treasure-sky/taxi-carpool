@@ -30,4 +30,10 @@ public class AuthController {
         LoginDTO.LoginResponse response = authService.login(loginRequest);
         return ResponseEntity.ok(response);
     }
+
+    @PostMapping("/refresh")
+    public ResponseEntity<LoginDTO.RefreshResponseDTO> refresh(@RequestBody LoginDTO.RefreshRequestDTO request) {
+        LoginDTO.RefreshResponseDTO response = authService.refresh(request);
+        return ResponseEntity.ok(response);
+    }
 }
