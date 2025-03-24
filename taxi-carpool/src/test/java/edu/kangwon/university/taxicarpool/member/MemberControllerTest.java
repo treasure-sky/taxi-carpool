@@ -45,8 +45,8 @@ class MemberControllerTest {
     void 멤버_생성_성공() throws Exception {
         // given
         MemberCreateDTO createDTO = new MemberCreateDTO();
-        createDTO.setEmail("test@example.com");
-        createDTO.setPassword("testPassword");
+        createDTO.setEmail("test@kangwon.ac.kr");
+        createDTO.setPassword("testPassword12");
         createDTO.setNickname("testNickname");
         createDTO.setGender(Gender.MALE);
 
@@ -69,7 +69,7 @@ class MemberControllerTest {
             )
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.id").value(1L))
-            .andExpect(jsonPath("$.email").value("test@example.com"))
+            .andExpect(jsonPath("$.email").value("test@kangwon.ac.kr"))
             .andExpect(jsonPath("$.nickname").value("testNickname"))
             .andExpect(jsonPath("$.gender").value("MALE"));
 
@@ -80,8 +80,8 @@ class MemberControllerTest {
     void 중복된_이메일로_멤버_생성시_예외처리() throws Exception {
         // given
         MemberCreateDTO createDTO = new MemberCreateDTO();
-        createDTO.setEmail("duplicate@example.com");
-        createDTO.setPassword("testPassword");
+        createDTO.setEmail("duplicate@kangwon.ac.kr");
+        createDTO.setPassword("testPassword12");
         createDTO.setNickname("testNickname");
         createDTO.setGender(Gender.MALE);
 
@@ -103,8 +103,8 @@ class MemberControllerTest {
     void 중복된_닉네임으로_멤버_생성시_예외처리() throws Exception {
         // given
         MemberCreateDTO createDTO = new MemberCreateDTO();
-        createDTO.setEmail("test@example.com");
-        createDTO.setPassword("testPassword");
+        createDTO.setEmail("test@kangwon.ac.kr");
+        createDTO.setPassword("testPassword12");
         createDTO.setNickname("duplicatedNickname");
         createDTO.setGender(Gender.MALE);
 
@@ -131,7 +131,7 @@ class MemberControllerTest {
 
         MemberResponseDTO responseDTO = new MemberResponseDTO();
         responseDTO.setId(memberId);
-        responseDTO.setEmail("test@example.com");
+        responseDTO.setEmail("test@kangwon.ac.kr");
         responseDTO.setNickname("testNickname");
         responseDTO.setGender(Gender.MALE);
 
@@ -141,7 +141,7 @@ class MemberControllerTest {
         mockMvc.perform(get("/api/member/{id}", memberId))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.id").value(memberId))
-            .andExpect(jsonPath("$.email").value("test@example.com"))
+            .andExpect(jsonPath("$.email").value("test@kangwon.ac.kr"))
             .andExpect(jsonPath("$.nickname").value("testNickname"))
             .andExpect(jsonPath("$.gender").value("MALE"));
 
@@ -168,11 +168,11 @@ class MemberControllerTest {
         Long memberId = 1L;
         MemberUpdateDTO updateDTO = new MemberUpdateDTO();
         updateDTO.setNewNickname("newNickname");
-        updateDTO.setNewPassword("newPassword");
+        updateDTO.setNewPassword("newPassword12");
 
         MemberResponseDTO responseDTO = new MemberResponseDTO();
         responseDTO.setId(memberId);
-        responseDTO.setEmail("test@example.com");
+        responseDTO.setEmail("test@kangwon.ac.kr");
         responseDTO.setNickname("newNickname");
         responseDTO.setGender(Gender.MALE);
 
@@ -190,7 +190,7 @@ class MemberControllerTest {
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.id").value(memberId))
             .andExpect(jsonPath("$.nickname").value("newNickname"))
-            .andExpect(jsonPath("$.email").value("test@example.com"))
+            .andExpect(jsonPath("$.email").value("test@kangwon.ac.kr"))
             .andExpect(jsonPath("$.gender").value("MALE"));
 
         verify(memberService, times(1)).updateMember(eq(memberId), any(MemberUpdateDTO.class));
@@ -203,7 +203,7 @@ class MemberControllerTest {
         Long memberId = 100L;
         MemberUpdateDTO updateDTO = new MemberUpdateDTO();
         updateDTO.setNewNickname("newNickname");
-        updateDTO.setNewPassword("newPassword");
+        updateDTO.setNewPassword("newPassword12");
 
         when(memberService.updateMember(eq(memberId), any(MemberUpdateDTO.class)))
             .thenThrow(new MemberNotFoundException("회원을 찾을 수 없습니다"));
@@ -227,7 +227,7 @@ class MemberControllerTest {
         Long memberId = 1L;
         MemberResponseDTO responseDTO = new MemberResponseDTO();
         responseDTO.setId(memberId);
-        responseDTO.setEmail("test@example.com");
+        responseDTO.setEmail("test@kangwon.ac.kr");
         responseDTO.setNickname("testNickname");
         responseDTO.setGender(Gender.MALE);
 
@@ -238,7 +238,7 @@ class MemberControllerTest {
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.id").value(memberId))
             .andExpect(jsonPath("$.nickname").value("testNickname"))
-            .andExpect(jsonPath("$.email").value("test@example.com"))
+            .andExpect(jsonPath("$.email").value("test@kangwon.ac.kr"))
             .andExpect(jsonPath("$.gender").value("MALE"));
 
         verify(memberService, times(1)).deleteMember(memberId);

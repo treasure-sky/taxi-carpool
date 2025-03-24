@@ -38,19 +38,19 @@ class MemberServiceTest {
     void 멤버_생성_성공() {
         // given
         MemberCreateDTO dto = new MemberCreateDTO();
-        dto.setEmail("test@example.com");
-        dto.setPassword("testPassword");
+        dto.setEmail("test@kangwon.ac.kr");
+        dto.setPassword("testPassword12");
         dto.setNickname("testNickname");
         dto.setGender(Gender.MALE);
 
-        when(passwordEncoder.encode("testPassword")).thenReturn("encodedPassword");
+        when(passwordEncoder.encode("testPassword12")).thenReturn("encodedPassword12");
         when(memberRepository.existsByEmail(dto.getEmail())).thenReturn(false);
 
         MemberEntity savedEntity = new MemberEntity();
         savedEntity.setId(1L);
         savedEntity.setEmail(dto.getEmail());
         savedEntity.setNickname(dto.getNickname());
-        savedEntity.setPassword("encodedPassword");
+        savedEntity.setPassword("encodedPassword12");
         savedEntity.setGender(dto.getGender());
 
         when(memberRepository.save(any(MemberEntity.class))).thenReturn(savedEntity);
@@ -61,12 +61,12 @@ class MemberServiceTest {
         // then
         assertThat(response).isNotNull();
         assertThat(response.getId()).isEqualTo(1L);
-        assertThat(response.getEmail()).isEqualTo("test@example.com");
+        assertThat(response.getEmail()).isEqualTo("test@kangwon.ac.kr");
         assertThat(response.getNickname()).isEqualTo("testNickname");
         assertThat(response.getGender()).isEqualTo(Gender.MALE);
 
         verify(memberRepository, times(1)).existsByEmail(dto.getEmail());
-        verify(passwordEncoder, times(1)).encode("testPassword");
+        verify(passwordEncoder, times(1)).encode("testPassword12");
         verify(memberRepository, times(1)).save(any(MemberEntity.class));
     }
 
@@ -74,8 +74,8 @@ class MemberServiceTest {
     void 중복된_이메일로_멤버_생성시_예외처리() {
         // given
         MemberCreateDTO dto = new MemberCreateDTO();
-        dto.setEmail("test@example.com");
-        dto.setPassword("testPassword");
+        dto.setEmail("test@kangwon.ac.kr");
+        dto.setPassword("testPassword12");
         dto.setNickname("testNickname");
         dto.setGender(Gender.MALE);
 
@@ -94,8 +94,8 @@ class MemberServiceTest {
     void 중복된_닉네임으로_멤버_생성시_예외처리() {
         // given
         MemberCreateDTO dto = new MemberCreateDTO();
-        dto.setEmail("test@example.com");
-        dto.setPassword("testPassword");
+        dto.setEmail("test@kangwon.ac.kr");
+        dto.setPassword("testPassword12");
         dto.setNickname("duplicateNickname");
         dto.setGender(Gender.MALE);
 
@@ -118,7 +118,7 @@ class MemberServiceTest {
         Long memberId = 1L;
         MemberEntity entity = new MemberEntity();
         entity.setId(memberId);
-        entity.setEmail("test@example.com");
+        entity.setEmail("test@kangwon.ac.kr");
         entity.setNickname("testNickname");
         entity.setGender(Gender.MALE);
 
@@ -130,7 +130,7 @@ class MemberServiceTest {
         // then
         assertThat(response).isNotNull();
         assertThat(response.getId()).isEqualTo(memberId);
-        assertThat(response.getEmail()).isEqualTo("test@example.com");
+        assertThat(response.getEmail()).isEqualTo("test@kangwon.ac.kr");
         assertThat(response.getNickname()).isEqualTo("testNickname");
         assertThat(response.getGender()).isEqualTo(Gender.MALE);
 
@@ -157,23 +157,23 @@ class MemberServiceTest {
         Long memberId = 1L;
         MemberEntity existedEntity = new MemberEntity();
         existedEntity.setId(memberId);
-        existedEntity.setEmail("test@example.com");
+        existedEntity.setEmail("test@kangwon.ac.kr");
         existedEntity.setNickname("oldNickname");
-        existedEntity.setPassword("oldPassword");
+        existedEntity.setPassword("oldPassword12");
         existedEntity.setGender(Gender.MALE);
 
         MemberUpdateDTO updateDto = new MemberUpdateDTO();
         updateDto.setNewNickname("newNickname");
-        updateDto.setNewPassword("newPassword");
+        updateDto.setNewPassword("newPassword12");
 
         when(memberRepository.findById(memberId)).thenReturn(Optional.of(existedEntity));
-        when(passwordEncoder.encode("newPassword")).thenReturn("encodedNewPassword");
+        when(passwordEncoder.encode("newPassword12")).thenReturn("encodedNewPassword12");
 
         MemberEntity updatedEntity = new MemberEntity();
         updatedEntity.setId(memberId);
-        updatedEntity.setEmail("test@example.com");
+        updatedEntity.setEmail("test@kangwon.ac.kr");
         updatedEntity.setNickname("newNickname");
-        updatedEntity.setPassword("encodedNewPassword");
+        updatedEntity.setPassword("encodedNewPassword12");
         updatedEntity.setGender(Gender.MALE);
 
         when(memberRepository.save(any(MemberEntity.class))).thenReturn(updatedEntity);
@@ -185,10 +185,10 @@ class MemberServiceTest {
         assertThat(response).isNotNull();
         assertThat(response.getId()).isEqualTo(memberId);
         assertThat(response.getNickname()).isEqualTo("newNickname");
-        assertThat(response.getEmail()).isEqualTo("test@example.com");
+        assertThat(response.getEmail()).isEqualTo("test@kangwon.ac.kr");
 
         verify(memberRepository, times(1)).findById(memberId);
-        verify(passwordEncoder, times(1)).encode("newPassword");
+        verify(passwordEncoder, times(1)).encode("newPassword12");
         verify(memberRepository, times(1)).save(any(MemberEntity.class));
     }
 
@@ -198,7 +198,7 @@ class MemberServiceTest {
         Long memberId = 100L;
         MemberUpdateDTO updateDto = new MemberUpdateDTO();
         updateDto.setNewNickname("newNickname");
-        updateDto.setNewPassword("newPassword");
+        updateDto.setNewPassword("newPassword12");
 
         when(memberRepository.findById(memberId)).thenReturn(Optional.empty());
 
@@ -221,14 +221,14 @@ class MemberServiceTest {
         // 이미 존재하는 회원
         MemberEntity existedEntity = new MemberEntity();
         existedEntity.setId(memberId);
-        existedEntity.setEmail("test@example.com");
+        existedEntity.setEmail("test@kangwon.ac.kr");
         existedEntity.setNickname(oldNickname);
-        existedEntity.setPassword("oldPassword");
+        existedEntity.setPassword("oldPassword12");
         existedEntity.setGender(Gender.MALE);
 
         MemberUpdateDTO updateDto = new MemberUpdateDTO();
         updateDto.setNewNickname(newNickname);
-        updateDto.setNewPassword("newPassword");
+        updateDto.setNewPassword("newPassword12");
 
         when(memberRepository.findById(memberId)).thenReturn(Optional.of(existedEntity));
         when(memberRepository.existsByNickname(newNickname)).thenReturn(true);
@@ -249,9 +249,9 @@ class MemberServiceTest {
         Long memberId = 1L;
         MemberEntity existedEntity = new MemberEntity();
         existedEntity.setId(memberId);
-        existedEntity.setEmail("test@example.com");
+        existedEntity.setEmail("test@kangwon.ac.kr");
         existedEntity.setNickname("testNickname");
-        existedEntity.setPassword("testPassword");
+        existedEntity.setPassword("testPassword12");
         existedEntity.setGender(Gender.MALE);
 
         when(memberRepository.findById(memberId)).thenReturn(Optional.of(existedEntity));
@@ -262,7 +262,7 @@ class MemberServiceTest {
         // then
         assertThat(response).isNotNull();
         assertThat(response.getId()).isEqualTo(memberId);
-        assertThat(response.getEmail()).isEqualTo("test@example.com");
+        assertThat(response.getEmail()).isEqualTo("test@kangwon.ac.kr");
         assertThat(response.getNickname()).isEqualTo("testNickname");
 
         verify(memberRepository, times(1)).findById(memberId);
