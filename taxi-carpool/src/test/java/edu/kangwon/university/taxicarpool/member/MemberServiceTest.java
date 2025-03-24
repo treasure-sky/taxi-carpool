@@ -71,7 +71,7 @@ class MemberServiceTest {
     }
 
     @Test
-    void 중복된_이메일로_멤버_생성시_에러() {
+    void 중복된_이메일로_멤버_생성시_예외처리() {
         // given
         MemberCreateDTO dto = new MemberCreateDTO();
         dto.setEmail("test@example.com");
@@ -91,7 +91,7 @@ class MemberServiceTest {
     }
 
     @Test
-    void 중복된_닉네임으로_멤버_생성시_에러() {
+    void 중복된_닉네임으로_멤버_생성시_예외처리() {
         // given
         MemberCreateDTO dto = new MemberCreateDTO();
         dto.setEmail("test@example.com");
@@ -138,7 +138,7 @@ class MemberServiceTest {
     }
 
     @Test
-    void 존재하지_않는_멤버_조회시_에러() {
+    void 존재하지_않는_멤버_조회시_예외처리() {
         // given
         Long memberId = 100L;
         when(memberRepository.findById(memberId)).thenReturn(Optional.empty());
@@ -193,7 +193,7 @@ class MemberServiceTest {
     }
 
     @Test
-    void 존재하지_않는_멤버_수정시_에러() {
+    void 존재하지_않는_멤버_수정시_예외처리() {
         // given
         Long memberId = 100L;
         MemberUpdateDTO updateDto = new MemberUpdateDTO();
@@ -212,7 +212,7 @@ class MemberServiceTest {
     }
 
     @Test
-    void 존재하는_닉네임으로_변경시_에러() {
+    void 존재하는_닉네임으로_변경시_예외처리() {
         // given
         Long memberId = 1L;
         String oldNickname = "oldNickname";
@@ -270,7 +270,7 @@ class MemberServiceTest {
     }
 
     @Test
-    void 존재하지_않는_멤버_삭제시_에러() {
+    void 존재하지_않는_멤버_삭제시_예외처리() {
         // given
         Long memberId = 100L;
         when(memberRepository.findById(memberId)).thenReturn(Optional.empty());
