@@ -44,7 +44,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     // 참고로 인수는 다음과 같다.
                     // Principal(사용자 식별 정보, 여기서는 email), Credentials(비밀번호 등 인증 수단, 여기서는 null), Authorities(권한 목록, 여기서는 null 혹은 빈 컬렉션)
 
-                    // 5) SecurityContextHolder에 등록(그래야 한 번의 request동안 계속 인증하지 않아도 댐)
+                    // 5) SecurityContextHolder에 등록(그래야 한 번의 request에서 필요한 사용자 정보를 공유하여 꺼내쓸 수 있음.)
                     SecurityContextHolder.getContext().setAuthentication(authentication);
                 }
             } catch (TokenExpiredException e) {
