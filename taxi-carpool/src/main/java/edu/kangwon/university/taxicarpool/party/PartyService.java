@@ -73,8 +73,7 @@ public class PartyService {
             MemberEntity member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new NoSuchElementException("해당 멤버가 존재하지 않습니다."));
             partyEntity.getMemberEntities().add(member);
-        }
-        else {
+        } else {
             throw new RuntimeException("memberId가 null임.");
         }
 
@@ -83,12 +82,13 @@ public class PartyService {
     }
 
     @Transactional
-    public PartyResponseDTO updateParty(Long partyId, Long memberId, PartyUpdateRequestDTO updateRequestDTO) {
+    public PartyResponseDTO updateParty(Long partyId, Long memberId,
+        PartyUpdateRequestDTO updateRequestDTO) {
         //  예외처리 일단 대충만 해놓음
         PartyEntity existingPartyEntity = partyRepository.findById(partyId)
             .orElseThrow(() -> new NoSuchElementException("해당 파티가 존재하지 않습니다."));
 
-        if (existingPartyEntity.getHostMemberId() != memberId) {
+        if (!existingPartyEntity.getHostMemberId().equals(memberId)) {
             throw new RuntimeException("호스트만 수정할 수 있습니다.");
         }
 
@@ -104,8 +104,8 @@ public class PartyService {
         // 예외처리 일단 대충만 해놓음
         PartyEntity partyEntity = partyRepository.findById(partyId)
             .orElseThrow(() -> new NoSuchElementException("해당 파티가 존재하지 않습니다."));
-        if(partyEntity.getHostMemberId() != memberId) {
-            throw new RuntimeException("호스트만 삭제 할 수 있습니다.");
+        if (!partyEntity.getHostMemberId().equals(memberId)) {
+            throw new RuntimeException("호스트만 삭제할 수 있습니다.");
         }
 
         partyEntity.setDeleted(true);
