@@ -86,23 +86,28 @@ public class PartyDTO {
         private List<MemberEntity> memberEntities = new ArrayList<>();
         private Long hostMemberId;
         private LocalDateTime endDate;
+        private Long memberId;
 
-        public PartyCreateRequestDTO(Long id, String name, boolean isDeleted,
+        public PartyCreateRequestDTO(Long id,
+            String name,
+            boolean isDeleted,
             List<MemberEntity> memberEntities,
             Long hostMemberId,
-            LocalDateTime endDate) {
+            LocalDateTime endDate,
+            Long memberId
+        ) {
             this.id = id;
             this.name = name;
             this.isDeleted = isDeleted;
             this.memberEntities = memberEntities;
             this.hostMemberId = hostMemberId;
             this.endDate = endDate;
+            this.memberId = memberId;
         }
 
         public Long getId() {
             return id;
         }
-
         public void setId(Long id) {
             this.id = id;
         }
@@ -110,7 +115,6 @@ public class PartyDTO {
         public String getName() {
             return name;
         }
-
         public void setName(String name) {
             this.name = name;
         }
@@ -118,7 +122,6 @@ public class PartyDTO {
         public boolean isDeleted() {
             return isDeleted;
         }
-
         public void setDeleted(boolean deleted) {
             isDeleted = deleted;
         }
@@ -126,7 +129,6 @@ public class PartyDTO {
         public List<MemberEntity> getMemberEntities() {
             return memberEntities;
         }
-
         public void setMemberEntities(List<MemberEntity> memberEntities) {
             this.memberEntities = memberEntities;
         }
@@ -134,7 +136,6 @@ public class PartyDTO {
         public Long getHostMemberId() {
             return hostMemberId;
         }
-
         public void setHostMemberId(Long hostMemberId) {
             this.hostMemberId = hostMemberId;
         }
@@ -142,9 +143,15 @@ public class PartyDTO {
         public LocalDateTime getEndDate() {
             return endDate;
         }
-
         public void setEndDate(LocalDateTime endDate) {
             this.endDate = endDate;
+        }
+
+        public Long getMemberId() {
+            return memberId;
+        }
+        public void setMemberId(Long memberId) {
+            this.memberId = memberId;
         }
     }
 
