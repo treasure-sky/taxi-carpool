@@ -43,7 +43,13 @@ public class PartyEntity {
     @Column(name = "is_deleted")
     private boolean isDeleted;
 
-    @OneToMany(mappedBy = "partyEntity", cascade = CascadeType.ALL, orphanRemoval = true)
+    // 다대일 -> 다대다로 변경
+    @ManyToMany
+    @JoinTable(
+        name = "party_member",
+        joinColumns = @JoinColumn(name = "party_id"),
+        inverseJoinColumns = @JoinColumn(name = "member_id")
+    )
     private List<MemberEntity> memberEntities = new ArrayList<>();
 
     @Column(name = "host_id")
@@ -84,6 +90,10 @@ public class PartyEntity {
         return hostMemberId;
     }
 
+    public void setHostMemberId(Long hostMemberId) {
+        this.hostMemberId = hostMemberId;
+    }
+
     public LocalDateTime getCreatedAt() {
         return createdAt;
     }
@@ -112,5 +122,9 @@ public class PartyEntity {
 
     public boolean isActive() {
         return !isDeleted;
+    }
+
+    public void setDeleted(boolean deleted) {
+        isDeleted = deleted;
     }
 }
