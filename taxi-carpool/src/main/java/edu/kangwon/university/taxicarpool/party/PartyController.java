@@ -48,17 +48,38 @@ public class PartyController {
     @PutMapping("/{partyId}")
     public ResponseEntity<PartyResponseDTO> updateParty(
         @RequestBody PartyUpdateRequestDTO updateRequestDTO,
+        @RequestParam Long memberId,
         @PathVariable Long partyId
     ) {
-        return ResponseEntity.ok(partyService.updateParty(partyId, updateRequestDTO));
+        return ResponseEntity.ok(partyService.updateParty(partyId, memberId, updateRequestDTO));
     }
 
-    // ResponseEntity<Map<String, Object>>로 수정
     @DeleteMapping("/{partyId}")
     public ResponseEntity<Map<String, Object>> deleteParty(
-        @PathVariable Long partyId
+        @PathVariable Long partyId,
+        @RequestParam Long memberId
     ) {
-        return ResponseEntity.ok(partyService.deleteParty(partyId));
+        return ResponseEntity.ok(partyService.deleteParty(partyId, memberId));
+    }
+
+    // 파티방에 멤버 추가하는 엔트포인트
+    @PostMapping("/{partyId}/join")
+    public ResponseEntity<PartyResponseDTO> joinParty(
+        @PathVariable Long partyId,
+        @RequestParam Long memberId
+    ) {
+        PartyResponseDTO result = partyService.joinParty(partyId, memberId);
+        return ResponseEntity.ok(result);
+    }
+
+    // 파티방에서 멤버가 퇴장할 때 엔드포인트
+    @PostMapping("/{partyId}/leave")
+    public ResponseEntity<PartyResponseDTO> leaveParty(
+        @PathVariable Long partyId,
+        @RequestParam Long memberId
+    ) {
+        PartyResponseDTO result = partyService.leaveParty(partyId, memberId);
+        return ResponseEntity.ok(result);
     }
 
 
