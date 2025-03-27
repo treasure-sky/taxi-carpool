@@ -61,10 +61,10 @@ public class PartyService {
 
     @Transactional
     public PartyResponseDTO createParty(PartyCreateRequestDTO createRequestDTO) {
-        // validation으로 바꿀거임.
-        if (createRequestDTO.getName() == null || createRequestDTO.getName().isEmpty()) {
-            throw new IllegalArgumentException("파티 이름은 필수 입력 항목입니다.");
-        }
+        // validation적용할 예정이라 필요없는 예외처리.
+//        if (createRequestDTO.getName() == null || createRequestDTO.getName().isEmpty()) {
+//            throw new IllegalArgumentException("파티 이름은 필수 입력 항목입니다.");
+//        }
 
         PartyEntity partyEntity = partyMapper.convertToEntity(createRequestDTO);
 
