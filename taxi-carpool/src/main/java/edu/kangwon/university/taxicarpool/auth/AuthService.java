@@ -1,5 +1,7 @@
 package edu.kangwon.university.taxicarpool.auth;
 
+import edu.kangwon.university.taxicarpool.auth.authException.AuthenticationFailedException;
+import edu.kangwon.university.taxicarpool.auth.authException.TokenInvalidException;
 import edu.kangwon.university.taxicarpool.member.MemberEntity;
 import edu.kangwon.university.taxicarpool.member.MemberRepository;
 import java.time.LocalDateTime;
@@ -14,7 +16,7 @@ public class AuthService {
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
-    private final RefreshTokenRepository refreshTokenRepository; // 추가
+    private final RefreshTokenRepository refreshTokenRepository;
 
     @Autowired
     public AuthService(MemberRepository memberRepository,
@@ -32,7 +34,7 @@ public class AuthService {
         // 이메일 중복 체크
         // 예외처리 대충 해놓음.
         if (memberRepository.findByEmail(request.getEmail()).isPresent()) {
-            throw new IllegalArgumentException("이미 사용 중인 이메일입니다.");
+            throw new AuthenticationFailedException("이미 사용 중인 이메일입니다.");
         }
 
         // 비밀번호 암호화 -> 엔티티 만들기(encode()가 PasswordEncoder에서 제공하는 암호화 메서드임.(구현체를 override말고, config에 구현해서 사용해야함))
@@ -57,12 +59,11 @@ public class AuthService {
 
     // 로그인
     public LoginDTO.LoginResponse login(LoginDTO.LoginRequest request) {
-        // 예외처리 일단 대충만 해놓음
         MemberEntity member = memberRepository.findByEmail(request.getEmail())
-            .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 이메일입니다."));
+            .orElseThrow(() -> new AuthenticationFailedException("존재하지 않는 이메일입니다."));
 
         if (!passwordEncoder.matches(request.getPassword(), member.getPassword())) {
-            throw new IllegalArgumentException("비밀번호가 올바르지 않습니다.");
+            throw new AuthenticationFailedException("비밀번호가 올바르지 않습니다.");
         }
 
         // 회원가입 DB를 거쳐서 회원임이 검증된 이후.
@@ -94,12 +95,12 @@ public class AuthService {
     public LoginDTO.RefreshResponseDTO refresh(LoginDTO.RefreshRequestDTO request) {
         // DB에서 리프래쉬 토큰 조회
         RefreshTokenEntity tokenEntity = refreshTokenRepository.findByRefreshToken(request.getRefreshToken())
-            .orElseThrow(() -> new IllegalArgumentException("유효하지 않은 리프래쉬 토큰입니다."));
+            .orElseThrow(() -> new TokenInvalidException("유효하지 않은 리프래쉬 토큰입니다."));
 
         // 리프래쉬 토큰이 만료됐는지 확인
         // 리프래쉬도 만료되면 재로그인 요청해야함.
         if (tokenEntity.getExpiryDate().isBefore(LocalDateTime.now())) {
-            throw new IllegalArgumentException("리프래쉬 토큰이 만료되었습니다. 다시 로그인해주세요.");
+            throw new TokenInvalidException("리프래쉬 토큰이 만료되었습니다. 다시 로그인해주세요.");
         }
 
         // 새 액세스 토큰 발급
@@ -113,7 +114,7 @@ public class AuthService {
     public void logout(String email) {
         // 1) 이메일로 Member 조회
         MemberEntity member = memberRepository.findByEmail(email)
-            .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 이메일입니다."));
+            .orElseThrow(() -> new AuthenticationFailedException("존재하지 않는 이메일입니다."));
 
         // 2) 리프레쉬 토큰 엔티티 조회
         Optional<RefreshTokenEntity> optionalToken = refreshTokenRepository.findByMember(member);
@@ -124,7 +125,9 @@ public class AuthService {
             tokenEntity.setExpiryDate(LocalDateTime.now());
             refreshTokenRepository.save(tokenEntity);
         }
-        // 토큰 엔티티가 없으면(로그인 안 했거나 이미 로그아웃 처리됨), 어케해야하지? 추가구현 필요하나..?
+        else {
+            throw new TokenInvalidException("토큰없는 로그아웃입니다.");
+        }
     }
 
 }
