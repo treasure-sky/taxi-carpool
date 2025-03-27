@@ -25,9 +25,8 @@ public class PartyController {
     public ResponseEntity<PartyResponseDTO> getParty(
         @PathVariable("partyId") Long partyId
     ) {
-        return partyService.getParty(partyId)
-            .map(ResponseEntity::ok)
-            .orElse(ResponseEntity.notFound().build());
+        PartyResponseDTO partyResponse = partyService.getParty(partyId);
+        return ResponseEntity.ok(partyResponse);
     }
 
     @GetMapping
@@ -35,7 +34,8 @@ public class PartyController {
         @RequestParam(defaultValue = "0") int page,
         @RequestParam(defaultValue = "10") int size
     ) {
-        return ResponseEntity.ok(partyService.getPartyList(page, size));
+        Page<PartyResponseDTO> partyList = partyService.getPartyList(page, size);
+        return ResponseEntity.ok(partyList);
     }
 
     @PostMapping
