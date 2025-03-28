@@ -1,5 +1,9 @@
 package edu.kangwon.university.taxicarpool;
 
+import edu.kangwon.university.taxicarpool.email.exception.EmailSendFailedException;
+import edu.kangwon.university.taxicarpool.email.exception.EmailVerificationNotFoundException;
+import edu.kangwon.university.taxicarpool.email.exception.ExpiredVerificationCodeException;
+import edu.kangwon.university.taxicarpool.email.exception.InvalidVerificationCodeException;
 import edu.kangwon.university.taxicarpool.member.exception.DuplicatedEmailException;
 import edu.kangwon.university.taxicarpool.member.exception.DuplicatedNicknameException;
 import edu.kangwon.university.taxicarpool.member.exception.MemberNotFoundException;
@@ -28,6 +32,34 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.CONFLICT)
             .body(e.getMessage());
     }
+
+    @ExceptionHandler(EmailVerificationNotFoundException.class)
+    public ResponseEntity<?> handleEmailVerificationNotFoundException(
+        EmailVerificationNotFoundException e) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+            .body(e.getMessage());
+    }
+
+    @ExceptionHandler(EmailSendFailedException.class)
+    public ResponseEntity<?> handleEmailSendFailedException(EmailSendFailedException e) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+            .body(e.getMessage());
+    }
+
+    @ExceptionHandler(InvalidVerificationCodeException.class)
+    public ResponseEntity<?> handleInvalidVerificationCodeException(
+        InvalidVerificationCodeException e) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+            .body(e.getMessage());
+    }
+
+    @ExceptionHandler(ExpiredVerificationCodeException.class)
+    public ResponseEntity<?> handleExpiredVerificationCodeException(
+        ExpiredVerificationCodeException e) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+            .body(e.getMessage());
+    }
+
 
 }
 
