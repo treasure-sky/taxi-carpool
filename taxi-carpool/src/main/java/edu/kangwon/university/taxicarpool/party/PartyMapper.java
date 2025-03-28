@@ -26,7 +26,11 @@ public class PartyMapper {
             createRequestDTO.getName(),
             createRequestDTO.getMemberEntities(),
             createRequestDTO.getHostMemberId(),
-            createRequestDTO.getEndDate()
+            createRequestDTO.getEndDate(),
+            createRequestDTO.isSameGenderOnly(),
+            createRequestDTO.isCostShareBeforeDropOff(),
+            createRequestDTO.isQuietMode(),
+            createRequestDTO.isDestinationChangeIn5Minutes()
         );
     }
 
@@ -36,7 +40,11 @@ public class PartyMapper {
             partyUpdateRequestDTO.isDeleted(),
             partyUpdateRequestDTO.getMemberEntities(),
             partyUpdateRequestDTO.getHostMemberId(),
-            partyUpdateRequestDTO.getEndDate()
+            partyUpdateRequestDTO.getEndDate(),
+            partyEntity.isSameGenderOnly(),
+            partyEntity.isCostShareBeforeDropOff(),
+            partyEntity.isQuietMode(),
+            partyEntity.isDestinationChangeIn5Minutes()
         );
     }
 }

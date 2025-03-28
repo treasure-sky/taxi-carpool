@@ -2,7 +2,6 @@ package edu.kangwon.university.taxicarpool.party;
 
 import edu.kangwon.university.taxicarpool.member.MemberEntity;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -103,21 +102,29 @@ public class PartyDTO {
 
         private Long memberId;
 
-        public PartyCreateRequestDTO(Long id,
-            String name,
-            boolean isDeleted,
+        private boolean sameGenderOnly;
+
+        private boolean costShareBeforeDropOff;
+
+        private boolean quietMode;
+
+        private boolean destinationChangeIn5Minutes;
+
+        public PartyCreateRequestDTO(String name, boolean isDeleted,
             List<MemberEntity> memberEntities,
-            Long hostMemberId,
-            LocalDateTime endDate,
-            Long memberId
-        ) {
-            this.id = id;
+            Long hostMemberId, LocalDateTime endDate, Long memberId, boolean sameGenderOnly,
+            boolean costShareBeforeDropOff, boolean quietMode,
+            boolean destinationChangeIn5Minutes) {
             this.name = name;
             this.isDeleted = isDeleted;
             this.memberEntities = memberEntities;
             this.hostMemberId = hostMemberId;
             this.endDate = endDate;
             this.memberId = memberId;
+            this.sameGenderOnly = sameGenderOnly;
+            this.costShareBeforeDropOff = costShareBeforeDropOff;
+            this.quietMode = quietMode;
+            this.destinationChangeIn5Minutes = destinationChangeIn5Minutes;
         }
 
         public Long getId() {
@@ -174,6 +181,38 @@ public class PartyDTO {
 
         public void setMemberId(Long memberId) {
             this.memberId = memberId;
+        }
+
+        public boolean isSameGenderOnly() {
+            return sameGenderOnly;
+        }
+
+        public void setSameGenderOnly(boolean sameGenderOnly) {
+            this.sameGenderOnly = sameGenderOnly;
+        }
+
+        public boolean isCostShareBeforeDropOff() {
+            return costShareBeforeDropOff;
+        }
+
+        public void setCostShareBeforeDropOff(boolean costShareBeforeDropOff) {
+            this.costShareBeforeDropOff = costShareBeforeDropOff;
+        }
+
+        public boolean isQuietMode() {
+            return quietMode;
+        }
+
+        public void setQuietMode(boolean quietMode) {
+            this.quietMode = quietMode;
+        }
+
+        public boolean isDestinationChangeIn5Minutes() {
+            return destinationChangeIn5Minutes;
+        }
+
+        public void setDestinationChangeIn5Minutes(boolean destinationChangeIn5Minutes) {
+            this.destinationChangeIn5Minutes = destinationChangeIn5Minutes;
         }
     }
 

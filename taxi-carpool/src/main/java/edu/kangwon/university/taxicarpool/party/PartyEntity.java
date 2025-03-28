@@ -22,13 +22,22 @@ public class PartyEntity {
         String name,
         List<MemberEntity> memberEntities,
         Long hostMemberId,
-        LocalDateTime endDate) {
+        LocalDateTime endDate,
+        boolean sameGenderOnly,
+        boolean costShareBeforeDropOff,
+        boolean quietMode,
+        boolean destinationChangeMinutes
+    ) {
         this.id = id;
         this.name = name;
         this.isDeleted = false;
         this.memberEntities = memberEntities;
         this.hostMemberId = hostMemberId;
         this.endDate = endDate;
+        this.sameGenderOnly = sameGenderOnly;
+        this.costShareBeforeDropOff = costShareBeforeDropOff;
+        this.quietMode = quietMode;
+        this.destinationChangeIn5Minutes = destinationChangeMinutes;
     }
 
     @Id
@@ -65,6 +74,18 @@ public class PartyEntity {
 
     @Column(name = "end_date")
     private LocalDateTime endDate;
+
+    @Column(name = "same_gender_only")
+    private boolean sameGenderOnly;
+
+    @Column(name = "cost_share_before_drop_off")
+    private boolean costShareBeforeDropOff;
+
+    @Column(name = "quiet_mode")
+    private boolean quietMode;
+
+    @Column(name = "destination_change_5minutes")
+    private boolean destinationChangeIn5Minutes;
 
     public String getName() {
         return name;
@@ -107,12 +128,21 @@ public class PartyEntity {
         boolean isDeleted,
         List<MemberEntity> memberEntities,
         Long hostMemberId,
-        LocalDateTime endDate) {
+        LocalDateTime endDate,
+        boolean sameGenderOnly,
+        boolean costShareBeforeDropOff,
+        boolean quietMode,
+        boolean destinationChangeIn5Minutes
+    ) {
         this.name = name;
         this.isDeleted = isDeleted;
         this.memberEntities = memberEntities;
         this.hostMemberId = hostMemberId;
         this.endDate = endDate;
+        this.sameGenderOnly = sameGenderOnly;
+        this.costShareBeforeDropOff = costShareBeforeDropOff;
+        this.quietMode = quietMode;
+        this.destinationChangeIn5Minutes = destinationChangeIn5Minutes;
         return this;
     }
 
@@ -126,5 +156,37 @@ public class PartyEntity {
 
     public void setDeleted(boolean deleted) {
         isDeleted = deleted;
+    }
+
+    public boolean isSameGenderOnly() {
+        return sameGenderOnly;
+    }
+
+    public void setSameGenderOnly(boolean sameGenderOnly) {
+        this.sameGenderOnly = sameGenderOnly;
+    }
+
+    public boolean isCostShareBeforeDropOff() {
+        return costShareBeforeDropOff;
+    }
+
+    public void setCostShareBeforeDropOff(boolean costShareBeforeDropOff) {
+        this.costShareBeforeDropOff = costShareBeforeDropOff;
+    }
+
+    public boolean isQuietMode() {
+        return quietMode;
+    }
+
+    public void setQuietMode(boolean quietMode) {
+        this.quietMode = quietMode;
+    }
+
+    public boolean isDestinationChangeIn5Minutes() {
+        return destinationChangeIn5Minutes;
+    }
+
+    public void setDestinationChangeIn5Minutes(boolean destinationChangeIn5Minutes) {
+        this.destinationChangeIn5Minutes = destinationChangeIn5Minutes;
     }
 }
