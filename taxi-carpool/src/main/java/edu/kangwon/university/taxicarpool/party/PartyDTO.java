@@ -1,6 +1,8 @@
 package edu.kangwon.university.taxicarpool.party;
 
 import edu.kangwon.university.taxicarpool.member.MemberEntity;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -10,10 +12,15 @@ public class PartyDTO {
     public static class PartyResponseDTO {
 
         private Long id;
+
         private String name;
+
         private boolean isDeleted;
+
         private List<MemberEntity> memberEntities = new ArrayList<>();
+
         private Long hostMemberId;
+
         private LocalDateTime endDate;
 
         public PartyResponseDTO(Long id,
@@ -80,12 +87,20 @@ public class PartyDTO {
     }
 
     public static class PartyCreateRequestDTO {
+
         private Long id;
+
+        @NotBlank(message = "파티 이름은 필수입니다.")
         private String name;
+
         private boolean isDeleted;
+
         private List<MemberEntity> memberEntities = new ArrayList<>();
+
         private Long hostMemberId;
+
         private LocalDateTime endDate;
+
         private Long memberId;
 
         public PartyCreateRequestDTO(Long id,
@@ -108,6 +123,7 @@ public class PartyDTO {
         public Long getId() {
             return id;
         }
+
         public void setId(Long id) {
             this.id = id;
         }
@@ -115,6 +131,7 @@ public class PartyDTO {
         public String getName() {
             return name;
         }
+
         public void setName(String name) {
             this.name = name;
         }
@@ -122,6 +139,7 @@ public class PartyDTO {
         public boolean isDeleted() {
             return isDeleted;
         }
+
         public void setDeleted(boolean deleted) {
             isDeleted = deleted;
         }
@@ -129,6 +147,7 @@ public class PartyDTO {
         public List<MemberEntity> getMemberEntities() {
             return memberEntities;
         }
+
         public void setMemberEntities(List<MemberEntity> memberEntities) {
             this.memberEntities = memberEntities;
         }
@@ -136,6 +155,7 @@ public class PartyDTO {
         public Long getHostMemberId() {
             return hostMemberId;
         }
+
         public void setHostMemberId(Long hostMemberId) {
             this.hostMemberId = hostMemberId;
         }
@@ -143,6 +163,7 @@ public class PartyDTO {
         public LocalDateTime getEndDate() {
             return endDate;
         }
+
         public void setEndDate(LocalDateTime endDate) {
             this.endDate = endDate;
         }
@@ -150,17 +171,25 @@ public class PartyDTO {
         public Long getMemberId() {
             return memberId;
         }
+
         public void setMemberId(Long memberId) {
             this.memberId = memberId;
         }
     }
 
     public static class PartyUpdateRequestDTO {
+
         private Long id;
+
+        @NotBlank(message = "파티 이름은 필수입니다.")
         private String name;
+
         private boolean isDeleted;
+
         private List<MemberEntity> memberEntities = new ArrayList<>();
+
         private Long hostMemberId;
+
         private LocalDateTime endDate;
 
         public PartyUpdateRequestDTO(Long id, String name, boolean isDeleted,

@@ -3,6 +3,7 @@ package edu.kangwon.university.taxicarpool.party;
 import edu.kangwon.university.taxicarpool.party.PartyDTO.PartyCreateRequestDTO;
 import edu.kangwon.university.taxicarpool.party.PartyDTO.PartyResponseDTO;
 import edu.kangwon.university.taxicarpool.party.PartyDTO.PartyUpdateRequestDTO;
+import jakarta.validation.Valid;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -40,14 +41,14 @@ public class PartyController {
 
     @PostMapping
     public ResponseEntity<PartyResponseDTO> createParty(
-        @RequestBody PartyCreateRequestDTO createRequestDTO
+        @RequestBody @Valid PartyCreateRequestDTO createRequestDTO
     ) {
         return ResponseEntity.ok(partyService.createParty(createRequestDTO));
     }
 
     @PutMapping("/{partyId}")
     public ResponseEntity<PartyResponseDTO> updateParty(
-        @RequestBody PartyUpdateRequestDTO updateRequestDTO,
+        @RequestBody @Valid PartyUpdateRequestDTO updateRequestDTO,
         @RequestParam Long memberId,
         @PathVariable Long partyId
     ) {

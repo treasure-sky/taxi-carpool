@@ -1,8 +1,13 @@
 package edu.kangwon.university.taxicarpool.auth;
 
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+
 public class LogoutDTO {
 
     public static class LogoutRequestDTO {
+        @NotBlank
+        @Email
         private String email;
 
         public LogoutRequestDTO() {}

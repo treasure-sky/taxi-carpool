@@ -39,7 +39,8 @@ public class AuthController {
 
     // 추가적으로 프론트측에서 엑세스 토큰도 제거해줘야함.
     @PostMapping("/logout")
-    public ResponseEntity<String> logout(@RequestBody LogoutDTO.LogoutRequestDTO logoutRequest) {
+    public ResponseEntity<String> logout(
+        @Validated @RequestBody LogoutDTO.LogoutRequestDTO logoutRequest) {
         // 예: 클라이언트가 로그아웃 요청 시, email(또는 token으로 해도됨)을 request로 받자.
         authService.logout(logoutRequest.getEmail());
         return ResponseEntity.ok("로그아웃 완료 (Refresh 토큰 무효화)");
