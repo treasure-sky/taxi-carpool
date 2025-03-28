@@ -32,7 +32,6 @@ public class AuthService {
     // 회원가입
     public SignUpDTO.SignUpResponseDTO signUp(SignUpDTO.SignUpRequestDTO request) {
         // 이메일 중복 체크
-        // 예외처리 대충 해놓음.
         if (memberRepository.findByEmail(request.getEmail()).isPresent()) {
             throw new AuthenticationFailedException("이미 사용 중인 이메일입니다.");
         }
