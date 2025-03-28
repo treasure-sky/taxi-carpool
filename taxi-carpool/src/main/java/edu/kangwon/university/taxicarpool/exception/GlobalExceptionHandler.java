@@ -1,6 +1,7 @@
 package edu.kangwon.university.taxicarpool.exception;
 
 import edu.kangwon.university.taxicarpool.auth.authException.AuthenticationFailedException;
+import edu.kangwon.university.taxicarpool.auth.authException.TokenExpiredException;
 import edu.kangwon.university.taxicarpool.auth.authException.TokenInvalidException;
 import edu.kangwon.university.taxicarpool.party.partyException.MemberNotFoundException;
 import edu.kangwon.university.taxicarpool.party.partyException.MemberNotInPartyException;
@@ -62,7 +63,12 @@ public class GlobalExceptionHandler {
         return new ErrorResponse(HttpStatus.FORBIDDEN.value(), ex.getMessage(), request.getRequestURI());
     }
 
-    // [수정됨] 그 외 잡히지 않은 모든 예외에 대한 전역 핸들러
+    @ExceptionHandler(TokenExpiredException.class)
+    public ErrorResponse handleTokenExpiredException(TokenExpiredException ex, HttpServletRequest request) {
+        return new ErrorResponse(HttpStatus.UNAUTHORIZED.value(), ex.getMessage(), request.getRequestURI());
+    }
+
+    // 그 외 잡히지 않은 모든 예외에 대한 전역 핸들러
     @ExceptionHandler(Exception.class)
     public ErrorResponse handleException(Exception ex, HttpServletRequest request) {
         return new ErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), "서버 내부 오류가 발생했습니다.", request.getRequestURI());

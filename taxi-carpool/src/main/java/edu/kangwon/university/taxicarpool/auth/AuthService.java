@@ -1,6 +1,7 @@
 package edu.kangwon.university.taxicarpool.auth;
 
 import edu.kangwon.university.taxicarpool.auth.authException.AuthenticationFailedException;
+import edu.kangwon.university.taxicarpool.auth.authException.TokenExpiredException;
 import edu.kangwon.university.taxicarpool.auth.authException.TokenInvalidException;
 import edu.kangwon.university.taxicarpool.member.MemberEntity;
 import edu.kangwon.university.taxicarpool.member.MemberRepository;
@@ -99,7 +100,7 @@ public class AuthService {
         // 리프래쉬 토큰이 만료됐는지 확인
         // 리프래쉬도 만료되면 재로그인 요청해야함.
         if (tokenEntity.getExpiryDate().isBefore(LocalDateTime.now())) {
-            throw new TokenInvalidException("리프래쉬 토큰이 만료되었습니다. 다시 로그인해주세요.");
+            throw new TokenExpiredException("리프래쉬 토큰이 만료되었습니다. 다시 로그인해주세요.");
         }
 
         // 새 액세스 토큰 발급
