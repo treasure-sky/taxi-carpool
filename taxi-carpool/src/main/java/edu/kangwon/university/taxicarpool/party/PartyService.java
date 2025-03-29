@@ -9,6 +9,7 @@ import edu.kangwon.university.taxicarpool.party.partyException.MemberNotFoundExc
 import edu.kangwon.university.taxicarpool.party.partyException.MemberNotInPartyException;
 import edu.kangwon.university.taxicarpool.party.partyException.PartyAlreadyDeletedException;
 import edu.kangwon.university.taxicarpool.party.partyException.PartyEmptyException;
+import edu.kangwon.university.taxicarpool.party.partyException.PartyFullException;
 import edu.kangwon.university.taxicarpool.party.partyException.PartyNotFoundException;
 import edu.kangwon.university.taxicarpool.party.partyException.UnauthorizedHostAccessException;
 import jakarta.transaction.Transactional;
@@ -66,28 +67,17 @@ public class PartyService {
 
         // 프론트로부터 파티를 만드는 멤버의 Id를 createRequestDTO 내부 필드(creatorMemberId)에 넣어서 보내달라고 해야함.
         Long creatorMemberId = createRequestDTO.getCreatorMemberId();
+
         if (creatorMemberId != null) {
-            partyEntity.updateParty(
-                partyEntity.getName(),
-                partyEntity.isDeleted(),
-                partyEntity.getMemberEntities(),
-                creatorMemberId,  // hostMemberId = creatorMemberId임(방을 만든 멤버가 최초 호스트)
-                partyEntity.getEndDate(),
-                partyEntity.isSameGenderOnly(),
-                partyEntity.isCostShareBeforeDropOff(),
-                partyEntity.isQuietMode(),
-                partyEntity.isDestinationChangeIn5Minutes(),
-                partyEntity.getStartDateTime(),
-                partyEntity.getStartLocation(),
-                partyEntity.getEndLocation(),
-                partyEntity.getComment(),
-                partyEntity.getCurrentParticipantCount(),
-                partyEntity.getMaxParticipantCount()
-            );
+            partyEntity.setHostMemberId(
+                creatorMemberId); // creatorMemberId(파티를 만든 멤버의 ID)를 HostMemberId로 설정
+
             // 처음 방 만든 멤버도 그 파티방의 멤버로 등록하는 것임.(이거 안 해놓으면 프론트한테 요청 2번 요청해야함.)
             MemberEntity member = memberRepository.findById(creatorMemberId)
                 .orElseThrow(() -> new MemberNotFoundException("해당 멤버가 존재하지 않습니다."));
             partyEntity.getMemberEntities().add(member);
+
+            partyEntity.setCurrentParticipantCount(1); // 방 만들고, 현재 인원 1명으로 설정
         } else {
             throw new IllegalArgumentException("파티방을 만든 멤버의 Id가 null임.");
         }
@@ -143,6 +133,15 @@ public class PartyService {
 
         party.getMemberEntities().add(member);
 
+        // 새로운 멤버가 파티 참가시, 현재인원 1명 추가
+        int currentParticipantCount = party.getCurrentParticipantCount();
+        if(currentParticipantCount < party.getMaxParticipantCount()) {
+            party.setCurrentParticipantCount(currentParticipantCount++);
+        }
+        else {
+            throw new PartyFullException("현재 파티의 참여중인 인원수가 가득찼습니다.");
+        }
+
         PartyEntity savedParty = partyRepository.save(party);
         return partyMapper.convertToResponseDTO(savedParty);
     }
@@ -163,6 +162,17 @@ public class PartyService {
 
         // 파티에서 멤버 제거
         party.getMemberEntities().remove(member);
+
+        // 파티의 현재 인원 수 감소시키기
+        int currentParticipantCount = party.getCurrentParticipantCount();
+        if(currentParticipantCount > 1) {
+            party.setCurrentParticipantCount(currentParticipantCount--);
+        }
+        else {
+            // 앱의 플로우상 마지막으로 떠나는 멤버가 호스트일수밖에 없어서, 해당 코드가 필요하지 않을 것 같긴한데, 혹시 몰라서 일단 추가해둠.
+            party.setDeleted(true);
+            throw new PartyEmptyException("파티방의 모든 멤버가 떠나여, 파티방이 삭제되었습니다.");
+        }
 
         // 호스트인 멤버가 파티를 떠나려고 할 때의 로직.
         if (isHostLeaving) {

@@ -7,6 +7,7 @@ import edu.kangwon.university.taxicarpool.party.partyException.MemberNotFoundExc
 import edu.kangwon.university.taxicarpool.party.partyException.MemberNotInPartyException;
 import edu.kangwon.university.taxicarpool.party.partyException.PartyAlreadyDeletedException;
 import edu.kangwon.university.taxicarpool.party.partyException.PartyEmptyException;
+import edu.kangwon.university.taxicarpool.party.partyException.PartyFullException;
 import edu.kangwon.university.taxicarpool.party.partyException.PartyNotFoundException;
 import edu.kangwon.university.taxicarpool.party.partyException.UnauthorizedHostAccessException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -65,6 +66,11 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(TokenExpiredException.class)
     public ErrorResponseDTO handleTokenExpiredException(TokenExpiredException ex, HttpServletRequest request) {
         return new ErrorResponseDTO(HttpStatus.UNAUTHORIZED.value(), ex.getMessage(), request.getRequestURI());
+    }
+
+    @ExceptionHandler(PartyFullException.class)
+    public ErrorResponseDTO handlePartyFullException(PartyFullException ex, HttpServletRequest request) {
+        return new ErrorResponseDTO(HttpStatus.CONFLICT.value(), ex.getMessage(), request.getRequestURI());
     }
 
     // 그 외 잡히지 않은 모든 예외에 대한 전역 핸들러
