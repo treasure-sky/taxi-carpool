@@ -25,7 +25,13 @@ public class PartyEntity {
         boolean sameGenderOnly,
         boolean costShareBeforeDropOff,
         boolean quietMode,
-        boolean destinationChangeMinutes
+        boolean destinationChange5Minutes,
+        LocalDateTime startDateTime,
+        String startLocation,
+        String endLocation,
+        String comment,
+        int currentParticipantCount,
+        int maxParticipantCount
     ) {
         this.name = name;
         this.isDeleted = false;
@@ -35,7 +41,13 @@ public class PartyEntity {
         this.sameGenderOnly = sameGenderOnly;
         this.costShareBeforeDropOff = costShareBeforeDropOff;
         this.quietMode = quietMode;
-        this.destinationChangeIn5Minutes = destinationChangeMinutes;
+        this.destinationChangeIn5Minutes = destinationChange5Minutes;
+        this.startDateTime = startDateTime;
+        this.startLocation = startLocation;
+        this.endLocation = endLocation;
+        this.comment = comment;
+        this.currentParticipantCount = currentParticipantCount;
+        this.maxParticipantCount = maxParticipantCount;
     }
 
     @Id
@@ -75,6 +87,24 @@ public class PartyEntity {
 
     @Column(name = "destination_change_5minutes")
     private boolean destinationChangeIn5Minutes;
+
+    @Column(name = "start_date_time")
+    private LocalDateTime startDateTime;
+
+    @Column(name = "start_location")
+    private String startLocation;
+
+    @Column(name = "end_location")
+    private String endLocation;
+
+    @Column(name = "comment")
+    private String comment;
+
+    @Column(name = "current_participant_count")
+    private int currentParticipantCount;
+
+    @Column(name = "max_participant_count")
+    private int maxParticipantCount;
 
     @CreatedDate
     @Column(name = "created_at", updatable = false)
@@ -164,6 +194,54 @@ public class PartyEntity {
         this.destinationChangeIn5Minutes = destinationChangeIn5Minutes;
     }
 
+    public LocalDateTime getStartDateTime() {
+        return startDateTime;
+    }
+
+    public void setStartDateTime(LocalDateTime startDateTime) {
+        this.startDateTime = startDateTime;
+    }
+
+    public String getStartLocation() {
+        return startLocation;
+    }
+
+    public void setStartLocation(String startLocation) {
+        this.startLocation = startLocation;
+    }
+
+    public String getEndLocation() {
+        return endLocation;
+    }
+
+    public void setEndLocation(String endLocation) {
+        this.endLocation = endLocation;
+    }
+
+    public String getComment() {
+        return comment;
+    }
+
+    public void setComment(String comment) {
+        this.comment = comment;
+    }
+
+    public int getCurrentParticipantCount() {
+        return currentParticipantCount;
+    }
+
+    public void setCurrentParticipantCount(int currentParticipantCount) {
+        this.currentParticipantCount = currentParticipantCount;
+    }
+
+    public int getMaxParticipantCount() {
+        return maxParticipantCount;
+    }
+
+    public void setMaxParticipantCount(int maxParticipantCount) {
+        this.maxParticipantCount = maxParticipantCount;
+    }
+
     public PartyEntity updateParty(
         String name,
         boolean isDeleted,
@@ -173,7 +251,13 @@ public class PartyEntity {
         boolean sameGenderOnly,
         boolean costShareBeforeDropOff,
         boolean quietMode,
-        boolean destinationChangeIn5Minutes
+        boolean destinationChangeIn5Minutes,
+        LocalDateTime startDateTime,
+        String startLocation,
+        String endLocation,
+        String comment,
+        int currentParticipantCount,
+        int maxParticipantCount
     ) {
         this.name = name;
         this.isDeleted = isDeleted;
@@ -184,7 +268,14 @@ public class PartyEntity {
         this.costShareBeforeDropOff = costShareBeforeDropOff;
         this.quietMode = quietMode;
         this.destinationChangeIn5Minutes = destinationChangeIn5Minutes;
+        this.startDateTime = startDateTime;
+        this.startLocation = startLocation;
+        this.endLocation = endLocation;
+        this.comment = comment;
+        this.currentParticipantCount = currentParticipantCount;
+        this.maxParticipantCount = maxParticipantCount;
         return this;
+
     }
 
 }

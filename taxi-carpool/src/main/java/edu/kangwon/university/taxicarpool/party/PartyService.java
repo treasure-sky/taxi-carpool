@@ -76,7 +76,13 @@ public class PartyService {
                 partyEntity.isSameGenderOnly(),
                 partyEntity.isCostShareBeforeDropOff(),
                 partyEntity.isQuietMode(),
-                partyEntity.isDestinationChangeIn5Minutes()
+                partyEntity.isDestinationChangeIn5Minutes(),
+                partyEntity.getStartDateTime(),
+                partyEntity.getStartLocation(),
+                partyEntity.getEndLocation(),
+                partyEntity.getComment(),
+                partyEntity.getCurrentParticipantCount(),
+                partyEntity.getMaxParticipantCount()
             );
             // 처음 방 만든 멤버도 그 파티방의 멤버로 등록하는 것임.(이거 안 해놓으면 프론트한테 요청 2번 요청해야함.)
             MemberEntity member = memberRepository.findById(creatorMemberId)

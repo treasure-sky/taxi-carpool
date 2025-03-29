@@ -32,6 +32,18 @@ public class PartyDTO {
 
         private boolean destinationChangeIn5Minutes;
 
+        private LocalDateTime startDateTime;
+
+        private String startLocation;
+
+        private String endLocation;
+
+        private String comment;
+
+        private int currentParticipantCount;
+
+        private int maxParticipantCount;
+
         public PartyResponseDTO(Long id,
             String name,
             boolean isDeleted,
@@ -41,7 +53,13 @@ public class PartyDTO {
             boolean sameGenderOnly,
             boolean costShareBeforeDropOff,
             boolean quietMode,
-            boolean destinationChangeIn5Minutes) {
+            boolean destinationChangeIn5Minutes,
+            LocalDateTime startDateTime,
+            String startLocation,
+            String endLocation,
+            String comment,
+            int currentParticipantCount,
+            int maxParticipantCount) {
             this.id = id;
             this.name = name;
             this.isDeleted = isDeleted;
@@ -52,6 +70,12 @@ public class PartyDTO {
             this.costShareBeforeDropOff = costShareBeforeDropOff;
             this.quietMode = quietMode;
             this.destinationChangeIn5Minutes = destinationChangeIn5Minutes;
+            this.startDateTime = startDateTime;
+            this.startLocation = startLocation;
+            this.endLocation = endLocation;
+            this.comment = comment;
+            this.currentParticipantCount = currentParticipantCount;
+            this.maxParticipantCount = maxParticipantCount;
         }
 
         public Long getId() {
@@ -133,6 +157,54 @@ public class PartyDTO {
         public void setDestinationChangeIn5Minutes(boolean destinationChangeIn5Minutes) {
             this.destinationChangeIn5Minutes = destinationChangeIn5Minutes;
         }
+
+        public LocalDateTime getStartDateTime() {
+            return startDateTime;
+        }
+
+        public void setStartDateTime(LocalDateTime startDateTime) {
+            this.startDateTime = startDateTime;
+        }
+
+        public String getStartLocation() {
+            return startLocation;
+        }
+
+        public void setStartLocation(String startLocation) {
+            this.startLocation = startLocation;
+        }
+
+        public String getEndLocation() {
+            return endLocation;
+        }
+
+        public void setEndLocation(String endLocation) {
+            this.endLocation = endLocation;
+        }
+
+        public String getComment() {
+            return comment;
+        }
+
+        public void setComment(String comment) {
+            this.comment = comment;
+        }
+
+        public int getCurrentParticipantCount() {
+            return currentParticipantCount;
+        }
+
+        public void setCurrentParticipantCount(int currentParticipantCount) {
+            this.currentParticipantCount = currentParticipantCount;
+        }
+
+        public int getMaxParticipantCount() {
+            return maxParticipantCount;
+        }
+
+        public void setMaxParticipantCount(int maxParticipantCount) {
+            this.maxParticipantCount = maxParticipantCount;
+        }
     }
 
     public static class PartyCreateRequestDTO {
@@ -162,11 +234,34 @@ public class PartyDTO {
 
         private boolean destinationChangeIn5Minutes;
 
-        public PartyCreateRequestDTO(String name, boolean isDeleted,
+        private LocalDateTime startDateTime;
+
+        private String startLocation;
+
+        private String endLocation;
+
+        private String comment;
+
+        private int currentParticipantCount;
+
+        private int maxParticipantCount;
+
+        public PartyCreateRequestDTO(String name,
+            boolean isDeleted,
             List<MemberEntity> memberEntities,
-            Long hostMemberId, LocalDateTime endDate, Long creatorMemberId, boolean sameGenderOnly,
-            boolean costShareBeforeDropOff, boolean quietMode,
-            boolean destinationChangeIn5Minutes) {
+            Long hostMemberId,
+            LocalDateTime endDate,
+            Long creatorMemberId,
+            boolean sameGenderOnly,
+            boolean costShareBeforeDropOff,
+            boolean quietMode,
+            boolean destinationChangeIn5Minutes,
+            LocalDateTime startDateTime,
+            String startLocation,
+            String endLocation,
+            String comment,
+            int currentParticipantCount,
+            int maxParticipantCount) {
             this.name = name;
             this.isDeleted = isDeleted;
             this.memberEntities = memberEntities;
@@ -177,6 +272,12 @@ public class PartyDTO {
             this.costShareBeforeDropOff = costShareBeforeDropOff;
             this.quietMode = quietMode;
             this.destinationChangeIn5Minutes = destinationChangeIn5Minutes;
+            this.startDateTime = startDateTime;
+            this.startLocation = startLocation;
+            this.endLocation = endLocation;
+            this.comment = comment;
+            this.currentParticipantCount = currentParticipantCount;
+            this.maxParticipantCount = maxParticipantCount;
         }
 
         public Long getId() {
@@ -266,6 +367,54 @@ public class PartyDTO {
         public void setDestinationChangeIn5Minutes(boolean destinationChangeIn5Minutes) {
             this.destinationChangeIn5Minutes = destinationChangeIn5Minutes;
         }
+
+        public LocalDateTime getStartDateTime() {
+            return startDateTime;
+        }
+
+        public void setStartDateTime(LocalDateTime startDateTime) {
+            this.startDateTime = startDateTime;
+        }
+
+        public String getStartLocation() {
+            return startLocation;
+        }
+
+        public void setStartLocation(String startLocation) {
+            this.startLocation = startLocation;
+        }
+
+        public String getEndLocation() {
+            return endLocation;
+        }
+
+        public void setEndLocation(String endLocation) {
+            this.endLocation = endLocation;
+        }
+
+        public String getComment() {
+            return comment;
+        }
+
+        public void setComment(String comment) {
+            this.comment = comment;
+        }
+
+        public int getCurrentParticipantCount() {
+            return currentParticipantCount;
+        }
+
+        public void setCurrentParticipantCount(int currentParticipantCount) {
+            this.currentParticipantCount = currentParticipantCount;
+        }
+
+        public int getMaxParticipantCount() {
+            return maxParticipantCount;
+        }
+
+        public void setMaxParticipantCount(int maxParticipantCount) {
+            this.maxParticipantCount = maxParticipantCount;
+        }
     }
 
     public static class PartyUpdateRequestDTO {
@@ -292,6 +441,18 @@ public class PartyDTO {
 
         private boolean destinationChangeIn5Minutes;
 
+        private LocalDateTime startDateTime;
+
+        private String startLocation;
+
+        private String endLocation;
+
+        private String comment;
+
+        private int currentParticipantCount;
+
+        private int maxParticipantCount;
+
         public PartyUpdateRequestDTO(
             Long id,
             String name,
@@ -302,7 +463,13 @@ public class PartyDTO {
             boolean sameGenderOnly,
             boolean costShareBeforeDropOff,
             boolean quietMode,
-            boolean destinationChangeIn5Minutes) {
+            boolean destinationChangeIn5Minutes,
+            LocalDateTime startDateTime,
+            String startLocation,
+            String endLocation,
+            String comment,
+            int currentParticipantCount,
+            int maxParticipantCount) {
             this.id = id;
             this.name = name;
             this.isDeleted = isDeleted;
@@ -313,6 +480,12 @@ public class PartyDTO {
             this.costShareBeforeDropOff = costShareBeforeDropOff;
             this.quietMode = quietMode;
             this.destinationChangeIn5Minutes = destinationChangeIn5Minutes;
+            this.startDateTime = startDateTime;
+            this.startLocation = startLocation;
+            this.endLocation = endLocation;
+            this.comment = comment;
+            this.currentParticipantCount = currentParticipantCount;
+            this.maxParticipantCount = maxParticipantCount;
         }
 
         public Long getId() {
@@ -393,6 +566,54 @@ public class PartyDTO {
 
         public void setDestinationChangeIn5Minutes(boolean destinationChangeIn5Minutes) {
             this.destinationChangeIn5Minutes = destinationChangeIn5Minutes;
+        }
+
+        public LocalDateTime getStartDateTime() {
+            return startDateTime;
+        }
+
+        public void setStartDateTime(LocalDateTime startDateTime) {
+            this.startDateTime = startDateTime;
+        }
+
+        public String getStartLocation() {
+            return startLocation;
+        }
+
+        public void setStartLocation(String startLocation) {
+            this.startLocation = startLocation;
+        }
+
+        public String getEndLocation() {
+            return endLocation;
+        }
+
+        public void setEndLocation(String endLocation) {
+            this.endLocation = endLocation;
+        }
+
+        public String getComment() {
+            return comment;
+        }
+
+        public void setComment(String comment) {
+            this.comment = comment;
+        }
+
+        public int getCurrentParticipantCount() {
+            return currentParticipantCount;
+        }
+
+        public void setCurrentParticipantCount(int currentParticipantCount) {
+            this.currentParticipantCount = currentParticipantCount;
+        }
+
+        public int getMaxParticipantCount() {
+            return maxParticipantCount;
+        }
+
+        public void setMaxParticipantCount(int maxParticipantCount) {
+            this.maxParticipantCount = maxParticipantCount;
         }
     }
 }

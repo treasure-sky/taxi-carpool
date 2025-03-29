@@ -20,7 +20,13 @@ public class PartyMapper {
             partyEntity.isSameGenderOnly(),
             partyEntity.isCostShareBeforeDropOff(),
             partyEntity.isQuietMode(),
-            partyEntity.isDestinationChangeIn5Minutes()
+            partyEntity.isDestinationChangeIn5Minutes(),
+            partyEntity.getStartDateTime(),
+            partyEntity.getStartLocation(),
+            partyEntity.getEndLocation(),
+            partyEntity.getComment(),
+            partyEntity.getCurrentParticipantCount(),
+            partyEntity.getMaxParticipantCount()
         );
     }
 
@@ -33,7 +39,13 @@ public class PartyMapper {
             createRequestDTO.isSameGenderOnly(),
             createRequestDTO.isCostShareBeforeDropOff(),
             createRequestDTO.isQuietMode(),
-            createRequestDTO.isDestinationChangeIn5Minutes()
+            createRequestDTO.isDestinationChangeIn5Minutes(),
+            createRequestDTO.getStartDateTime(),
+            createRequestDTO.getStartLocation(),
+            createRequestDTO.getEndLocation(),
+            createRequestDTO.getComment(),
+            createRequestDTO.getCurrentParticipantCount(),
+            createRequestDTO.getMaxParticipantCount()
         );
     }
 
@@ -47,7 +59,13 @@ public class PartyMapper {
             partyUpdateRequestDTO.isSameGenderOnly(),
             partyUpdateRequestDTO.isCostShareBeforeDropOff(),
             partyUpdateRequestDTO.isQuietMode(),
-            partyUpdateRequestDTO.isDestinationChangeIn5Minutes()
+            partyUpdateRequestDTO.isDestinationChangeIn5Minutes(),
+            partyUpdateRequestDTO.getStartDateTime(),
+            partyUpdateRequestDTO.getStartLocation(),
+            partyUpdateRequestDTO.getEndLocation(),
+            partyUpdateRequestDTO.getComment(),
+            partyUpdateRequestDTO.getCurrentParticipantCount(),
+            partyUpdateRequestDTO.getMaxParticipantCount()
         );
     }
 }
