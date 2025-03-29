@@ -34,9 +34,7 @@ public class LoginDTO {
     public static class LoginResponse {
         private String token;       // JWT 액세스 토큰 (2시간)
         private String refreshToken; // 리프래쉬 토큰 (1주)
-        private String email;       // 사용자 식별 정보(선택)
-
-        // 필요한 정보를 추가로 담을 수 있음 (예: 닉네임, 권한 등)
+        private String email;       // 사용자 식별 정보(필요하면 추가로 더 담을 수 있음)
 
         public LoginResponse() {}
 

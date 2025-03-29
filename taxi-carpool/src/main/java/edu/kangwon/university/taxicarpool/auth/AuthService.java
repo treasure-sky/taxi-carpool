@@ -111,6 +111,7 @@ public class AuthService {
         return new LoginDTO.RefreshResponseDTO(newAccessToken, tokenEntity.getRefreshToken());
     }
 
+    // 로그아웃
     public void logout(String email) {
         // 1) 이메일로 Member 조회
         MemberEntity member = memberRepository.findByEmail(email)
@@ -126,7 +127,7 @@ public class AuthService {
             refreshTokenRepository.save(tokenEntity);
         }
         else {
-            throw new TokenInvalidException("토큰없는 로그아웃입니다.");
+            throw new TokenInvalidException("토큰없는 로그아웃입니다. 재로그인 후 로그아웃 해주세요.");
         }
     }
 

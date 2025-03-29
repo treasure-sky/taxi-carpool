@@ -24,7 +24,7 @@ public class JwtUtil {
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + ACCESS_EXPIRATION);
 
-        // 헤더랑 페이로드로 시그니처 만듦.
+        // 헤더랑 페이로드, 이메일(사용자 정보)로 시그니처 만듦.
         return Jwts.builder()
             .setSubject(email)         // 토큰 식별자 (이메일 등)
             .setIssuedAt(now)          // 발급 시간
@@ -52,7 +52,6 @@ public class JwtUtil {
         return Keys.hmacShaKeyFor(SECRET_KEY.getBytes());
     }
 
-    // 토큰에서 email 추출, 추후 권한 추가할 때 이거 사용하면 됨.
     public String getEmailFromToken(String token) {
         return Jwts.parserBuilder()
             .setSigningKey(getSigningKey())
@@ -62,7 +61,7 @@ public class JwtUtil {
             .getSubject();
     }
 
-    // 토큰 검증 (추후에 전역 예외처리로 변경하기)
+    // 토큰 검증 (추후에 통합으로 변경하기)
     public boolean validateToken(String token) {
         try {
             Jwts.parserBuilder()// 이 빌더에서 내부적으로 만료 기한도 검사함.

@@ -9,13 +9,13 @@ public class SignUpDTO {
 
     public static class SignUpRequestDTO {
         @NotBlank
-        @Email
+        @Email // merge후에 진호가 만든 validation으로 바꾸기
         private String email;
 
         @NotBlank
         private String password;
 
-        @NotBlank
+        // Blank일 경우 랜덤이어야함.
         private String nickname;
 
         @NotNull
