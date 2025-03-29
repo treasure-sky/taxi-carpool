@@ -208,9 +208,8 @@ public class PartyDTO {
         }
     }
 
+    // creatorMemberId 필드 존재
     public static class PartyCreateRequestDTO {
-
-        private Long id;
 
         @NotNull
         @NotBlank(message = "파티 이름은 필수입니다.")
@@ -227,6 +226,7 @@ public class PartyDTO {
 
         private Long creatorMemberId;
 
+        // 아래 4개 옵션들 NotNull해야하나..?
         private boolean sameGenderOnly;
 
         private boolean costShareBeforeDropOff;
@@ -287,14 +287,6 @@ public class PartyDTO {
             this.comment = comment;
             this.currentParticipantCount = currentParticipantCount;
             this.maxParticipantCount = maxParticipantCount;
-        }
-
-        public Long getId() {
-            return id;
-        }
-
-        public void setId(Long id) {
-            this.id = id;
         }
 
         public String getName() {
