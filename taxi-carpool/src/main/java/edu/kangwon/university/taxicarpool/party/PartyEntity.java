@@ -256,7 +256,6 @@ public class PartyEntity {
         String startLocation,
         String endLocation,
         String comment,
-        int currentParticipantCount,
         int maxParticipantCount
     ) {
         this.name = name;
@@ -272,7 +271,6 @@ public class PartyEntity {
         this.startLocation = startLocation;
         this.endLocation = endLocation;
         this.comment = comment;
-        this.currentParticipantCount = currentParticipantCount;
         this.maxParticipantCount = maxParticipantCount;
         return this;
 

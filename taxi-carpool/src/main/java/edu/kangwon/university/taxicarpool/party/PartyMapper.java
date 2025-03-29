@@ -64,7 +64,6 @@ public class PartyMapper {
             partyUpdateRequestDTO.getStartLocation(),
             partyUpdateRequestDTO.getEndLocation(),
             partyUpdateRequestDTO.getComment(),
-            partyUpdateRequestDTO.getCurrentParticipantCount(),
             partyUpdateRequestDTO.getMaxParticipantCount()
         );
     }

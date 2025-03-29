@@ -426,6 +426,7 @@ public class PartyDTO {
         }
     }
 
+    // UpdateRequestDTO에는 현재 인원수에 대한 필드가 없음 -> 파티의 인원수에 관한 로직은 무조건 join/leave 엔트포인트 사용 강제를 위해
     public static class PartyUpdateRequestDTO {
 
         private Long id;
@@ -465,8 +466,6 @@ public class PartyDTO {
         @Size(max = 30, message = "설명은 최대 30글자입니다.")
         private String comment;
 
-        private int currentParticipantCount;
-
         @Max(value = 4, message = "택시의 최대 탑승 인원 수는 4명입니다.")
         private int maxParticipantCount;
 
@@ -485,7 +484,6 @@ public class PartyDTO {
             String startLocation,
             String endLocation,
             String comment,
-            int currentParticipantCount,
             int maxParticipantCount) {
             this.id = id;
             this.name = name;
@@ -501,7 +499,6 @@ public class PartyDTO {
             this.startLocation = startLocation;
             this.endLocation = endLocation;
             this.comment = comment;
-            this.currentParticipantCount = currentParticipantCount;
             this.maxParticipantCount = maxParticipantCount;
         }
 
@@ -615,14 +612,6 @@ public class PartyDTO {
 
         public void setComment(String comment) {
             this.comment = comment;
-        }
-
-        public int getCurrentParticipantCount() {
-            return currentParticipantCount;
-        }
-
-        public void setCurrentParticipantCount(int currentParticipantCount) {
-            this.currentParticipantCount = currentParticipantCount;
         }
 
         public int getMaxParticipantCount() {
