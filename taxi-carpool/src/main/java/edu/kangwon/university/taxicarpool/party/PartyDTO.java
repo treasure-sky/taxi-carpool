@@ -1,6 +1,7 @@
 package edu.kangwon.university.taxicarpool.party;
 
 import edu.kangwon.university.taxicarpool.member.MemberEntity;
+import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -251,6 +252,7 @@ public class PartyDTO {
 
         private int currentParticipantCount;
 
+        @Max(value = 4, message = "택시의 최대 탑승 인원 수는 4명입니다.")
         private int maxParticipantCount;
 
         public PartyCreateRequestDTO(String name,
@@ -465,6 +467,7 @@ public class PartyDTO {
 
         private int currentParticipantCount;
 
+        @Max(value = 4, message = "택시의 최대 탑승 인원 수는 4명입니다.")
         private int maxParticipantCount;
 
         public PartyUpdateRequestDTO(
