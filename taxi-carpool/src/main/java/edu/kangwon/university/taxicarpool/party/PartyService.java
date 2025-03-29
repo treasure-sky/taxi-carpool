@@ -61,21 +61,17 @@ public class PartyService {
 
     @Transactional
     public PartyResponseDTO createParty(PartyCreateRequestDTO createRequestDTO) {
-        // validation적용할 예정이라 필요없는 예외처리.
-//        if (createRequestDTO.getName() == null || createRequestDTO.getName().isEmpty()) {
-//            throw new IllegalArgumentException("파티 이름은 필수 입력 항목입니다.");
-//        }
 
         PartyEntity partyEntity = partyMapper.convertToEntity(createRequestDTO);
 
-        // 프론트로부터 파티를 만드는 멤버의 Id를 createRequestDTO 내부 필드에 넣어서 보내달라고 해야함.
-        Long memberId = createRequestDTO.getMemberId();
-        if (memberId != null) {
+        // 프론트로부터 파티를 만드는 멤버의 Id를 createRequestDTO 내부 필드(creatorMemberId)에 넣어서 보내달라고 해야함.
+        Long creatorMemberId = createRequestDTO.getCreatorMemberId();
+        if (creatorMemberId != null) {
             partyEntity.updateParty(
                 partyEntity.getName(),
                 partyEntity.isDeleted(),
                 partyEntity.getMemberEntities(),
-                memberId,  // hostMemberId = memberId임(방을 만든 멤버가 최초 호스트)
+                creatorMemberId,  // hostMemberId = creatorMemberId임(방을 만든 멤버가 최초 호스트)
                 partyEntity.getEndDate(),
                 partyEntity.isSameGenderOnly(),
                 partyEntity.isCostShareBeforeDropOff(),
@@ -83,11 +79,11 @@ public class PartyService {
                 partyEntity.isDestinationChangeIn5Minutes()
             );
             // 처음 방 만든 멤버도 그 파티방의 멤버로 등록하는 것임.(이거 안 해놓으면 프론트한테 요청 2번 요청해야함.)
-            MemberEntity member = memberRepository.findById(memberId)
+            MemberEntity member = memberRepository.findById(creatorMemberId)
                 .orElseThrow(() -> new MemberNotFoundException("해당 멤버가 존재하지 않습니다."));
             partyEntity.getMemberEntities().add(member);
         } else {
-            throw new IllegalArgumentException("memberId가 null임.");
+            throw new IllegalArgumentException("파티방을 만든 멤버의 Id가 null임.");
         }
 
         PartyEntity savedPartyEntity = partyRepository.save(partyEntity);

@@ -18,7 +18,6 @@ public class PartyEntity {
     }
 
     public PartyEntity(
-        Long id,
         String name,
         List<MemberEntity> memberEntities,
         Long hostMemberId,
@@ -28,7 +27,6 @@ public class PartyEntity {
         boolean quietMode,
         boolean destinationChangeMinutes
     ) {
-        this.id = id;
         this.name = name;
         this.isDeleted = false;
         this.memberEntities = memberEntities;
@@ -52,7 +50,6 @@ public class PartyEntity {
     @Column(name = "is_deleted")
     private boolean isDeleted;
 
-    // 다대일 -> 다대다로 변경
     @ManyToMany
     @JoinTable(
         name = "party_member",
@@ -63,14 +60,6 @@ public class PartyEntity {
 
     @Column(name = "host_id")
     private Long hostMemberId;
-
-    @CreatedDate
-    @Column(name = "created_at", updatable = false)
-    private LocalDateTime createdAt;
-
-    @LastModifiedDate
-    @Column(name = "last_modified_at")
-    private LocalDateTime lastModifiedAt;
 
     @Column(name = "end_date")
     private LocalDateTime endDate;
@@ -86,6 +75,14 @@ public class PartyEntity {
 
     @Column(name = "destination_change_5minutes")
     private boolean destinationChangeIn5Minutes;
+
+    @CreatedDate
+    @Column(name = "created_at", updatable = false)
+    private LocalDateTime createdAt;
+
+    @LastModifiedDate
+    @Column(name = "last_modified_at")
+    private LocalDateTime lastModifiedAt;
 
     public String getName() {
         return name;
@@ -121,29 +118,6 @@ public class PartyEntity {
 
     public LocalDateTime getLastModifiedAt() {
         return lastModifiedAt;
-    }
-
-    public PartyEntity updateParty(
-        String name,
-        boolean isDeleted,
-        List<MemberEntity> memberEntities,
-        Long hostMemberId,
-        LocalDateTime endDate,
-        boolean sameGenderOnly,
-        boolean costShareBeforeDropOff,
-        boolean quietMode,
-        boolean destinationChangeIn5Minutes
-    ) {
-        this.name = name;
-        this.isDeleted = isDeleted;
-        this.memberEntities = memberEntities;
-        this.hostMemberId = hostMemberId;
-        this.endDate = endDate;
-        this.sameGenderOnly = sameGenderOnly;
-        this.costShareBeforeDropOff = costShareBeforeDropOff;
-        this.quietMode = quietMode;
-        this.destinationChangeIn5Minutes = destinationChangeIn5Minutes;
-        return this;
     }
 
     public boolean isExpired() {
@@ -189,4 +163,28 @@ public class PartyEntity {
     public void setDestinationChangeIn5Minutes(boolean destinationChangeIn5Minutes) {
         this.destinationChangeIn5Minutes = destinationChangeIn5Minutes;
     }
+
+    public PartyEntity updateParty(
+        String name,
+        boolean isDeleted,
+        List<MemberEntity> memberEntities,
+        Long hostMemberId,
+        LocalDateTime endDate,
+        boolean sameGenderOnly,
+        boolean costShareBeforeDropOff,
+        boolean quietMode,
+        boolean destinationChangeIn5Minutes
+    ) {
+        this.name = name;
+        this.isDeleted = isDeleted;
+        this.memberEntities = memberEntities;
+        this.hostMemberId = hostMemberId;
+        this.endDate = endDate;
+        this.sameGenderOnly = sameGenderOnly;
+        this.costShareBeforeDropOff = costShareBeforeDropOff;
+        this.quietMode = quietMode;
+        this.destinationChangeIn5Minutes = destinationChangeIn5Minutes;
+        return this;
+    }
+
 }

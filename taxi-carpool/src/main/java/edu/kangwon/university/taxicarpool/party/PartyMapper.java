@@ -16,13 +16,16 @@ public class PartyMapper {
             partyEntity.isDeleted(),
             partyEntity.getMemberEntities(),
             partyEntity.getHostMemberId(),
-            partyEntity.getEndDate()
+            partyEntity.getEndDate(),
+            partyEntity.isSameGenderOnly(),
+            partyEntity.isCostShareBeforeDropOff(),
+            partyEntity.isQuietMode(),
+            partyEntity.isDestinationChangeIn5Minutes()
         );
     }
 
     public PartyEntity convertToEntity(PartyCreateRequestDTO createRequestDTO) {
         return new PartyEntity(
-            createRequestDTO.getId(),
             createRequestDTO.getName(),
             createRequestDTO.getMemberEntities(),
             createRequestDTO.getHostMemberId(),
@@ -41,10 +44,10 @@ public class PartyMapper {
             partyUpdateRequestDTO.getMemberEntities(),
             partyUpdateRequestDTO.getHostMemberId(),
             partyUpdateRequestDTO.getEndDate(),
-            partyEntity.isSameGenderOnly(),
-            partyEntity.isCostShareBeforeDropOff(),
-            partyEntity.isQuietMode(),
-            partyEntity.isDestinationChangeIn5Minutes()
+            partyUpdateRequestDTO.isSameGenderOnly(),
+            partyUpdateRequestDTO.isCostShareBeforeDropOff(),
+            partyUpdateRequestDTO.isQuietMode(),
+            partyUpdateRequestDTO.isDestinationChangeIn5Minutes()
         );
     }
 }
