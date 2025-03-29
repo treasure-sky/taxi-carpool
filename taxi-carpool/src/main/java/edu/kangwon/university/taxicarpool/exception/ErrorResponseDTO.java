@@ -2,14 +2,14 @@ package edu.kangwon.university.taxicarpool.exception;
 
 import java.time.LocalDateTime;
 
-public class ErrorResponse {
+public class ErrorResponseDTO {
 
     private int status;
     private String message;
     private String path;
     private LocalDateTime timestamp;
 
-    public ErrorResponse(int status, String message, String path) {
+    public ErrorResponseDTO(int status, String message, String path) {
         this.status = status;
         this.message = message;
         this.path = path;
