@@ -234,12 +234,19 @@ public class PartyDTO {
 
         private boolean destinationChangeIn5Minutes;
 
+        @NotNull
+        @NotBlank(message = "출발 시간 입력은 필수입니다.")
         private LocalDateTime startDateTime;
 
+        @NotNull
+        @NotBlank(message = "출발지 입력은 필수입니다.")
         private String startLocation;
 
+        @NotNull
+        @NotBlank(message = "목적지 입력은 필수입니다.")
         private String endLocation;
 
+        @Size(max = 30, message = "설명은 최대 30글자입니다.")
         private String comment;
 
         private int currentParticipantCount;
@@ -441,12 +448,19 @@ public class PartyDTO {
 
         private boolean destinationChangeIn5Minutes;
 
+        @NotNull
+        @NotBlank(message = "출발 시간 입력은 필수입니다.")
         private LocalDateTime startDateTime;
 
+        @NotNull
+        @NotBlank(message = "출발지 입력은 필수입니다.")
         private String startLocation;
 
+        @NotNull
+        @NotBlank(message = "목적지 입력은 필수입니다.")
         private String endLocation;
 
+        @Size(max = 30, message = "설명은 최대 30글자입니다.")
         private String comment;
 
         private int currentParticipantCount;
