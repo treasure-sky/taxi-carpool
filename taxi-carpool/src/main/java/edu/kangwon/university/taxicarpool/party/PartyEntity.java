@@ -273,7 +273,6 @@ public class PartyEntity {
         this.comment = comment;
         this.maxParticipantCount = maxParticipantCount;
         return this;
-
     }
 
 }

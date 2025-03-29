@@ -421,8 +421,6 @@ public class PartyDTO {
     // UpdateRequestDTO에는 현재 인원수에 대한 필드가 없음 -> 파티의 인원수에 관한 로직은 무조건 join/leave 엔트포인트 사용을 강제를 위해
     public static class PartyUpdateRequestDTO {
 
-        private Long id;
-
         @NotNull
         @NotBlank(message = "파티 이름은 필수입니다.")
         private String name;
@@ -462,7 +460,6 @@ public class PartyDTO {
         private int maxParticipantCount;
 
         public PartyUpdateRequestDTO(
-            Long id,
             String name,
             boolean isDeleted,
             List<MemberEntity> memberEntities,
@@ -477,7 +474,6 @@ public class PartyDTO {
             String endLocation,
             String comment,
             int maxParticipantCount) {
-            this.id = id;
             this.name = name;
             this.isDeleted = isDeleted;
             this.memberEntities = memberEntities;
@@ -492,14 +488,6 @@ public class PartyDTO {
             this.endLocation = endLocation;
             this.comment = comment;
             this.maxParticipantCount = maxParticipantCount;
-        }
-
-        public Long getId() {
-            return id;
-        }
-
-        public void setId(Long id) {
-            this.id = id;
         }
 
         public String getName() {

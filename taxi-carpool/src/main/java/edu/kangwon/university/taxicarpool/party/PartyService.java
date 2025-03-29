@@ -65,22 +65,22 @@ public class PartyService {
 
         PartyEntity partyEntity = partyMapper.convertToEntity(createRequestDTO);
 
-        // 프론트로부터 파티를 만드는 멤버의 Id를 createRequestDTO 내부 필드(creatorMemberId)에 넣어서 보내달라고 해야함.
+        // 프론트로부터 파티를 만드는 멤버의 Id(creatorMemberId)를 createRequestDTO 내부 필드(creatorMemberId)에 넣어서 보내달라고 해야함.
         Long creatorMemberId = createRequestDTO.getCreatorMemberId();
 
         if (creatorMemberId != null) {
-            partyEntity.setHostMemberId(
-                creatorMemberId); // creatorMemberId(파티를 만든 멤버의 ID)를 HostMemberId로 설정
-
-            // 처음 방 만든 멤버도 그 파티방의 멤버로 등록하는 것임.(이거 안 해놓으면 프론트한테 요청 2번 요청해야함.)
-            MemberEntity member = memberRepository.findById(creatorMemberId)
-                .orElseThrow(() -> new MemberNotFoundException("해당 멤버가 존재하지 않습니다."));
-            partyEntity.getMemberEntities().add(member);
-
-            partyEntity.setCurrentParticipantCount(1); // 방 만들고, 현재 인원 1명으로 설정
+            partyEntity.setHostMemberId(creatorMemberId); // creatorMemberId(파티를 만든 멤버의 ID)를 HostMemberId로 설정
         } else {
             throw new IllegalArgumentException("파티방을 만든 멤버의 Id가 null임.");
         }
+
+        // 처음 방 만든 멤버도 그 파티방의 멤버로 등록하는 것임.(이거 안 해놓으면 프론트한테 요청 2번 요청해야함.)
+        MemberEntity member = memberRepository.findById(creatorMemberId)
+            .orElseThrow(() -> new MemberNotFoundException("파티방을 만든 멤버가 존재하지 않습니다."));
+        partyEntity.getMemberEntities().add(member);
+
+        partyEntity.setCurrentParticipantCount(1); // 방 만들고, 현재 인원 1명으로 설정
+
 
         PartyEntity savedPartyEntity = partyRepository.save(partyEntity);
         return partyMapper.convertToResponseDTO(savedPartyEntity);
@@ -157,6 +157,7 @@ public class PartyService {
             throw new MemberNotInPartyException("이 멤버는 해당 파티에 속해있지 않습니다.");
         }
 
+        // 호스트인 멤버가 파티를 떠나려고 할 때의 로직을 위한 isHostLeaving
         boolean isHostLeaving = (party.getHostMemberId() != null
             && party.getHostMemberId().equals(memberId));
 
