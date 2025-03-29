@@ -426,7 +426,7 @@ public class PartyDTO {
         }
     }
 
-    // UpdateRequestDTO에는 현재 인원수에 대한 필드가 없음 -> 파티의 인원수에 관한 로직은 무조건 join/leave 엔트포인트 사용 강제를 위해
+    // UpdateRequestDTO에는 현재 인원수에 대한 필드가 없음 -> 파티의 인원수에 관한 로직은 무조건 join/leave 엔트포인트 사용을 강제를 위해
     public static class PartyUpdateRequestDTO {
 
         private Long id;
