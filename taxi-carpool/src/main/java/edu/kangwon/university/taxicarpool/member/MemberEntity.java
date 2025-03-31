@@ -8,20 +8,13 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.validation.constraints.NotNull;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.validation.constraints.NotNull;
 
 @Entity
 public class MemberEntity {
-
-    public MemberEntity(String email, Gender gender, Long id, String nickname, String password) {
-        this.email = email;
-        this.gender = gender;
-        this.id = id;
-        this.nickname = nickname;
-        this.password = password;
-    }
 
     //(순호)가 회원가입 서비스 계층에서 사용하려고 만듦.(setter사용을 최대한 지양하기 위함.)
     public MemberEntity(String email, String password, String nickname, Gender gender) {
@@ -46,6 +39,7 @@ public class MemberEntity {
     private String password;
 
     @NotNull
+    @Column(unique = true)
     private String nickname;
 
     @NotNull
@@ -56,9 +50,12 @@ public class MemberEntity {
     @JoinColumn(name = "party_id")
     private PartyEntity partyEntity;
 
-
     public Long getId() {
         return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getEmail() {
@@ -92,4 +89,5 @@ public class MemberEntity {
     public void setGender(Gender gender) {
         this.gender = gender;
     }
+
 }
