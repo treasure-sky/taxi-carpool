@@ -1,5 +1,6 @@
 package edu.kangwon.university.taxicarpool.member;
 
+import edu.kangwon.university.taxicarpool.party.PartyEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -8,15 +9,19 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.validation.constraints.NotNull;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.validation.constraints.NotNull;
 
 @Entity
 public class MemberEntity {
 
-    public MemberEntity(String email, Gender gender, String nickname, String password) {
+    //(순호)가 회원가입 서비스 계층에서 사용하려고 만듦.(setter사용을 최대한 지양하기 위함.)
+    public MemberEntity(String email, String password, String nickname, Gender gender) {
         this.email = email;
-        this.gender = gender;
-        this.nickname = nickname;
         this.password = password;
+        this.nickname = nickname;
+        this.gender = gender;
     }
 
     public MemberEntity() {
@@ -41,6 +46,9 @@ public class MemberEntity {
     @Enumerated(EnumType.STRING)
     private Gender gender;
 
+    @ManyToOne
+    @JoinColumn(name = "party_id")
+    private PartyEntity partyEntity;
 
     public Long getId() {
         return id;
@@ -81,4 +89,5 @@ public class MemberEntity {
     public void setGender(Gender gender) {
         this.gender = gender;
     }
+
 }
