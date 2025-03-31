@@ -39,6 +39,11 @@ public class EmailVerificationService {
         this.javaMailSender = javaMailSender;
     }
 
+    /**
+     * 인증코드 전송
+     *
+     * @param email 사용자 이메일
+     */
     public void sendCode(String email) throws Exception {
 
         // 이미 가입된 사용자가 이메일을 사용하고 있으면 예외 처리
@@ -74,7 +79,6 @@ public class EmailVerificationService {
      *
      * @param email 사용자 이메일
      * @param code  사용자가 입력한 코드
-     * @return 인증 되었는지 여부
      */
     public void verifyCode(String email, String code) {
 
