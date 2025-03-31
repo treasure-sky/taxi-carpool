@@ -8,7 +8,6 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.validation.constraints.NotNull;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.validation.constraints.NotNull;
@@ -16,7 +15,6 @@ import jakarta.validation.constraints.NotNull;
 @Entity
 public class MemberEntity {
 
-    //(순호)가 회원가입 서비스 계층에서 사용하려고 만듦.(setter사용을 최대한 지양하기 위함.)
     public MemberEntity(String email, String password, String nickname, Gender gender) {
         this.email = email;
         this.password = password;
