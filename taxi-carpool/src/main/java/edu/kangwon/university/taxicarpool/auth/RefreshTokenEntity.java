@@ -1,8 +1,12 @@
 package edu.kangwon.university.taxicarpool.auth;
 
 import edu.kangwon.university.taxicarpool.member.MemberEntity;
-import jakarta.persistence.*;
-
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
 import java.time.LocalDateTime;
 
 @Entity
@@ -23,7 +27,8 @@ public class RefreshTokenEntity {
     // 만료 기한
     private LocalDateTime expiryDate;
 
-    public RefreshTokenEntity() {}
+    public RefreshTokenEntity() {
+    }
 
     public RefreshTokenEntity(MemberEntity member, String refreshToken, LocalDateTime expiryDate) {
         this.member = member;

@@ -13,19 +13,15 @@ import edu.kangwon.university.taxicarpool.party.partyException.PartyFullExceptio
 import edu.kangwon.university.taxicarpool.party.partyException.PartyNotFoundException;
 import edu.kangwon.university.taxicarpool.party.partyException.UnauthorizedHostAccessException;
 import jakarta.transaction.Transactional;
-import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.NoSuchElementException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.Optional;
 
 @Service
 public class PartyService {
@@ -69,7 +65,8 @@ public class PartyService {
         Long creatorMemberId = createRequestDTO.getCreatorMemberId();
 
         if (creatorMemberId != null) {
-            partyEntity.setHostMemberId(creatorMemberId); // creatorMemberId(파티를 만든 멤버의 ID)를 HostMemberId로 설정
+            partyEntity.setHostMemberId(
+                creatorMemberId); // creatorMemberId(파티를 만든 멤버의 ID)를 HostMemberId로 설정
         } else {
             throw new IllegalArgumentException("파티방을 만든 멤버의 Id가 null임.");
         }
@@ -80,7 +77,6 @@ public class PartyService {
         partyEntity.getMemberEntities().add(member);
 
         partyEntity.setCurrentParticipantCount(1); // 방 만들고, 현재 인원 1명으로 설정
-
 
         PartyEntity savedPartyEntity = partyRepository.save(partyEntity);
         return partyMapper.convertToResponseDTO(savedPartyEntity);
@@ -135,10 +131,9 @@ public class PartyService {
 
         // 새로운 멤버가 파티 참가시, 현재인원 1명 추가
         int currentParticipantCount = party.getCurrentParticipantCount();
-        if(currentParticipantCount < party.getMaxParticipantCount()) {
+        if (currentParticipantCount < party.getMaxParticipantCount()) {
             party.setCurrentParticipantCount(currentParticipantCount++);
-        }
-        else {
+        } else {
             throw new PartyFullException("현재 파티의 참여중인 인원수가 가득찼습니다.");
         }
 
@@ -166,10 +161,9 @@ public class PartyService {
 
         // 파티의 현재 인원 수 감소시키기
         int currentParticipantCount = party.getCurrentParticipantCount();
-        if(currentParticipantCount > 1) {
+        if (currentParticipantCount > 1) {
             party.setCurrentParticipantCount(currentParticipantCount--);
-        }
-        else {
+        } else {
             // 앱의 플로우상 마지막으로 떠나는 멤버가 호스트일수밖에 없어서, 해당 코드가 필요하지 않을 것 같긴한데, 혹시 몰라서 일단 추가해둠.
             party.setDeleted(true);
             throw new PartyEmptyException("파티방의 모든 멤버가 떠나여, 파티방이 삭제되었습니다.");

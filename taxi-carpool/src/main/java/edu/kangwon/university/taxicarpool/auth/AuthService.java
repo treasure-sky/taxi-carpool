@@ -82,7 +82,8 @@ public class AuthService {
             tokenEntity.updateRefreshToken(refreshToken, refreshExpiry);
             refreshTokenRepository.save(tokenEntity);
         } else {
-            RefreshTokenEntity newToken = new RefreshTokenEntity(member, refreshToken, refreshExpiry);
+            RefreshTokenEntity newToken = new RefreshTokenEntity(member, refreshToken,
+                refreshExpiry);
             refreshTokenRepository.save(newToken);
         }
 
@@ -94,7 +95,8 @@ public class AuthService {
     // 리프래쉬 토큰으로 액세스 토큰 재발급
     public LoginDTO.RefreshResponseDTO refresh(LoginDTO.RefreshRequestDTO request) {
         // DB에서 리프래쉬 토큰 조회
-        RefreshTokenEntity tokenEntity = refreshTokenRepository.findByRefreshToken(request.getRefreshToken())
+        RefreshTokenEntity tokenEntity = refreshTokenRepository.findByRefreshToken(
+                request.getRefreshToken())
             .orElseThrow(() -> new TokenInvalidException("유효하지 않은 리프래쉬 토큰입니다."));
 
         // 리프래쉬 토큰이 만료됐는지 확인
@@ -125,8 +127,7 @@ public class AuthService {
             // 만료시간을 현재 시각으로 세팅하여 무효화시키기 (걍 레포지토리에서 delete해도 되긴함)
             tokenEntity.setExpiryDate(LocalDateTime.now());
             refreshTokenRepository.save(tokenEntity);
-        }
-        else {
+        } else {
             throw new TokenInvalidException("토큰없는 로그아웃입니다. 재로그인 후 로그아웃 해주세요.");
         }
     }

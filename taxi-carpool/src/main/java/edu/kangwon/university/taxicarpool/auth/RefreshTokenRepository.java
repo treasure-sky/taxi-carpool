@@ -1,9 +1,8 @@
 package edu.kangwon.university.taxicarpool.auth;
 
 import edu.kangwon.university.taxicarpool.member.MemberEntity;
-import org.springframework.data.jpa.repository.JpaRepository;
-
 import java.util.Optional;
+import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface RefreshTokenRepository extends JpaRepository<RefreshTokenEntity, Long> {
 
