@@ -1,5 +1,5 @@
 package edu.kangwon.university.taxicarpool.member;
 
-public class MemberDTO {
-
+public enum Gender {
+    MALE, FEMALE
 }
