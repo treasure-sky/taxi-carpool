@@ -73,6 +73,51 @@ public class GlobalExceptionHandler {
         return new ErrorResponseDTO(HttpStatus.CONFLICT.value(), ex.getMessage(), request.getRequestURI());
     }
 
+    @ExceptionHandler(MemberNotFoundException.class)
+    public ResponseEntity<?> handleMemberNotFoundException(MemberNotFoundException e) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+            .body(e.getMessage());
+    }
+
+    @ExceptionHandler(DuplicatedNicknameException.class)
+    public ResponseEntity<?> handleDuplicatedNicknameException(DuplicatedNicknameException e) {
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+            .body(e.getMessage());
+    }
+
+    @ExceptionHandler(DuplicatedEmailException.class)
+    public ResponseEntity<?> handleDuplicatedNicknameException(DuplicatedEmailException e) {
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+            .body(e.getMessage());
+    }
+
+    @ExceptionHandler(EmailVerificationNotFoundException.class)
+    public ResponseEntity<?> handleEmailVerificationNotFoundException(
+        EmailVerificationNotFoundException e) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+            .body(e.getMessage());
+    }
+
+    @ExceptionHandler(EmailSendFailedException.class)
+    public ResponseEntity<?> handleEmailSendFailedException(EmailSendFailedException e) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+            .body(e.getMessage());
+    }
+
+    @ExceptionHandler(InvalidVerificationCodeException.class)
+    public ResponseEntity<?> handleInvalidVerificationCodeException(
+        InvalidVerificationCodeException e) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+            .body(e.getMessage());
+    }
+
+    @ExceptionHandler(ExpiredVerificationCodeException.class)
+    public ResponseEntity<?> handleExpiredVerificationCodeException(
+        ExpiredVerificationCodeException e) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+            .body(e.getMessage());
+    }
+
     // 그 외 잡히지 않은 모든 예외에 대한 전역 핸들러
     @ExceptionHandler(Exception.class)
     public ErrorResponseDTO handleException(Exception ex, HttpServletRequest request) {
