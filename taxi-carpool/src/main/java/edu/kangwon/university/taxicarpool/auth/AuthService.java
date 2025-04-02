@@ -3,8 +3,11 @@ package edu.kangwon.university.taxicarpool.auth;
 import edu.kangwon.university.taxicarpool.auth.authException.AuthenticationFailedException;
 import edu.kangwon.university.taxicarpool.auth.authException.TokenExpiredException;
 import edu.kangwon.university.taxicarpool.auth.authException.TokenInvalidException;
+import edu.kangwon.university.taxicarpool.email.EmailVerificationService;
 import edu.kangwon.university.taxicarpool.member.MemberEntity;
-import edu.kangwon.university.taxicarpool.member.MemberRepository;
+import edu.kangwon.university.taxicarpool.member.MemberService;
+import edu.kangwon.university.taxicarpool.member.dto.MemberCreateDTO;
+import edu.kangwon.university.taxicarpool.member.dto.MemberResponseDTO;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,53 +17,38 @@ import org.springframework.stereotype.Service;
 @Service
 public class AuthService {
 
-    private final MemberRepository memberRepository;
+    private final MemberService memberService;
+    private final EmailVerificationService emailVerificationService;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
     private final RefreshTokenRepository refreshTokenRepository;
 
     @Autowired
-    public AuthService(MemberRepository memberRepository,
+    public AuthService(MemberService memberService,
+        EmailVerificationService emailVerificationService,
         PasswordEncoder passwordEncoder,
         JwtUtil jwtUtil,
         RefreshTokenRepository refreshTokenRepository) {
-        this.memberRepository = memberRepository;
+        this.memberService = memberService;
+        this.emailVerificationService = emailVerificationService;
         this.passwordEncoder = passwordEncoder;
         this.jwtUtil = jwtUtil;
         this.refreshTokenRepository = refreshTokenRepository;
     }
 
     // 회원가입
-    public SignUpDTO.SignUpResponseDTO signUp(SignUpDTO.SignUpRequestDTO request) {
-        // 이메일 중복 체크
-        if (memberRepository.findByEmail(request.getEmail()).isPresent()) {
-            throw new AuthenticationFailedException("이미 사용 중인 이메일입니다.");
-        }
+    public MemberResponseDTO signUp(MemberCreateDTO request) {
 
-        // 비밀번호 암호화 -> 엔티티 만들기(encode()가 PasswordEncoder에서 제공하는 암호화 메서드임.(구현체를 override말고, config에 구현해서 사용해야함))
-        MemberEntity member = new MemberEntity(
-            request.getEmail(),
-            passwordEncoder.encode(request.getPassword()),
-            request.getNickname(),
-            request.getGender()
-        );
+        // 이메일 인증여부 확인
+        emailVerificationService.isEmailVerified(request.getEmail());
 
-        // DB 저장(일단 레포지토리에 직접 저장해놓았는데, 추후에 merge되면 memberService로 바꿔서 해도 괜찮을듯..?)
-        MemberEntity savedMember = memberRepository.save(member);
-
-        // 응답 DTO 만들기
-        return new SignUpDTO.SignUpResponseDTO(
-            savedMember.getId(),
-            savedMember.getEmail(),
-            savedMember.getNickname(),
-            savedMember.getGender()
-        );
+        return memberService.createMember(request);
     }
 
     // 로그인
     public LoginDTO.LoginResponse login(LoginDTO.LoginRequest request) {
-        MemberEntity member = memberRepository.findByEmail(request.getEmail())
-            .orElseThrow(() -> new AuthenticationFailedException("존재하지 않는 이메일입니다."));
+
+        MemberEntity member = memberService.getMemberEntityByEmail(request.getEmail());
 
         if (!passwordEncoder.matches(request.getPassword(), member.getPassword())) {
             throw new AuthenticationFailedException("비밀번호가 올바르지 않습니다.");
@@ -116,8 +104,7 @@ public class AuthService {
     // 로그아웃
     public void logout(String email) {
         // 1) 이메일로 Member 조회
-        MemberEntity member = memberRepository.findByEmail(email)
-            .orElseThrow(() -> new AuthenticationFailedException("존재하지 않는 이메일입니다."));
+        MemberEntity member = memberService.getMemberEntityByEmail(email);
 
         // 2) 리프레쉬 토큰 엔티티 조회
         Optional<RefreshTokenEntity> optionalToken = refreshTokenRepository.findByMember(member);
