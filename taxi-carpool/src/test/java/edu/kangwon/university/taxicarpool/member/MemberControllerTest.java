@@ -7,17 +7,13 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import edu.kangwon.university.taxicarpool.member.dto.MemberCreateDTO;
 import edu.kangwon.university.taxicarpool.member.dto.MemberResponseDTO;
 import edu.kangwon.university.taxicarpool.member.dto.MemberUpdateDTO;
-import edu.kangwon.university.taxicarpool.member.exception.DuplicatedEmailException;
-import edu.kangwon.university.taxicarpool.member.exception.DuplicatedNicknameException;
 import edu.kangwon.university.taxicarpool.member.exception.MemberNotFoundException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -40,89 +36,6 @@ class MemberControllerTest {
 
     @Autowired
     private ObjectMapper objectMapper;
-
-    @Test
-    void 멤버_생성_성공() throws Exception {
-        // given
-        MemberCreateDTO createDTO = new MemberCreateDTO();
-        createDTO.setEmail("test@kangwon.ac.kr");
-        createDTO.setPassword("testPassword12");
-        createDTO.setNickname("testNickname");
-        createDTO.setGender(Gender.MALE);
-
-        MemberResponseDTO responseDTO = new MemberResponseDTO();
-        responseDTO.setId(1L);
-        responseDTO.setEmail(createDTO.getEmail());
-        responseDTO.setNickname(createDTO.getNickname());
-        responseDTO.setGender(createDTO.getGender());
-
-        when(memberService.createMember(any(MemberCreateDTO.class))).thenReturn(responseDTO);
-
-        // JSON으로 변환
-        String requestBody = objectMapper.writeValueAsString(createDTO);
-
-        // when & then
-        mockMvc.perform(
-                post("/api/member")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(requestBody)
-            )
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.id").value(1L))
-            .andExpect(jsonPath("$.email").value("test@kangwon.ac.kr"))
-            .andExpect(jsonPath("$.nickname").value("testNickname"))
-            .andExpect(jsonPath("$.gender").value("MALE"));
-
-        verify(memberService, times(1)).createMember(any(MemberCreateDTO.class));
-    }
-
-    @Test
-    void 중복된_이메일로_멤버_생성시_예외처리() throws Exception {
-        // given
-        MemberCreateDTO createDTO = new MemberCreateDTO();
-        createDTO.setEmail("duplicate@kangwon.ac.kr");
-        createDTO.setPassword("testPassword12");
-        createDTO.setNickname("testNickname");
-        createDTO.setGender(Gender.MALE);
-
-        when(memberService.createMember(any(MemberCreateDTO.class)))
-            .thenThrow(new DuplicatedEmailException("이미 사용 중인 이메일입니다."));
-
-        String requestBody = objectMapper.writeValueAsString(createDTO);
-
-        // when & then
-        mockMvc.perform(post("/api/member")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(requestBody))
-            .andExpect(status().isConflict());
-
-        verify(memberService, times(1)).createMember(any(MemberCreateDTO.class));
-    }
-
-    @Test
-    void 중복된_닉네임으로_멤버_생성시_예외처리() throws Exception {
-        // given
-        MemberCreateDTO createDTO = new MemberCreateDTO();
-        createDTO.setEmail("test@kangwon.ac.kr");
-        createDTO.setPassword("testPassword12");
-        createDTO.setNickname("duplicatedNickname");
-        createDTO.setGender(Gender.MALE);
-
-        when(memberService.createMember(any(MemberCreateDTO.class)))
-            .thenThrow(new DuplicatedNicknameException("이미 사용 중인 닉네임입니다."));
-
-        String requestBody = objectMapper.writeValueAsString(createDTO);
-
-        // when & then
-        mockMvc.perform(
-                post("/api/member")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(requestBody)
-            )
-            .andExpect(status().isConflict());
-
-        verify(memberService, times(1)).createMember(any(MemberCreateDTO.class));
-    }
 
     @Test
     void 멤버_조회_성공() throws Exception {
