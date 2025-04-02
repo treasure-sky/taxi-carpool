@@ -132,7 +132,8 @@ public class PartyService {
         // 새로운 멤버가 파티 참가시, 현재인원 1명 추가
         int currentParticipantCount = party.getCurrentParticipantCount();
         if (currentParticipantCount < party.getMaxParticipantCount()) {
-            party.setCurrentParticipantCount(currentParticipantCount++);
+            currentParticipantCount += 1;
+            party.setCurrentParticipantCount(currentParticipantCount);
         } else {
             throw new PartyFullException("현재 파티의 참여중인 인원수가 가득찼습니다.");
         }
@@ -162,7 +163,8 @@ public class PartyService {
         // 파티의 현재 인원 수 감소시키기
         int currentParticipantCount = party.getCurrentParticipantCount();
         if (currentParticipantCount > 1) {
-            party.setCurrentParticipantCount(currentParticipantCount--);
+            currentParticipantCount -= 1;
+            party.setCurrentParticipantCount(currentParticipantCount);
         } else {
             // 앱의 플로우상 마지막으로 떠나는 멤버가 호스트일수밖에 없어서, 해당 코드가 필요하지 않을 것 같긴한데, 혹시 몰라서 일단 추가해둠.
             party.setDeleted(true);
