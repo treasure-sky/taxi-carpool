@@ -102,7 +102,7 @@ public class MemberService {
         return responseDTO;
     }
 
-    public MemberResponseDTO getMember(Long memberId) {
+    public MemberResponseDTO getMemberById(Long memberId) {
 
         MemberEntity entity = memberRepository.findById(memberId)
             .orElseThrow(() -> new MemberNotFoundException("회원을 찾을 수 없습니다: " + memberId));
@@ -116,4 +116,15 @@ public class MemberService {
 
         return responseDTO;
     }
+
+    public MemberEntity getMemberEntityByEmail(String email) {
+        return memberRepository.findByEmail(email)
+            .orElseThrow(() -> new DuplicatedEmailException("존재하지 않는 이메일입니다: " + email));
+    }
+
+    public boolean existsByEmail(String email) {
+        return memberRepository.existsByEmail(email);
+    }
+
+
 }

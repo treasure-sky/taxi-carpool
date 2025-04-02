@@ -128,7 +128,7 @@ class MemberServiceTest {
         when(memberRepository.findById(memberId)).thenReturn(Optional.of(entity));
 
         // when
-        MemberResponseDTO response = memberService.getMember(memberId);
+        MemberResponseDTO response = memberService.getMemberById(memberId);
 
         // then
         assertThat(response).isNotNull();
@@ -147,7 +147,7 @@ class MemberServiceTest {
         when(memberRepository.findById(memberId)).thenReturn(Optional.empty());
 
         // when & then
-        assertThatThrownBy(() -> memberService.getMember(memberId))
+        assertThatThrownBy(() -> memberService.getMemberById(memberId))
             .isInstanceOf(MemberNotFoundException.class)
             .hasMessageContaining("회원을 찾을 수 없습니다");
 

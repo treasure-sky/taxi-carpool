@@ -136,7 +136,7 @@ class MemberControllerTest {
             Gender.MALE
         );
 
-        when(memberService.getMember(memberId)).thenReturn(responseDTO);
+        when(memberService.getMemberById(memberId)).thenReturn(responseDTO);
 
         // when & then
         mockMvc.perform(get("/api/member/{id}", memberId))
@@ -146,21 +146,21 @@ class MemberControllerTest {
             .andExpect(jsonPath("$.nickname").value("testNickname"))
             .andExpect(jsonPath("$.gender").value("MALE"));
 
-        verify(memberService, times(1)).getMember(memberId);
+        verify(memberService, times(1)).getMemberById(memberId);
     }
 
     @Test
     void 존재하지_않는_멤버_조회시_예외처리() throws Exception {
         // given
         Long memberId = 100L;
-        when(memberService.getMember(memberId))
+        when(memberService.getMemberById(memberId))
             .thenThrow(new MemberNotFoundException("회원을 찾을 수 없습니다."));
 
         // when & then
         mockMvc.perform(get("/api/member/{id}", memberId))
             .andExpect(status().isNotFound());
 
-        verify(memberService, times(1)).getMember(memberId);
+        verify(memberService, times(1)).getMemberById(memberId);
     }
 
     @Test

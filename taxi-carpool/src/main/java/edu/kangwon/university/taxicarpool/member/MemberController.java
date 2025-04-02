@@ -33,7 +33,7 @@ public class MemberController {
 
     @GetMapping("/{memberId}")
     public ResponseEntity<MemberResponseDTO> getMember(@PathVariable Long memberId) {
-        MemberResponseDTO member = memberService.getMember(memberId);
+        MemberResponseDTO member = memberService.getMemberById(memberId);
         return ResponseEntity.ok(member);
     }
 
