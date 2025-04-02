@@ -119,7 +119,7 @@ public class MemberService {
 
     public MemberEntity getMemberEntityByEmail(String email) {
         return memberRepository.findByEmail(email)
-            .orElseThrow(() -> new DuplicatedEmailException("존재하지 않는 이메일입니다: " + email));
+            .orElseThrow(() -> new MemberNotFoundException("존재하지 않는 이메일입니다: " + email));
     }
 
     public boolean existsByEmail(String email) {
