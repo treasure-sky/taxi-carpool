@@ -129,11 +129,12 @@ class MemberControllerTest {
         // given
         Long memberId = 1L;
 
-        MemberResponseDTO responseDTO = new MemberResponseDTO();
-        responseDTO.setId(memberId);
-        responseDTO.setEmail("test@kangwon.ac.kr");
-        responseDTO.setNickname("testNickname");
-        responseDTO.setGender(Gender.MALE);
+        MemberResponseDTO responseDTO = new MemberResponseDTO(
+            memberId,
+            "test@kangwon.ac.kr",
+            "testNickname",
+            Gender.MALE
+        );
 
         when(memberService.getMember(memberId)).thenReturn(responseDTO);
 
@@ -170,11 +171,12 @@ class MemberControllerTest {
         updateDTO.setNewNickname("newNickname");
         updateDTO.setNewPassword("newPassword12");
 
-        MemberResponseDTO responseDTO = new MemberResponseDTO();
-        responseDTO.setId(memberId);
-        responseDTO.setEmail("test@kangwon.ac.kr");
-        responseDTO.setNickname("newNickname");
-        responseDTO.setGender(Gender.MALE);
+        MemberResponseDTO responseDTO = new MemberResponseDTO(
+            memberId,
+            "test@kangwon.ac.kr",
+            "newNickname",
+            Gender.MALE
+        );
 
         when(memberService.updateMember(eq(memberId), any(MemberUpdateDTO.class)))
             .thenReturn(responseDTO);
@@ -225,11 +227,12 @@ class MemberControllerTest {
     void 멤버_삭제_성공() throws Exception {
         // given
         Long memberId = 1L;
-        MemberResponseDTO responseDTO = new MemberResponseDTO();
-        responseDTO.setId(memberId);
-        responseDTO.setEmail("test@kangwon.ac.kr");
-        responseDTO.setNickname("testNickname");
-        responseDTO.setGender(Gender.MALE);
+        MemberResponseDTO responseDTO = new MemberResponseDTO(
+            memberId,
+            "test@kangwon.ac.kr",
+            "testNickname",
+            Gender.MALE
+        );
 
         when(memberService.deleteMember(memberId)).thenReturn(responseDTO);
 

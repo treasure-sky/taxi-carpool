@@ -49,11 +49,12 @@ public class MemberService {
         MemberEntity saved = memberRepository.save(entity);
 
         // 저장된 결과를 DTO로 변환하여 반환
-        MemberResponseDTO responseDTO = new MemberResponseDTO();
-        responseDTO.setId(saved.getId());
-        responseDTO.setEmail(saved.getEmail());
-        responseDTO.setNickname(saved.getNickname());
-        responseDTO.setGender(saved.getGender());
+        MemberResponseDTO responseDTO = new MemberResponseDTO(
+            saved.getId(),
+            saved.getEmail(),
+            saved.getNickname(),
+            saved.getGender()
+        );
 
         return responseDTO;
     }
@@ -75,11 +76,12 @@ public class MemberService {
 
         MemberEntity updated = memberRepository.save(existedEntity);
 
-        MemberResponseDTO responseDTO = new MemberResponseDTO();
-        responseDTO.setId(updated.getId());
-        responseDTO.setEmail(updated.getEmail());
-        responseDTO.setNickname(updated.getNickname());
-        responseDTO.setGender(updated.getGender());
+        MemberResponseDTO responseDTO = new MemberResponseDTO(
+            updated.getId(),
+            updated.getEmail(),
+            updated.getNickname(),
+            updated.getGender()
+        );
 
         return responseDTO;
     }
@@ -90,11 +92,12 @@ public class MemberService {
 
         memberRepository.delete(entity);
 
-        MemberResponseDTO responseDTO = new MemberResponseDTO();
-        responseDTO.setId(entity.getId());
-        responseDTO.setEmail(entity.getEmail());
-        responseDTO.setNickname(entity.getNickname());
-        responseDTO.setGender(entity.getGender());
+        MemberResponseDTO responseDTO = new MemberResponseDTO(
+            entity.getId(),
+            entity.getEmail(),
+            entity.getNickname(),
+            entity.getGender()
+        );
 
         return responseDTO;
     }
@@ -104,11 +107,12 @@ public class MemberService {
         MemberEntity entity = memberRepository.findById(memberId)
             .orElseThrow(() -> new MemberNotFoundException("회원을 찾을 수 없습니다: " + memberId));
 
-        MemberResponseDTO responseDTO = new MemberResponseDTO();
-        responseDTO.setId(entity.getId());
-        responseDTO.setEmail(entity.getEmail());
-        responseDTO.setNickname(entity.getNickname());
-        responseDTO.setGender(entity.getGender());
+        MemberResponseDTO responseDTO = new MemberResponseDTO(
+            entity.getId(),
+            entity.getEmail(),
+            entity.getNickname(),
+            entity.getGender()
+        );
 
         return responseDTO;
     }
