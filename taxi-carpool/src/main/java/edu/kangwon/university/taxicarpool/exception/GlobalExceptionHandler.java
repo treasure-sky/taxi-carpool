@@ -8,7 +8,6 @@ import edu.kangwon.university.taxicarpool.email.exception.EmailVerificationNotFo
 import edu.kangwon.university.taxicarpool.email.exception.ExpiredVerificationCodeException;
 import edu.kangwon.university.taxicarpool.email.exception.InvalidVerificationCodeException;
 import edu.kangwon.university.taxicarpool.map.exception.KakaoApiParseException;
-import edu.kangwon.university.taxicarpool.map.exception.NoSearchResultException;
 import edu.kangwon.university.taxicarpool.member.exception.DuplicatedEmailException;
 import edu.kangwon.university.taxicarpool.member.exception.DuplicatedNicknameException;
 import edu.kangwon.university.taxicarpool.party.partyException.MemberNotFoundException;
@@ -153,14 +152,6 @@ public class GlobalExceptionHandler {
         KakaoApiParseException ex,
         HttpServletRequest request) {
         return new ErrorResponseDTO(HttpStatus.INTERNAL_SERVER_ERROR.value(), ex.getMessage(),
-            request.getRequestURI());
-    }
-
-    @ExceptionHandler(NoSearchResultException.class)
-    public ErrorResponseDTO handleNoSearchResultException(
-        NoSearchResultException ex,
-        HttpServletRequest request) {
-        return new ErrorResponseDTO(HttpStatus.NO_CONTENT.value(), ex.getMessage(),
             request.getRequestURI());
     }
 

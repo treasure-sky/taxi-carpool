@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.kangwon.university.taxicarpool.map.exception.KakaoApiParseException;
-import edu.kangwon.university.taxicarpool.map.exception.NoSearchResultException;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Value;
@@ -77,10 +76,6 @@ public class MapService {
                     doc.get("y").asText()
                 );
                 places.add(place);
-            }
-
-            if (places.isEmpty()) {
-                throw new NoSearchResultException("검색결과가 없습니다");
             }
 
             return new MapSearchResponseDTO(places);
