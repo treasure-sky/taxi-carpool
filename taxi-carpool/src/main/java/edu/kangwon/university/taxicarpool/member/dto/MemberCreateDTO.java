@@ -9,6 +9,13 @@ import jakarta.validation.constraints.NotNull;
 
 public class MemberCreateDTO {
 
+    public MemberCreateDTO(String email, String password, String nickname, Gender gender) {
+        this.email = email;
+        this.password = password;
+        this.nickname = nickname;
+        this.gender = gender;
+    }
+
     @NotBlank(message = "이메일은 필수 입력 항목입니다.")
     @EmailValid
     private String email;
