@@ -18,7 +18,12 @@ import edu.kangwon.university.taxicarpool.party.partyException.PartyFullExceptio
 import edu.kangwon.university.taxicarpool.party.partyException.PartyNotFoundException;
 import edu.kangwon.university.taxicarpool.party.partyException.UnauthorizedHostAccessException;
 import jakarta.servlet.http.HttpServletRequest;
+import java.util.HashMap;
+import java.util.Map;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -37,6 +42,15 @@ public class GlobalExceptionHandler {
         HttpServletRequest request) {
         return new ErrorResponseDTO(HttpStatus.UNAUTHORIZED.value(), ex.getMessage(),
             request.getRequestURI());
+    }
+
+    // 빈 JSON이나 잘못된 형식으로 인한 예외 처리
+    @ExceptionHandler({MethodArgumentNotValidException.class,
+        HttpMessageNotReadableException.class})
+    public ResponseEntity<Map<String, String>> handleValidationExceptions(Exception ex) {
+        Map<String, String> errorResponse = new HashMap<>();
+        errorResponse.put("message", "이메일과 패스워드 모두 입력해주세요");
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }
 
     @ExceptionHandler(TokenInvalidException.class)
