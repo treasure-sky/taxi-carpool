@@ -31,17 +31,19 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(PartyNotFoundException.class)
-    public ErrorResponseDTO handlePartyNotFoundException(PartyNotFoundException ex,
+    public ResponseEntity<ErrorResponseDTO> handlePartyNotFoundException(PartyNotFoundException ex,
         HttpServletRequest request) {
-        return new ErrorResponseDTO(HttpStatus.NOT_FOUND.value(), ex.getMessage(),
+        ErrorResponseDTO errorResponse = new ErrorResponseDTO(HttpStatus.NOT_FOUND.value(), ex.getMessage(),
             request.getRequestURI());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
     }
 
     @ExceptionHandler(AuthenticationFailedException.class)
-    public ErrorResponseDTO handleAuthenticationFailedException(AuthenticationFailedException ex,
+    public ResponseEntity<ErrorResponseDTO> handleAuthenticationFailedException(AuthenticationFailedException ex,
         HttpServletRequest request) {
-        return new ErrorResponseDTO(HttpStatus.UNAUTHORIZED.value(), ex.getMessage(),
+        ErrorResponseDTO errorResponse = new ErrorResponseDTO(HttpStatus.UNAUTHORIZED.value(), ex.getMessage(),
             request.getRequestURI());
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
     }
 
     // 빈 JSON이나 잘못된 형식으로 인한 예외 처리
@@ -49,130 +51,147 @@ public class GlobalExceptionHandler {
         HttpMessageNotReadableException.class})
     public ResponseEntity<Map<String, String>> handleValidationExceptions(Exception ex) {
         Map<String, String> errorResponse = new HashMap<>();
-        errorResponse.put("message", "이메일과 패스워드 모두 입력해주세요");
+        errorResponse.put("message", "로그인 형식을 올바르게 보내주세요.");
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }
 
     @ExceptionHandler(TokenInvalidException.class)
-    public ErrorResponseDTO handleTokenInvalidException(TokenInvalidException ex,
+    public ResponseEntity<ErrorResponseDTO> handleTokenInvalidException(TokenInvalidException ex,
         HttpServletRequest request) {
-        return new ErrorResponseDTO(HttpStatus.UNAUTHORIZED.value(), ex.getMessage(),
+        ErrorResponseDTO errorResponse = new ErrorResponseDTO(HttpStatus.UNAUTHORIZED.value(), ex.getMessage(),
             request.getRequestURI());
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
-    public ErrorResponseDTO handleIllegalArgumentException(IllegalArgumentException ex,
+    public ResponseEntity<ErrorResponseDTO> handleIllegalArgumentException(IllegalArgumentException ex,
         HttpServletRequest request) {
-        return new ErrorResponseDTO(HttpStatus.BAD_REQUEST.value(), ex.getMessage(),
+        ErrorResponseDTO errorResponse = new ErrorResponseDTO(HttpStatus.BAD_REQUEST.value(), ex.getMessage(),
             request.getRequestURI());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }
 
     @ExceptionHandler(MemberNotFoundException.class)
-    public ErrorResponseDTO handleMemberNotFoundException(MemberNotFoundException ex,
+    public ResponseEntity<ErrorResponseDTO> handleMemberNotFoundException(MemberNotFoundException ex,
         HttpServletRequest request) {
-        return new ErrorResponseDTO(HttpStatus.NOT_FOUND.value(), ex.getMessage(),
+        ErrorResponseDTO errorResponse = new ErrorResponseDTO(HttpStatus.NOT_FOUND.value(), ex.getMessage(),
             request.getRequestURI());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
     }
 
     @ExceptionHandler(MemberNotInPartyException.class)
-    public ErrorResponseDTO handleMemberNotInPartyException(MemberNotInPartyException ex,
+    public ResponseEntity<ErrorResponseDTO> handleMemberNotInPartyException(MemberNotInPartyException ex,
         HttpServletRequest request) {
-        return new ErrorResponseDTO(HttpStatus.BAD_REQUEST.value(), ex.getMessage(),
+        ErrorResponseDTO errorResponse = new ErrorResponseDTO(HttpStatus.BAD_REQUEST.value(), ex.getMessage(),
             request.getRequestURI());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }
 
     @ExceptionHandler(PartyAlreadyDeletedException.class)
-    public ErrorResponseDTO handlePartyAlreadyDeletedException(PartyAlreadyDeletedException ex,
+    public ResponseEntity<ErrorResponseDTO> handlePartyAlreadyDeletedException(PartyAlreadyDeletedException ex,
         HttpServletRequest request) {
-        return new ErrorResponseDTO(HttpStatus.GONE.value(), ex.getMessage(),
+        ErrorResponseDTO errorResponse = new ErrorResponseDTO(HttpStatus.GONE.value(), ex.getMessage(),
             request.getRequestURI());
+        return ResponseEntity.status(HttpStatus.GONE).body(errorResponse);
     }
 
     @ExceptionHandler(PartyEmptyException.class)
-    public ErrorResponseDTO handlePartyEmptyException(PartyEmptyException ex,
+    public ResponseEntity<ErrorResponseDTO> handlePartyEmptyException(PartyEmptyException ex,
         HttpServletRequest request) {
-        return new ErrorResponseDTO(HttpStatus.GONE.value(), ex.getMessage(),
+        ErrorResponseDTO errorResponse = new ErrorResponseDTO(HttpStatus.GONE.value(), ex.getMessage(),
             request.getRequestURI());
+        return ResponseEntity.status(HttpStatus.GONE).body(errorResponse);
     }
 
     @ExceptionHandler(UnauthorizedHostAccessException.class)
-    public ErrorResponseDTO handleUnauthorizedHostAccessException(
+    public ResponseEntity<ErrorResponseDTO> handleUnauthorizedHostAccessException(
         UnauthorizedHostAccessException ex, HttpServletRequest request) {
-        return new ErrorResponseDTO(HttpStatus.FORBIDDEN.value(), ex.getMessage(),
+        ErrorResponseDTO errorResponse = new ErrorResponseDTO(HttpStatus.FORBIDDEN.value(), ex.getMessage(),
             request.getRequestURI());
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(errorResponse);
     }
 
     @ExceptionHandler(TokenExpiredException.class)
-    public ErrorResponseDTO handleTokenExpiredException(TokenExpiredException ex,
+    public ResponseEntity<ErrorResponseDTO> handleTokenExpiredException(TokenExpiredException ex,
         HttpServletRequest request) {
-        return new ErrorResponseDTO(HttpStatus.UNAUTHORIZED.value(), ex.getMessage(),
+        ErrorResponseDTO errorResponse = new ErrorResponseDTO(HttpStatus.UNAUTHORIZED.value(), ex.getMessage(),
             request.getRequestURI());
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
     }
 
     @ExceptionHandler(PartyFullException.class)
-    public ErrorResponseDTO handlePartyFullException(PartyFullException ex,
+    public ResponseEntity<ErrorResponseDTO> handlePartyFullException(PartyFullException ex,
         HttpServletRequest request) {
-        return new ErrorResponseDTO(HttpStatus.CONFLICT.value(), ex.getMessage(),
+        ErrorResponseDTO errorResponse = new ErrorResponseDTO(HttpStatus.CONFLICT.value(), ex.getMessage(),
             request.getRequestURI());
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
     }
 
     @ExceptionHandler(DuplicatedNicknameException.class)
-    public ErrorResponseDTO handleDuplicatedNicknameException(DuplicatedNicknameException ex,
+    public ResponseEntity<ErrorResponseDTO> handleDuplicatedNicknameException(DuplicatedNicknameException ex,
         HttpServletRequest request) {
-        return new ErrorResponseDTO(HttpStatus.CONFLICT.value(), ex.getMessage(),
+        ErrorResponseDTO errorResponse = new ErrorResponseDTO(HttpStatus.CONFLICT.value(), ex.getMessage(),
             request.getRequestURI());
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
     }
 
     @ExceptionHandler(DuplicatedEmailException.class)
-    public ErrorResponseDTO handleDuplicatedEmailException(DuplicatedEmailException ex,
+    public ResponseEntity<ErrorResponseDTO> handleDuplicatedEmailException(DuplicatedEmailException ex,
         HttpServletRequest request) {
-        return new ErrorResponseDTO(HttpStatus.CONFLICT.value(), ex.getMessage(),
+        ErrorResponseDTO errorResponse = new ErrorResponseDTO(HttpStatus.CONFLICT.value(), ex.getMessage(),
             request.getRequestURI());
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
     }
 
     @ExceptionHandler(EmailVerificationNotFoundException.class)
-    public ErrorResponseDTO handleEmailVerificationNotFoundException(
+    public ResponseEntity<ErrorResponseDTO> handleEmailVerificationNotFoundException(
         EmailVerificationNotFoundException ex,
         HttpServletRequest request) {
-        return new ErrorResponseDTO(HttpStatus.NOT_FOUND.value(), ex.getMessage(),
+        ErrorResponseDTO errorResponse = new ErrorResponseDTO(HttpStatus.NOT_FOUND.value(), ex.getMessage(),
             request.getRequestURI());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
     }
 
     @ExceptionHandler(EmailSendFailedException.class)
-    public ErrorResponseDTO handleEmailSendFailedException(EmailSendFailedException ex,
+    public ResponseEntity<ErrorResponseDTO> handleEmailSendFailedException(EmailSendFailedException ex,
         HttpServletRequest request) {
-        return new ErrorResponseDTO(HttpStatus.INTERNAL_SERVER_ERROR.value(), ex.getMessage(),
+        ErrorResponseDTO errorResponse = new ErrorResponseDTO(HttpStatus.INTERNAL_SERVER_ERROR.value(), ex.getMessage(),
             request.getRequestURI());
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
     }
 
     @ExceptionHandler(InvalidVerificationCodeException.class)
-    public ErrorResponseDTO handleInvalidVerificationCodeException(
+    public ResponseEntity<ErrorResponseDTO> handleInvalidVerificationCodeException(
         InvalidVerificationCodeException ex,
         HttpServletRequest request) {
-        return new ErrorResponseDTO(HttpStatus.UNAUTHORIZED.value(), ex.getMessage(),
+        ErrorResponseDTO errorResponse = new ErrorResponseDTO(HttpStatus.UNAUTHORIZED.value(), ex.getMessage(),
             request.getRequestURI());
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
     }
 
     @ExceptionHandler(ExpiredVerificationCodeException.class)
-    public ErrorResponseDTO handleExpiredVerificationCodeException(
+    public ResponseEntity<ErrorResponseDTO> handleExpiredVerificationCodeException(
         ExpiredVerificationCodeException ex,
         HttpServletRequest request) {
-        return new ErrorResponseDTO(HttpStatus.UNAUTHORIZED.value(), ex.getMessage(),
+        ErrorResponseDTO errorResponse = new ErrorResponseDTO(HttpStatus.UNAUTHORIZED.value(), ex.getMessage(),
             request.getRequestURI());
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
     }
 
     @ExceptionHandler(KakaoApiParseException.class)
-    public ErrorResponseDTO handleKakaoApiParseException(
+    public ResponseEntity<ErrorResponseDTO> handleKakaoApiParseException(
         KakaoApiParseException ex,
         HttpServletRequest request) {
-        return new ErrorResponseDTO(HttpStatus.INTERNAL_SERVER_ERROR.value(), ex.getMessage(),
+        ErrorResponseDTO errorResponse = new ErrorResponseDTO(HttpStatus.INTERNAL_SERVER_ERROR.value(), ex.getMessage(),
             request.getRequestURI());
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
     }
 
     // 그 외 잡히지 않은 모든 예외에 대한 전역 핸들러
     @ExceptionHandler(Exception.class)
-    public ErrorResponseDTO handleException(Exception ex, HttpServletRequest request) {
-        return new ErrorResponseDTO(HttpStatus.INTERNAL_SERVER_ERROR.value(), "서버 내부 오류가 발생했습니다.",
+    public ResponseEntity<ErrorResponseDTO> handleException(Exception ex, HttpServletRequest request) {
+        ErrorResponseDTO errorResponse = new ErrorResponseDTO(HttpStatus.INTERNAL_SERVER_ERROR.value(), "서버 내부 오류가 발생했습니다.",
             request.getRequestURI());
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
     }
 }
