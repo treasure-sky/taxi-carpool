@@ -39,7 +39,9 @@ public class PartyEntity {
         String endLocation,
         String comment,
         int currentParticipantCount,
-        int maxParticipantCount
+        int maxParticipantCount,
+        double x,
+        double y
     ) {
         this.name = name;
         this.isDeleted = false;
@@ -56,6 +58,8 @@ public class PartyEntity {
         this.comment = comment;
         this.currentParticipantCount = currentParticipantCount;
         this.maxParticipantCount = maxParticipantCount;
+        this.x = x;
+        this.y = y;
     }
 
     @Id
@@ -113,6 +117,12 @@ public class PartyEntity {
 
     @Column(name = "max_participant_count")
     private int maxParticipantCount;
+
+    @Column(name = "longitude")
+    private double x;
+
+    @Column(name = "latitude")
+    private double y;
 
     @CreatedDate
     @Column(name = "created_at", updatable = false)
@@ -250,6 +260,22 @@ public class PartyEntity {
         this.maxParticipantCount = maxParticipantCount;
     }
 
+    public double getX() {
+        return x;
+    }
+
+    public void setX(double x) {
+        this.x = x;
+    }
+
+    public double getY() {
+        return y;
+    }
+
+    public void setY(double y) {
+        this.y = y;
+    }
+
     public PartyEntity updateParty(
         String name,
         boolean isDeleted,
@@ -264,7 +290,9 @@ public class PartyEntity {
         String startLocation,
         String endLocation,
         String comment,
-        int maxParticipantCount
+        int maxParticipantCount,
+        double x,
+        double y
     ) {
         this.name = name;
         this.isDeleted = isDeleted;
@@ -280,6 +308,8 @@ public class PartyEntity {
         this.endLocation = endLocation;
         this.comment = comment;
         this.maxParticipantCount = maxParticipantCount;
+        this.x = x;
+        this.y = y;
         return this;
     }
 

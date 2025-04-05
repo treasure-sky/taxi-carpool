@@ -45,6 +45,10 @@ public class PartyDTO {
 
         private int maxParticipantCount;
 
+        private double x;
+
+        private double y;
+
         public PartyResponseDTO(Long id,
             String name,
             boolean isDeleted,
@@ -60,7 +64,9 @@ public class PartyDTO {
             String endLocation,
             String comment,
             int currentParticipantCount,
-            int maxParticipantCount) {
+            int maxParticipantCount,
+            double x,
+            double y) {
             this.id = id;
             this.name = name;
             this.isDeleted = isDeleted;
@@ -77,6 +83,8 @@ public class PartyDTO {
             this.comment = comment;
             this.currentParticipantCount = currentParticipantCount;
             this.maxParticipantCount = maxParticipantCount;
+            this.x = x;
+            this.y = y;
         }
 
         public Long getId() {
@@ -206,9 +214,25 @@ public class PartyDTO {
         public void setMaxParticipantCount(int maxParticipantCount) {
             this.maxParticipantCount = maxParticipantCount;
         }
+
+        public double getX() {
+            return x;
+        }
+
+        public void setX(double x) {
+            this.x = x;
+        }
+
+        public double getY() {
+            return y;
+        }
+
+        public void setY(double y) {
+            this.y = y;
+        }
     }
 
-    // creatorMemberId 필드 존재
+    // creatorMemberId 필드 존재, hostMemberId필드 삭제 -> creatorMemberId사용의 강제를 위해.
     public static class PartyCreateRequestDTO {
 
         @NotNull
@@ -219,8 +243,6 @@ public class PartyDTO {
         private boolean isDeleted;
 
         private List<MemberEntity> memberEntities = new ArrayList<>();
-
-        private Long hostMemberId;
 
         private LocalDateTime endDate;
 
@@ -255,10 +277,13 @@ public class PartyDTO {
         @Max(value = 4, message = "택시의 최대 탑승 인원 수는 4명입니다.")
         private int maxParticipantCount;
 
+        private double x;
+
+        private double y;
+
         public PartyCreateRequestDTO(String name,
             boolean isDeleted,
             List<MemberEntity> memberEntities,
-            Long hostMemberId,
             LocalDateTime endDate,
             Long creatorMemberId,
             boolean sameGenderOnly,
@@ -270,11 +295,12 @@ public class PartyDTO {
             String endLocation,
             String comment,
             int currentParticipantCount,
-            int maxParticipantCount) {
+            int maxParticipantCount,
+            double x,
+            double y) {
             this.name = name;
             this.isDeleted = isDeleted;
             this.memberEntities = memberEntities;
-            this.hostMemberId = hostMemberId;
             this.endDate = endDate;
             this.creatorMemberId = creatorMemberId;
             this.sameGenderOnly = sameGenderOnly;
@@ -287,6 +313,8 @@ public class PartyDTO {
             this.comment = comment;
             this.currentParticipantCount = currentParticipantCount;
             this.maxParticipantCount = maxParticipantCount;
+            this.x = x;
+            this.y = y;
         }
 
         public String getName() {
@@ -311,14 +339,6 @@ public class PartyDTO {
 
         public void setMemberEntities(List<MemberEntity> memberEntities) {
             this.memberEntities = memberEntities;
-        }
-
-        public Long getHostMemberId() {
-            return hostMemberId;
-        }
-
-        public void setHostMemberId(Long hostMemberId) {
-            this.hostMemberId = hostMemberId;
         }
 
         public LocalDateTime getEndDate() {
@@ -416,6 +436,22 @@ public class PartyDTO {
         public void setMaxParticipantCount(int maxParticipantCount) {
             this.maxParticipantCount = maxParticipantCount;
         }
+
+        public double getX() {
+            return x;
+        }
+
+        public void setX(double x) {
+            this.x = x;
+        }
+
+        public double getY() {
+            return y;
+        }
+
+        public void setY(double y) {
+            this.y = y;
+        }
     }
 
     // UpdateRequestDTO에는 현재 인원수에 대한 필드가 없음 -> 파티의 인원수에 관한 로직은 무조건 join/leave 엔트포인트 사용을 강제를 위해
@@ -459,6 +495,10 @@ public class PartyDTO {
         @Max(value = 4, message = "택시의 최대 탑승 인원 수는 4명입니다.")
         private int maxParticipantCount;
 
+        private double x;
+
+        private double y;
+
         public PartyUpdateRequestDTO(
             String name,
             boolean isDeleted,
@@ -473,7 +513,10 @@ public class PartyDTO {
             String startLocation,
             String endLocation,
             String comment,
-            int maxParticipantCount) {
+            int maxParticipantCount,
+            double x,
+            double y
+        ) {
             this.name = name;
             this.isDeleted = isDeleted;
             this.memberEntities = memberEntities;
@@ -488,6 +531,8 @@ public class PartyDTO {
             this.endLocation = endLocation;
             this.comment = comment;
             this.maxParticipantCount = maxParticipantCount;
+            this.x = x;
+            this.y = y;
         }
 
         public String getName() {
@@ -600,6 +645,22 @@ public class PartyDTO {
 
         public void setMaxParticipantCount(int maxParticipantCount) {
             this.maxParticipantCount = maxParticipantCount;
+        }
+
+        public double getX() {
+            return x;
+        }
+
+        public void setX(double x) {
+            this.x = x;
+        }
+
+        public double getY() {
+            return y;
+        }
+
+        public void setY(double y) {
+            this.y = y;
         }
     }
 }
