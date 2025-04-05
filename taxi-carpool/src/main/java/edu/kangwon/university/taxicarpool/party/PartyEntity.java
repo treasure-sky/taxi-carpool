@@ -40,8 +40,10 @@ public class PartyEntity {
         String comment,
         int currentParticipantCount,
         int maxParticipantCount,
-        double x,
-        double y
+        double start_x,
+        double start_y,
+        double end_x,
+        double end_y
     ) {
         this.name = name;
         this.isDeleted = false;
@@ -58,8 +60,10 @@ public class PartyEntity {
         this.comment = comment;
         this.currentParticipantCount = currentParticipantCount;
         this.maxParticipantCount = maxParticipantCount;
-        this.x = x;
-        this.y = y;
+        this.start_x = start_x;
+        this.start_y = start_y;
+        this.end_x = end_x;
+        this.end_y = end_y;
     }
 
     @Id
@@ -118,11 +122,17 @@ public class PartyEntity {
     @Column(name = "max_participant_count")
     private int maxParticipantCount;
 
-    @Column(name = "longitude")
-    private double x;
+    @Column(name = "start_longitude")
+    private double start_x;
 
-    @Column(name = "latitude")
-    private double y;
+    @Column(name = "start_latitude")
+    private double start_y;
+
+    @Column(name = "end_longitude")
+    private double end_x;
+
+    @Column(name = "end_latitude")
+    private double end_y;
 
     @CreatedDate
     @Column(name = "created_at", updatable = false)
@@ -260,20 +270,36 @@ public class PartyEntity {
         this.maxParticipantCount = maxParticipantCount;
     }
 
-    public double getX() {
-        return x;
+    public double getStart_x() {
+        return start_x;
     }
 
-    public void setX(double x) {
-        this.x = x;
+    public void setStart_x(double start_x) {
+        this.start_x = start_x;
     }
 
-    public double getY() {
-        return y;
+    public double getStart_y() {
+        return start_y;
     }
 
-    public void setY(double y) {
-        this.y = y;
+    public void setStart_y(double start_y) {
+        this.start_y = start_y;
+    }
+
+    public double getEnd_x() {
+        return end_x;
+    }
+
+    public void setEnd_x(double end_x) {
+        this.end_x = end_x;
+    }
+
+    public double getEnd_y() {
+        return end_y;
+    }
+
+    public void setEnd_y(double end_y) {
+        this.end_y = end_y;
     }
 
     public PartyEntity updateParty(
@@ -291,8 +317,10 @@ public class PartyEntity {
         String endLocation,
         String comment,
         int maxParticipantCount,
-        double x,
-        double y
+        double start_x,
+        double start_y,
+        double end_x,
+        double end_y
     ) {
         this.name = name;
         this.isDeleted = isDeleted;
@@ -308,8 +336,10 @@ public class PartyEntity {
         this.endLocation = endLocation;
         this.comment = comment;
         this.maxParticipantCount = maxParticipantCount;
-        this.x = x;
-        this.y = y;
+        this.start_x = start_x;
+        this.start_y = start_y;
+        this.end_x = end_x;
+        this.end_y = end_y;
         return this;
     }
 

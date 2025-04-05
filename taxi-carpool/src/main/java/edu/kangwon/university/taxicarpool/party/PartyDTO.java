@@ -45,9 +45,13 @@ public class PartyDTO {
 
         private int maxParticipantCount;
 
-        private double x;
+        private double start_x;
 
-        private double y;
+        private double start_y;
+
+        private double end_x;
+
+        private double end_y;
 
         public PartyResponseDTO(Long id,
             String name,
@@ -65,8 +69,10 @@ public class PartyDTO {
             String comment,
             int currentParticipantCount,
             int maxParticipantCount,
-            double x,
-            double y) {
+            double start_x,
+            double start_y,
+            double end_x,
+            double end_y) {
             this.id = id;
             this.name = name;
             this.isDeleted = isDeleted;
@@ -83,8 +89,10 @@ public class PartyDTO {
             this.comment = comment;
             this.currentParticipantCount = currentParticipantCount;
             this.maxParticipantCount = maxParticipantCount;
-            this.x = x;
-            this.y = y;
+            this.start_x = start_x;
+            this.start_y = start_y;
+            this.end_x = end_x;
+            this.end_y = end_y;
         }
 
         public Long getId() {
@@ -215,20 +223,36 @@ public class PartyDTO {
             this.maxParticipantCount = maxParticipantCount;
         }
 
-        public double getX() {
-            return x;
+        public double getStart_x() {
+            return start_x;
         }
 
-        public void setX(double x) {
-            this.x = x;
+        public void setStart_x(double start_x) {
+            this.start_x = start_x;
         }
 
-        public double getY() {
-            return y;
+        public double getStart_y() {
+            return start_y;
         }
 
-        public void setY(double y) {
-            this.y = y;
+        public void setStart_y(double start_y) {
+            this.start_y = start_y;
+        }
+
+        public double getEnd_x() {
+            return end_x;
+        }
+
+        public void setEnd_x(double end_x) {
+            this.end_x = end_x;
+        }
+
+        public double getEnd_y() {
+            return end_y;
+        }
+
+        public void setEnd_y(double end_y) {
+            this.end_y = end_y;
         }
     }
 
@@ -277,9 +301,13 @@ public class PartyDTO {
         @Max(value = 4, message = "택시의 최대 탑승 인원 수는 4명입니다.")
         private int maxParticipantCount;
 
-        private double x;
+        private double start_x;
 
-        private double y;
+        private double start_y;
+
+        private double end_x;
+
+        private double end_y;
 
         public PartyCreateRequestDTO(String name,
             boolean isDeleted,
@@ -296,8 +324,10 @@ public class PartyDTO {
             String comment,
             int currentParticipantCount,
             int maxParticipantCount,
-            double x,
-            double y) {
+            double start_x,
+            double start_y,
+            double end_x,
+            double end_y) {
             this.name = name;
             this.isDeleted = isDeleted;
             this.memberEntities = memberEntities;
@@ -313,8 +343,10 @@ public class PartyDTO {
             this.comment = comment;
             this.currentParticipantCount = currentParticipantCount;
             this.maxParticipantCount = maxParticipantCount;
-            this.x = x;
-            this.y = y;
+            this.start_x = start_x;
+            this.start_y = start_y;
+            this.end_x = end_x;
+            this.end_y = end_y;
         }
 
         public String getName() {
@@ -437,20 +469,36 @@ public class PartyDTO {
             this.maxParticipantCount = maxParticipantCount;
         }
 
-        public double getX() {
-            return x;
+        public double getStart_x() {
+            return start_x;
         }
 
-        public void setX(double x) {
-            this.x = x;
+        public void setStart_x(double start_x) {
+            this.start_x = start_x;
         }
 
-        public double getY() {
-            return y;
+        public double getStart_y() {
+            return start_y;
         }
 
-        public void setY(double y) {
-            this.y = y;
+        public void setStart_y(double start_y) {
+            this.start_y = start_y;
+        }
+
+        public double getEnd_x() {
+            return end_x;
+        }
+
+        public void setEnd_x(double end_x) {
+            this.end_x = end_x;
+        }
+
+        public double getEnd_y() {
+            return end_y;
+        }
+
+        public void setEnd_y(double end_y) {
+            this.end_y = end_y;
         }
     }
 
@@ -495,9 +543,13 @@ public class PartyDTO {
         @Max(value = 4, message = "택시의 최대 탑승 인원 수는 4명입니다.")
         private int maxParticipantCount;
 
-        private double x;
+        private double start_x;
 
-        private double y;
+        private double start_y;
+
+        private double end_x;
+
+        private double end_y;
 
         public PartyUpdateRequestDTO(
             String name,
@@ -514,8 +566,10 @@ public class PartyDTO {
             String endLocation,
             String comment,
             int maxParticipantCount,
-            double x,
-            double y
+            double start_x,
+            double start_y,
+            double end_x,
+            double end_y
         ) {
             this.name = name;
             this.isDeleted = isDeleted;
@@ -531,8 +585,10 @@ public class PartyDTO {
             this.endLocation = endLocation;
             this.comment = comment;
             this.maxParticipantCount = maxParticipantCount;
-            this.x = x;
-            this.y = y;
+            this.start_x = start_x;
+            this.start_y = start_y;
+            this.end_x = end_x;
+            this.end_y = end_y;
         }
 
         public String getName() {
@@ -647,20 +703,36 @@ public class PartyDTO {
             this.maxParticipantCount = maxParticipantCount;
         }
 
-        public double getX() {
-            return x;
+        public double getStart_x() {
+            return start_x;
         }
 
-        public void setX(double x) {
-            this.x = x;
+        public void setStart_x(double start_x) {
+            this.start_x = start_x;
         }
 
-        public double getY() {
-            return y;
+        public double getStart_y() {
+            return start_y;
         }
 
-        public void setY(double y) {
-            this.y = y;
+        public void setStart_y(double start_y) {
+            this.start_y = start_y;
+        }
+
+        public double getEnd_x() {
+            return end_x;
+        }
+
+        public void setEnd_x(double end_x) {
+            this.end_x = end_x;
+        }
+
+        public double getEnd_y() {
+            return end_y;
+        }
+
+        public void setEnd_y(double end_y) {
+            this.end_y = end_y;
         }
     }
 }

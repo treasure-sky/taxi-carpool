@@ -27,8 +27,10 @@ public class PartyMapper {
             partyEntity.getComment(),
             partyEntity.getCurrentParticipantCount(),
             partyEntity.getMaxParticipantCount(),
-            partyEntity.getX(),
-            partyEntity.getY()
+            partyEntity.getStart_x(),
+            partyEntity.getStart_y(),
+            partyEntity.getEnd_x(),
+            partyEntity.getEnd_y()
         );
     }
 
@@ -48,8 +50,10 @@ public class PartyMapper {
             createRequestDTO.getComment(),
             createRequestDTO.getCurrentParticipantCount(),
             createRequestDTO.getMaxParticipantCount(),
-            createRequestDTO.getX(),
-            createRequestDTO.getY()
+            createRequestDTO.getStart_x(),
+            createRequestDTO.getStart_y(),
+            createRequestDTO.getEnd_x(),
+            createRequestDTO.getEnd_y()
         );
     }
 
@@ -71,8 +75,10 @@ public class PartyMapper {
             partyUpdateRequestDTO.getEndLocation(),
             partyUpdateRequestDTO.getComment(),
             partyUpdateRequestDTO.getMaxParticipantCount(),
-            partyUpdateRequestDTO.getX(),
-            partyUpdateRequestDTO.getY()
+            partyUpdateRequestDTO.getStart_x(),
+            partyUpdateRequestDTO.getStart_y(),
+            partyUpdateRequestDTO.getEnd_x(),
+            partyUpdateRequestDTO.getEnd_y()
         );
     }
 }
