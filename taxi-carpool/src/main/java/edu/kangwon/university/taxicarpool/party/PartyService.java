@@ -10,9 +10,11 @@ import edu.kangwon.university.taxicarpool.party.partyException.MemberNotInPartyE
 import edu.kangwon.university.taxicarpool.party.partyException.PartyAlreadyDeletedException;
 import edu.kangwon.university.taxicarpool.party.partyException.PartyEmptyException;
 import edu.kangwon.university.taxicarpool.party.partyException.PartyFullException;
+import edu.kangwon.university.taxicarpool.party.partyException.PartyGetCustomException;
 import edu.kangwon.university.taxicarpool.party.partyException.PartyNotFoundException;
 import edu.kangwon.university.taxicarpool.party.partyException.UnauthorizedHostAccessException;
 import jakarta.transaction.Transactional;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -49,10 +51,27 @@ public class PartyService {
 
     public Page<PartyResponseDTO> getPartyList(int page, int size) {
         if (page < 0 || size <= 0) {
-            throw new IllegalArgumentException("페이지 번호 또는 페이지 크기가 올바르지 않습니다.");
+            throw new PartyGetCustomException("페이지 번호 또는 페이지 크기가 올바르지 않습니다.");
         }
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
         Page<PartyEntity> partyEntities = partyRepository.findAll(pageable);
+        return partyEntities.map(partyMapper::convertToResponseDTO);
+    }
+
+    @Transactional
+    public Page<PartyResponseDTO> getCustomPartyList(double userDepartureLng,
+        double userDepartureLat,
+        double userDestinationLng, double userDestinationLat,
+        LocalDateTime userDepartureTime,
+        int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        if (page < 0 || size <= 0) {
+            throw new PartyGetCustomException("페이지 번호 또는 페이지 크기가 올바르지 않습니다.");
+        }
+        Page<PartyEntity> partyEntities = partyRepository.findCustomPartyList(userDepartureLng,
+            userDepartureLat,
+            userDestinationLng, userDestinationLat,
+            userDepartureTime, pageable);
         return partyEntities.map(partyMapper::convertToResponseDTO);
     }
 
