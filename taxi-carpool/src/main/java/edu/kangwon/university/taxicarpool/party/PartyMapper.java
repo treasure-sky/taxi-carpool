@@ -26,7 +26,11 @@ public class PartyMapper {
             partyEntity.getEndLocation(),
             partyEntity.getComment(),
             partyEntity.getCurrentParticipantCount(),
-            partyEntity.getMaxParticipantCount()
+            partyEntity.getMaxParticipantCount(),
+            partyEntity.getStart_x(),
+            partyEntity.getStart_y(),
+            partyEntity.getEnd_x(),
+            partyEntity.getEnd_y()
         );
     }
 
@@ -34,7 +38,7 @@ public class PartyMapper {
         return new PartyEntity(
             createRequestDTO.getName(),
             createRequestDTO.getMemberEntities(),
-            createRequestDTO.getHostMemberId(),
+            null,
             createRequestDTO.getEndDate(),
             createRequestDTO.isSameGenderOnly(),
             createRequestDTO.isCostShareBeforeDropOff(),
@@ -45,7 +49,11 @@ public class PartyMapper {
             createRequestDTO.getEndLocation(),
             createRequestDTO.getComment(),
             createRequestDTO.getCurrentParticipantCount(),
-            createRequestDTO.getMaxParticipantCount()
+            createRequestDTO.getMaxParticipantCount(),
+            createRequestDTO.getStart_x(),
+            createRequestDTO.getStart_y(),
+            createRequestDTO.getEnd_x(),
+            createRequestDTO.getEnd_y()
         );
     }
 
@@ -66,7 +74,11 @@ public class PartyMapper {
             partyUpdateRequestDTO.getStartLocation(),
             partyUpdateRequestDTO.getEndLocation(),
             partyUpdateRequestDTO.getComment(),
-            partyUpdateRequestDTO.getMaxParticipantCount()
+            partyUpdateRequestDTO.getMaxParticipantCount(),
+            partyUpdateRequestDTO.getStart_x(),
+            partyUpdateRequestDTO.getStart_y(),
+            partyUpdateRequestDTO.getEnd_x(),
+            partyUpdateRequestDTO.getEnd_y()
         );
     }
 }
