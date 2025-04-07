@@ -218,11 +218,11 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponseDTO> handlePartyServiceException(PartyGetCustomException ex,
         HttpServletRequest request) {
         ErrorResponseDTO errorResponse = new ErrorResponseDTO(
-            HttpStatus.INTERNAL_SERVER_ERROR.value(),
+            HttpStatus.BAD_REQUEST.value(),
             ex.getMessage(),
             request.getRequestURI()
         );
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }
 
     // 그 외 잡히지 않은 모든 예외에 대한 전역 핸들러

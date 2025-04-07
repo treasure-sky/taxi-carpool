@@ -15,6 +15,7 @@ public interface PartyRepository extends JpaRepository<PartyEntity, Long> {
 
     Optional<PartyEntity> findById(Long partyId);
 
+    // 모든 파라미터가 온 경우
     @Query(value = "SELECT p.*, " +
         " (ST_Distance_Sphere(" +
         "    ST_GeomFromText(CONCAT('POINT(', p.start_longitude, ' ', p.start_latitude, ')')), " +
@@ -36,6 +37,48 @@ public interface PartyRepository extends JpaRepository<PartyEntity, Long> {
         @Param("userDestinationLng") double userDestinationLng,
         @Param("userDestinationLat") double userDestinationLat,
         @Param("userDepartureTime") LocalDateTime userDepartureTime,
+        Pageable pageable
+    );
+
+    // 출발지 또는 도착지에 대한 파라미터가 오지 않은 경우(오버로딩 한 것. 파라미터의 이름은 일단 도착지로 해둠)
+    @Query(value = "SELECT p.*, " +
+        " ST_Distance_Sphere(" +
+        "    ST_GeomFromText(CONCAT('POINT(', p.end_longitude, ' ', p.end_latitude, ')')), " +
+        "    ST_GeomFromText(CONCAT('POINT(', :userDestinationLng, ' ', :userDestinationLat, ')'))"
+        +
+        " ) AS total_distance " +
+        "FROM party p " +
+        "ORDER BY total_distance ASC, ABS(TIMESTAMPDIFF(MINUTE, p.start_date_time, :userDepartureTime)) ASC",
+        countQuery = "SELECT COUNT(*) FROM party p",
+        nativeQuery = true)
+    Page<PartyEntity> findCustomPartyList(
+        @Param("userDestinationLng") double userDestinationLng,
+        @Param("userDestinationLat") double userDestinationLat,
+        @Param("userDepartureTime") LocalDateTime userDepartureTime,
+        Pageable pageable
+    );
+
+    // 출발 시간 파라미터가 오지 않은 경우
+    @Query(value = "SELECT p.*, " +
+        " (ST_Distance_Sphere(" +
+        "    ST_GeomFromText(CONCAT('POINT(', p.start_longitude, ' ', p.start_latitude, ')')), " +
+        "    ST_GeomFromText(CONCAT('POINT(', :userDepartureLng, ' ', :userDepartureLat, ')'))" +
+        " ) + " +
+        " ST_Distance_Sphere(" +
+        "    ST_GeomFromText(CONCAT('POINT(', p.end_longitude, ' ', p.end_latitude, ')')), " +
+        "    ST_GeomFromText(CONCAT('POINT(', :userDestinationLng, ' ', :userDestinationLat, ')'))"
+        +
+        " )" +
+        " ) AS total_distance " +
+        "FROM party p " +
+        "ORDER BY total_distance ASC",
+        countQuery = "SELECT COUNT(*) FROM party p",
+        nativeQuery = true)
+    Page<PartyEntity> findCustomPartyList(
+        @Param("userDepartureLng") double userDepartureLng,
+        @Param("userDepartureLat") double userDepartureLat,
+        @Param("userDestinationLng") double userDestinationLng,
+        @Param("userDestinationLat") double userDestinationLat,
         Pageable pageable
     );
 

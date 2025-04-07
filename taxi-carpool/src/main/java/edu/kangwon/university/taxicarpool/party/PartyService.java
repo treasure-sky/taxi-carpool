@@ -49,29 +49,85 @@ public class PartyService {
         return partyMapper.convertToResponseDTO(partyEntity);
     }
 
-    public Page<PartyResponseDTO> getPartyList(int page, int size) {
-        if (page < 0 || size <= 0) {
-            throw new PartyGetCustomException("페이지 번호 또는 페이지 크기가 올바르지 않습니다.");
-        }
+    public Page<PartyResponseDTO> getPartyList(Integer page, Integer size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
         Page<PartyEntity> partyEntities = partyRepository.findAll(pageable);
         return partyEntities.map(partyMapper::convertToResponseDTO);
     }
 
     @Transactional
-    public Page<PartyResponseDTO> getCustomPartyList(double userDepartureLng,
-        double userDepartureLat,
-        double userDestinationLng, double userDestinationLat,
+    public Page<PartyResponseDTO> getCustomPartyList(
+        Double userDepartureLng,
+        Double userDepartureLat,
+        Double userDestinationLng,
+        Double userDestinationLat,
         LocalDateTime userDepartureTime,
-        int page, int size) {
+        Integer page, Integer size) {
+
         Pageable pageable = PageRequest.of(page, size);
-        if (page < 0 || size <= 0) {
-            throw new PartyGetCustomException("페이지 번호 또는 페이지 크기가 올바르지 않습니다.");
+
+        // 각 그룹(출발지, 도착지, 출발시간)의 누락 여부 확인
+        boolean missingDeparture = (userDepartureLng == null || userDepartureLat == null);
+        boolean missingDestination = (userDestinationLng == null || userDestinationLat == null);
+        boolean missingDepartureTime = (userDepartureTime == null);
+
+        int missingCount = 0;
+        if (missingDeparture) {
+            missingCount++;
         }
-        Page<PartyEntity> partyEntities = partyRepository.findCustomPartyList(userDepartureLng,
-            userDepartureLat,
-            userDestinationLng, userDestinationLat,
-            userDepartureTime, pageable);
+        if (missingDestination) {
+            missingCount++;
+        }
+        if (missingDepartureTime) {
+            missingCount++;
+        }
+
+        // 2개 이상의 정보가 누락되었으면 예외 발생
+        if (missingCount >= 2) {
+            throw new PartyGetCustomException("출발지, 도착지, 출발시간에 대한 정보 중 2개 이상 넣어주세요!");
+        }
+
+        Page<PartyEntity> partyEntities;
+
+        // 모든 정보가 있는 경우
+        if (!missingDeparture && !missingDestination && !missingDepartureTime) {
+            partyEntities = partyRepository.findCustomPartyList(
+                userDepartureLng,
+                userDepartureLat,
+                userDestinationLng,
+                userDestinationLat,
+                userDepartureTime,
+                pageable);
+
+            // 출발지 정보가 누락된 경우
+        } else if (missingDeparture) {
+            partyEntities = partyRepository.findCustomPartyList(
+                userDestinationLng,
+                userDestinationLat,
+                userDepartureTime,
+                pageable);
+
+            // 도착지 정보가 누락된 경우
+        } else if (missingDestination) {
+            partyEntities = partyRepository.findCustomPartyList(
+                userDepartureLng,
+                userDepartureLat,
+                userDepartureTime,
+                pageable);
+
+            // 출발시간이 누락된 경우
+        } else if (missingDepartureTime) {
+            partyEntities = partyRepository.findCustomPartyList(
+                userDepartureLng,
+                userDepartureLat,
+                userDestinationLng,
+                userDestinationLat,
+                pageable);
+
+        } else {
+            throw new PartyGetCustomException("출발지, 도착지, 출발시간에 대한 정보를 올바르게 넣어주세요!");
+        }
+
         return partyEntities.map(partyMapper::convertToResponseDTO);
     }
 
