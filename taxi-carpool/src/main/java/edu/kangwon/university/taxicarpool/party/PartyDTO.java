@@ -1,6 +1,7 @@
 package edu.kangwon.university.taxicarpool.party;
 
 import edu.kangwon.university.taxicarpool.member.MemberEntity;
+import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -282,6 +283,7 @@ public class PartyDTO {
         private boolean destinationChangeIn5Minutes;
 
         @NotNull
+        @Future(message = "출발 시간은 현재 시간보다 이후여야 합니다.")
         @NotBlank(message = "출발 시간 입력은 필수입니다.")
         private LocalDateTime startDateTime;
 
