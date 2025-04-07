@@ -260,6 +260,7 @@ public class PartyDTO {
     // creatorMemberId 필드 존재, hostMemberId필드 삭제 -> creatorMemberId사용의 강제를 위해.
     public static class PartyCreateRequestDTO {
 
+        @NotNull
         @NotBlank(message = "파티 이름은 필수입니다.")
         @Size(max = 20, message = "이름은 공백 포함 최대 20글자까지 가능합니다.")
         private String name;
@@ -281,13 +282,16 @@ public class PartyDTO {
 
         private boolean destinationChangeIn5Minutes;
 
+        @NotNull
         @Future(message = "출발 시간은 현재 시간보다 이후여야 합니다.")
-        @NotNull(message = "출발 시간 입력은 필수입니다.")
+        @NotBlank(message = "출발 시간 입력은 필수입니다.")
         private LocalDateTime startDateTime;
 
+        @NotNull
         @NotBlank(message = "출발지 입력은 필수입니다.")
         private String startLocation;
 
+        @NotNull
         @NotBlank(message = "목적지 입력은 필수입니다.")
         private String endLocation;
 
@@ -503,6 +507,7 @@ public class PartyDTO {
     // UpdateRequestDTO에는 현재 인원수에 대한 필드가 없음 -> 파티의 인원수에 관한 로직은 무조건 join/leave 엔트포인트 사용을 강제를 위해
     public static class PartyUpdateRequestDTO {
 
+        @NotNull
         @NotBlank(message = "파티 이름은 필수입니다.")
         private String name;
 
@@ -522,12 +527,15 @@ public class PartyDTO {
 
         private boolean destinationChangeIn5Minutes;
 
-        @NotNull(message = "출발 시간 입력은 필수입니다.")
+        @NotNull
+        @NotBlank(message = "출발 시간 입력은 필수입니다.")
         private LocalDateTime startDateTime;
 
+        @NotNull
         @NotBlank(message = "출발지 입력은 필수입니다.")
         private String startLocation;
 
+        @NotNull
         @NotBlank(message = "목적지 입력은 필수입니다.")
         private String endLocation;
 
