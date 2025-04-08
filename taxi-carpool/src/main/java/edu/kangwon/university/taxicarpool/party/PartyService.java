@@ -124,11 +124,10 @@ public class PartyService {
                 userDestinationLat,
                 pageable);
 
-        } else {
-            throw new PartyGetCustomException("출발지, 도착지, 출발시간에 대한 정보를 올바르게 넣어주세요!");
         }
 
-        return partyEntities.map(partyMapper::convertToResponseDTO);
+        throw new PartyGetCustomException("출발지, 도착지, 출발시간에 대한 정보를 올바르게 넣어주세요!");
+
     }
 
     @Transactional
