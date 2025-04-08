@@ -1,24 +1,26 @@
 package edu.kangwon.university.taxicarpool.party;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.when;
+
 import edu.kangwon.university.taxicarpool.member.MemberEntity;
 import edu.kangwon.university.taxicarpool.member.MemberRepository;
+import edu.kangwon.university.taxicarpool.member.exception.MemberNotFoundException;
 import edu.kangwon.university.taxicarpool.party.PartyDTO.PartyCreateRequestDTO;
 import edu.kangwon.university.taxicarpool.party.PartyDTO.PartyResponseDTO;
-import edu.kangwon.university.taxicarpool.party.partyException.MemberNotFoundException;
 import edu.kangwon.university.taxicarpool.party.partyException.PartyNotFoundException;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.*;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class PartyServiceTest {
@@ -77,7 +79,8 @@ class PartyServiceTest {
             4
         );
 
-        mockMemberEntity = new MemberEntity("test@test.com", "password", "닉네임", edu.kangwon.university.taxicarpool.member.Gender.MALE);
+        mockMemberEntity = new MemberEntity("test@test.com", "password", "닉네임",
+            edu.kangwon.university.taxicarpool.member.Gender.MALE);
         mockMemberEntity.setEmail("test@test.com");
         mockMemberEntity.setNickname("테스트멤버");
         mockMemberEntity.setPassword("password");

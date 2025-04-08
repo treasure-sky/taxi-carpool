@@ -2,10 +2,10 @@ package edu.kangwon.university.taxicarpool.party;
 
 import edu.kangwon.university.taxicarpool.member.MemberEntity;
 import edu.kangwon.university.taxicarpool.member.MemberRepository;
+import edu.kangwon.university.taxicarpool.member.exception.MemberNotFoundException;
 import edu.kangwon.university.taxicarpool.party.PartyDTO.PartyCreateRequestDTO;
 import edu.kangwon.university.taxicarpool.party.PartyDTO.PartyResponseDTO;
 import edu.kangwon.university.taxicarpool.party.PartyDTO.PartyUpdateRequestDTO;
-import edu.kangwon.university.taxicarpool.party.partyException.MemberNotFoundException;
 import edu.kangwon.university.taxicarpool.party.partyException.MemberNotInPartyException;
 import edu.kangwon.university.taxicarpool.party.partyException.PartyAlreadyDeletedException;
 import edu.kangwon.university.taxicarpool.party.partyException.PartyEmptyException;
