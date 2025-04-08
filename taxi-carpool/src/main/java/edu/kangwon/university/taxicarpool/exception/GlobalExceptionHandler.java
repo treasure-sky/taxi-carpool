@@ -51,12 +51,13 @@ public class GlobalExceptionHandler {
     }
 
     // 빈 JSON이나 잘못된 형식으로 인한 예외 처리
-    @ExceptionHandler({MethodArgumentNotValidException.class,
-        HttpMessageNotReadableException.class})
-    public ResponseEntity<Map<String, String>> handleValidationExceptions(Exception ex) {
-        Map<String, String> errorResponse = new HashMap<>();
-        errorResponse.put("message", "로그인 형식을 올바르게 보내주세요.");
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<Map<String, String>> handleValidationExceptions(
+        MethodArgumentNotValidException ex) {
+        Map<String, String> errors = new HashMap<>();
+        ex.getBindingResult().getFieldErrors().forEach(error ->
+            errors.put(error.getField(), error.getDefaultMessage()));
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
     }
 
     @ExceptionHandler(TokenInvalidException.class)
