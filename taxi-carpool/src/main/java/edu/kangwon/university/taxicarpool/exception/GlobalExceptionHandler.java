@@ -10,13 +10,13 @@ import edu.kangwon.university.taxicarpool.email.exception.InvalidVerificationCod
 import edu.kangwon.university.taxicarpool.map.exception.KakaoApiParseException;
 import edu.kangwon.university.taxicarpool.member.exception.DuplicatedEmailException;
 import edu.kangwon.university.taxicarpool.member.exception.DuplicatedNicknameException;
-import edu.kangwon.university.taxicarpool.party.partyException.MemberNotFoundException;
+import edu.kangwon.university.taxicarpool.member.exception.MemberNotFoundException;
 import edu.kangwon.university.taxicarpool.party.partyException.MemberNotInPartyException;
 import edu.kangwon.university.taxicarpool.party.partyException.PartyAlreadyDeletedException;
 import edu.kangwon.university.taxicarpool.party.partyException.PartyEmptyException;
 import edu.kangwon.university.taxicarpool.party.partyException.PartyFullException;
-import edu.kangwon.university.taxicarpool.party.partyException.PartyNotFoundException;
 import edu.kangwon.university.taxicarpool.party.partyException.PartyGetCustomException;
+import edu.kangwon.university.taxicarpool.party.partyException.PartyNotFoundException;
 import edu.kangwon.university.taxicarpool.party.partyException.UnauthorizedHostAccessException;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.HashMap;
