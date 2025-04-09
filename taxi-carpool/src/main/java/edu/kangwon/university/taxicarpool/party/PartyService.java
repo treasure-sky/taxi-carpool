@@ -175,7 +175,7 @@ public class PartyService {
 
     @Transactional
     public Map<String, Object> deleteParty(Long partyId, Long memberId) {
-        PartyEntity partyEntity = partyRepository.findById(partyId)
+        PartyEntity partyEntity = partyRepository.findByIdAndIsDeletedFalse(partyId)
             .orElseThrow(() -> new PartyNotFoundException("해당 파티가 존재하지 않습니다."));
         if (!partyEntity.getHostMemberId().equals(memberId)) {
             throw new UnauthorizedHostAccessException("호스트만 삭제할 수 있습니다.");

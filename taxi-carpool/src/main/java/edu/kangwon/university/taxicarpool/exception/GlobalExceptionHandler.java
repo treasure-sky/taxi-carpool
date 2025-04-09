@@ -19,11 +19,11 @@ import edu.kangwon.university.taxicarpool.party.partyException.PartyGetCustomExc
 import edu.kangwon.university.taxicarpool.party.partyException.PartyNotFoundException;
 import edu.kangwon.university.taxicarpool.party.partyException.UnauthorizedHostAccessException;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.ConstraintViolationException;
 import java.util.HashMap;
 import java.util.Map;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -223,6 +223,26 @@ public class GlobalExceptionHandler {
             ex.getMessage(),
             request.getRequestURI()
         );
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+    }
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<ErrorResponseDTO> handleConstraintViolationException(
+        ConstraintViolationException ex,
+        HttpServletRequest request
+    ) {
+        String errorMessage = ex.getConstraintViolations()
+            .stream()
+            .map(v -> v.getMessage())
+            .findFirst()
+            .orElse("잘못된 요청입니다.");
+
+        ErrorResponseDTO errorResponse = new ErrorResponseDTO(
+            HttpStatus.BAD_REQUEST.value(),
+            errorMessage,
+            request.getRequestURI()
+        );
+
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }
 
