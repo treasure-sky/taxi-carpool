@@ -2,17 +2,18 @@ package edu.kangwon.university.taxicarpool.auth;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 public class LoginDTO {
 
     // 로그인 요청 DTO
     public static class LoginRequest {
 
-        @NotBlank
+        @NotBlank(message = "이메일이 공백일 수 없습니다")
         @Email
         private String email;
 
-        @NotBlank
+        @NotBlank(message = "패스워드가 공백일 수 없습니다")
         private String password;
 
         public LoginRequest() {
@@ -80,6 +81,7 @@ public class LoginDTO {
     //리프래쉬 토큰으로 액세스 토큰 재발급 요청 DTO
     public static class RefreshRequestDTO {
 
+        @NotNull
         private String refreshToken;
 
         public RefreshRequestDTO() {

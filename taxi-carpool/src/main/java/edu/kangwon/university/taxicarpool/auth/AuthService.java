@@ -111,11 +111,12 @@ public class AuthService {
         if (optionalToken.isPresent()) {
             RefreshTokenEntity tokenEntity = optionalToken.get();
 
-            // 만료시간을 현재 시각으로 세팅하여 무효화시키기 (걍 레포지토리에서 delete해도 되긴함)
+            // 만료시간을 현재 시각으로 세팅하여 리프레쉬 토큰 무효화시키기 (걍 레포지토리에서 delete해도 되긴함)
             tokenEntity.setExpiryDate(LocalDateTime.now());
             refreshTokenRepository.save(tokenEntity);
         } else {
-            throw new TokenInvalidException("토큰없는 로그아웃입니다. 재로그인 후 로그아웃 해주세요.");
+            // 토큰없는 로그아웃
+            throw new TokenInvalidException("재로그인 후 로그아웃 해주세요.");
         }
     }
 

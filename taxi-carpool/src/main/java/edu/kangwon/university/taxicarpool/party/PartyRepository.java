@@ -15,6 +15,8 @@ public interface PartyRepository extends JpaRepository<PartyEntity, Long> {
 
     Optional<PartyEntity> findById(Long partyId);
 
+    Optional<PartyEntity> findByIdAndIsDeletedFalse(Long partyId);
+
     // 모든 파라미터가 온 경우
     @Query(value = "SELECT p.*, " +
         " (ST_Distance_Sphere(" +

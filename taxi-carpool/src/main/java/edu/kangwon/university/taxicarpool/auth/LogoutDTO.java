@@ -7,8 +7,8 @@ public class LogoutDTO {
 
     public static class LogoutRequestDTO {
 
-        @NotBlank
-        @Email
+        @NotBlank(message = "이메일 공백 오류")
+        @Email(message = "이메일 형식을 지켜주세요.")
         private String email;
 
         public LogoutRequestDTO() {
