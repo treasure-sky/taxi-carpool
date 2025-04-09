@@ -2,6 +2,7 @@ package edu.kangwon.university.taxicarpool.auth;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 public class LoginDTO {
 
@@ -80,6 +81,7 @@ public class LoginDTO {
     //리프래쉬 토큰으로 액세스 토큰 재발급 요청 DTO
     public static class RefreshRequestDTO {
 
+        @NotNull
         private String refreshToken;
 
         public RefreshRequestDTO() {
