@@ -11,6 +11,10 @@ public class PasswordValidator implements ConstraintValidator<PasswordValid, Str
 
     @Override
     public boolean isValid(String value, ConstraintValidatorContext context) {
-        return value != null && PASSWORD_PATTERN.matcher(value).matches();
+        // null이거나 공백의 경우 해당 메서드에서 처리하지 않음
+        if (value == null || value.trim().isEmpty()) {
+            return true;
+        }
+        return PASSWORD_PATTERN.matcher(value).matches();
     }
 }
