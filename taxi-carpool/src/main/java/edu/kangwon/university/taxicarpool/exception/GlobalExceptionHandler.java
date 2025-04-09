@@ -1,5 +1,6 @@
 package edu.kangwon.university.taxicarpool.exception;
 
+import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import edu.kangwon.university.taxicarpool.auth.authException.AuthenticationFailedException;
 import edu.kangwon.university.taxicarpool.auth.authException.TokenExpiredException;
 import edu.kangwon.university.taxicarpool.auth.authException.TokenInvalidException;
@@ -50,12 +51,29 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
     }
 
-    // 빈 JSON이나 잘못된 형식으로 인한 예외 처리
-    @ExceptionHandler({MethodArgumentNotValidException.class,
-        HttpMessageNotReadableException.class})
-    public ResponseEntity<Map<String, String>> handleValidationExceptions(Exception ex) {
-        Map<String, String> errorResponse = new HashMap<>();
-        errorResponse.put("message", "로그인 형식을 올바르게 보내주세요.");
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<Map<String, Object>> handleValidationException(
+        MethodArgumentNotValidException ex) {
+        Map<String, Object> errorResponse = new HashMap<>();
+        Map<String, String> fieldErrors = new HashMap<>();
+        ex.getBindingResult().getFieldErrors().forEach(error ->
+            fieldErrors.put(error.getField(), error.getDefaultMessage())
+        );
+        errorResponse.put("message", "입력 필드가 올바르지 않습니다.");
+        errorResponse.put("errors", fieldErrors);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<Map<String, Object>> handleJsonParseException(
+        HttpMessageNotReadableException ex) {
+        Map<String, Object> errorResponse = new HashMap<>();
+
+        if (ex.getCause() instanceof InvalidFormatException) {
+            errorResponse.put("message", "입력 형식이 올바르지 않거나 지원하지 않는 값입니다.");
+        } else {
+            errorResponse.put("message", "요청 형식이 올바르지 않습니다. (JSON 오류)");
+        }
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }
 
