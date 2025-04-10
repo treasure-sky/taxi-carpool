@@ -231,7 +231,7 @@ public class PartyService {
         return partyMapper.convertToResponseDTO(savedParty);
     }
 
-    @Transactional(noRollbackFor = PartyEmptyException.class)
+    @Transactional
     public PartyResponseDTO leaveParty(Long partyId, Long memberId) {
         PartyEntity party = partyRepository.findByIdAndIsDeletedFalse(partyId)
             .orElseThrow(() -> new PartyNotFoundException("해당 파티가 존재하지 않습니다."));
@@ -257,8 +257,7 @@ public class PartyService {
         } else {
             // 앱의 플로우상 마지막으로 떠나는 멤버가 호스트일수밖에 없어서, 해당 코드가 필요하지 않을 것 같긴한데, 혹시 몰라서 일단 추가해둠.
             party.setDeleted(true);
-            partyRepository.saveAndFlush(party);
-            throw new PartyEmptyException("파티방의 모든 멤버가 떠나여, 파티방이 삭제되었습니다.");
+            return partyMapper.convertToResponseDTO(party);
         }
 
         // 호스트인 멤버가 파티를 떠나려고 할 때의 로직.
@@ -267,8 +266,7 @@ public class PartyService {
             if (remaining.isEmpty()) {
                 // 아무도 없으면 삭제 처리
                 party.setDeleted(true);
-                partyRepository.saveAndFlush(party);
-                throw new PartyEmptyException("파티방의 모든 멤버가 떠나여, 파티방이 삭제되었습니다.");
+                return partyMapper.convertToResponseDTO(party);
             } else {
                 // 첫 멤버를 새 호스트로(호스트 제외하고 가장 빨리 들어온 멤버)
                 MemberEntity nextHost = remaining.get(0);
