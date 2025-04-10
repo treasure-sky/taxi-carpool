@@ -17,6 +17,10 @@ public interface PartyRepository extends JpaRepository<PartyEntity, Long> {
 
     Optional<PartyEntity> findByIdAndIsDeletedFalse(Long partyId);
 
+    boolean existsByNameAndIsDeletedFalse(String name);
+
+    Page<PartyEntity> findAllByIsDeletedFalse(Pageable pageable);
+
     // 모든 파라미터가 온 경우
     @Query(value = "SELECT p.*, " +
         " (ST_Distance_Sphere(" +
@@ -30,14 +34,15 @@ public interface PartyRepository extends JpaRepository<PartyEntity, Long> {
         " )" +
         " ) AS total_distance " +
         "FROM party p " +
+        "WHERE p.is_deleted = false " +
         "ORDER BY total_distance ASC, ABS(TIMESTAMPDIFF(MINUTE, p.start_date_time, :userDepartureTime)) ASC",
-        countQuery = "SELECT COUNT(*) FROM party p",
+        countQuery = "SELECT COUNT(*) FROM party p WHERE p.is_deleted = false",
         nativeQuery = true)
     Page<PartyEntity> findCustomPartyList(
-        @Param("userDepartureLng") double userDepartureLng,
-        @Param("userDepartureLat") double userDepartureLat,
-        @Param("userDestinationLng") double userDestinationLng,
-        @Param("userDestinationLat") double userDestinationLat,
+        @Param("userDepartureLng") Double userDepartureLng,
+        @Param("userDepartureLat") Double userDepartureLat,
+        @Param("userDestinationLng") Double userDestinationLng,
+        @Param("userDestinationLat") Double userDestinationLat,
         @Param("userDepartureTime") LocalDateTime userDepartureTime,
         Pageable pageable
     );
@@ -50,12 +55,13 @@ public interface PartyRepository extends JpaRepository<PartyEntity, Long> {
         +
         " ) AS total_distance " +
         "FROM party p " +
+        "WHERE p.is_deleted = false " +
         "ORDER BY total_distance ASC, ABS(TIMESTAMPDIFF(MINUTE, p.start_date_time, :userDepartureTime)) ASC",
-        countQuery = "SELECT COUNT(*) FROM party p",
+        countQuery = "SELECT COUNT(*) FROM party p WHERE p.is_deleted = false",
         nativeQuery = true)
     Page<PartyEntity> findCustomPartyList(
-        @Param("userDestinationLng") double userDestinationLng,
-        @Param("userDestinationLat") double userDestinationLat,
+        @Param("userDestinationLng") Double userDestinationLng,
+        @Param("userDestinationLat") Double userDestinationLat,
         @Param("userDepartureTime") LocalDateTime userDepartureTime,
         Pageable pageable
     );
@@ -73,14 +79,15 @@ public interface PartyRepository extends JpaRepository<PartyEntity, Long> {
         " )" +
         " ) AS total_distance " +
         "FROM party p " +
+        "WHERE p.is_deleted = false " +
         "ORDER BY total_distance ASC",
-        countQuery = "SELECT COUNT(*) FROM party p",
+        countQuery = "SELECT COUNT(*) FROM party p WHERE p.is_deleted = false",
         nativeQuery = true)
     Page<PartyEntity> findCustomPartyList(
-        @Param("userDepartureLng") double userDepartureLng,
-        @Param("userDepartureLat") double userDepartureLat,
-        @Param("userDestinationLng") double userDestinationLng,
-        @Param("userDestinationLat") double userDestinationLat,
+        @Param("userDepartureLng") Double userDepartureLng,
+        @Param("userDepartureLat") Double userDepartureLat,
+        @Param("userDestinationLng") Double userDestinationLng,
+        @Param("userDestinationLat") Double userDestinationLat,
         Pageable pageable
     );
 

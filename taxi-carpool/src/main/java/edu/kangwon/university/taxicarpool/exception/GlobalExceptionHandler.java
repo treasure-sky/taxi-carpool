@@ -12,9 +12,10 @@ import edu.kangwon.university.taxicarpool.map.exception.KakaoApiParseException;
 import edu.kangwon.university.taxicarpool.member.exception.DuplicatedEmailException;
 import edu.kangwon.university.taxicarpool.member.exception.DuplicatedNicknameException;
 import edu.kangwon.university.taxicarpool.member.exception.MemberNotFoundException;
+import edu.kangwon.university.taxicarpool.party.partyException.DuplicatedPartyNameException;
+import edu.kangwon.university.taxicarpool.party.partyException.MemberAlreadyInPartyException;
 import edu.kangwon.university.taxicarpool.party.partyException.MemberNotInPartyException;
 import edu.kangwon.university.taxicarpool.party.partyException.PartyAlreadyDeletedException;
-import edu.kangwon.university.taxicarpool.party.partyException.PartyEmptyException;
 import edu.kangwon.university.taxicarpool.party.partyException.PartyFullException;
 import edu.kangwon.university.taxicarpool.party.partyException.PartyGetCustomException;
 import edu.kangwon.university.taxicarpool.party.partyException.PartyNotFoundException;
@@ -120,15 +121,6 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(PartyAlreadyDeletedException.class)
     public ResponseEntity<ErrorResponseDTO> handlePartyAlreadyDeletedException(
         PartyAlreadyDeletedException ex,
-        HttpServletRequest request) {
-        ErrorResponseDTO errorResponse = new ErrorResponseDTO(HttpStatus.GONE.value(),
-            ex.getMessage(),
-            request.getRequestURI());
-        return ResponseEntity.status(HttpStatus.GONE).body(errorResponse);
-    }
-
-    @ExceptionHandler(PartyEmptyException.class)
-    public ResponseEntity<ErrorResponseDTO> handlePartyEmptyException(PartyEmptyException ex,
         HttpServletRequest request) {
         ErrorResponseDTO errorResponse = new ErrorResponseDTO(HttpStatus.GONE.value(),
             ex.getMessage(),
@@ -263,6 +255,28 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }
+
+    @ExceptionHandler(DuplicatedPartyNameException.class)
+    public ResponseEntity<ErrorResponseDTO> handleDuplicatedPartyNameException(
+        DuplicatedPartyNameException ex, HttpServletRequest request) {
+        ErrorResponseDTO errorResponse = new ErrorResponseDTO(
+            HttpStatus.CONFLICT.value(),
+            ex.getMessage(),
+            request.getRequestURI());
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
+    }
+
+    @ExceptionHandler(MemberAlreadyInPartyException.class)
+    public ResponseEntity<ErrorResponseDTO> handleMemberAlreadyInPartyException(
+        MemberAlreadyInPartyException ex, HttpServletRequest request) {
+        ErrorResponseDTO errorResponse = new ErrorResponseDTO(
+            HttpStatus.CONFLICT.value(),
+            ex.getMessage(),
+            request.getRequestURI()
+        );
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
+    }
+
 
     // 그 외 잡히지 않은 모든 예외에 대한 전역 핸들러
     @ExceptionHandler(Exception.class)
