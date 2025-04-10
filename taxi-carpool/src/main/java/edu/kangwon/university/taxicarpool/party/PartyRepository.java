@@ -34,10 +34,10 @@ public interface PartyRepository extends JpaRepository<PartyEntity, Long> {
         countQuery = "SELECT COUNT(*) FROM party p",
         nativeQuery = true)
     Page<PartyEntity> findCustomPartyList(
-        @Param("userDepartureLng") double userDepartureLng,
-        @Param("userDepartureLat") double userDepartureLat,
-        @Param("userDestinationLng") double userDestinationLng,
-        @Param("userDestinationLat") double userDestinationLat,
+        @Param("userDepartureLng") Double userDepartureLng,
+        @Param("userDepartureLat") Double userDepartureLat,
+        @Param("userDestinationLng") Double userDestinationLng,
+        @Param("userDestinationLat") Double userDestinationLat,
         @Param("userDepartureTime") LocalDateTime userDepartureTime,
         Pageable pageable
     );
@@ -54,8 +54,8 @@ public interface PartyRepository extends JpaRepository<PartyEntity, Long> {
         countQuery = "SELECT COUNT(*) FROM party p",
         nativeQuery = true)
     Page<PartyEntity> findCustomPartyList(
-        @Param("userDestinationLng") double userDestinationLng,
-        @Param("userDestinationLat") double userDestinationLat,
+        @Param("userDestinationLng") Double userDestinationLng,
+        @Param("userDestinationLat") Double userDestinationLat,
         @Param("userDepartureTime") LocalDateTime userDepartureTime,
         Pageable pageable
     );
@@ -77,10 +77,10 @@ public interface PartyRepository extends JpaRepository<PartyEntity, Long> {
         countQuery = "SELECT COUNT(*) FROM party p",
         nativeQuery = true)
     Page<PartyEntity> findCustomPartyList(
-        @Param("userDepartureLng") double userDepartureLng,
-        @Param("userDepartureLat") double userDepartureLat,
-        @Param("userDestinationLng") double userDestinationLng,
-        @Param("userDestinationLat") double userDestinationLat,
+        @Param("userDepartureLng") Double userDepartureLng,
+        @Param("userDepartureLat") Double userDepartureLat,
+        @Param("userDestinationLng") Double userDestinationLng,
+        @Param("userDestinationLat") Double userDestinationLat,
         Pageable pageable
     );
 

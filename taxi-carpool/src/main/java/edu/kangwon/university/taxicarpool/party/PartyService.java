@@ -23,6 +23,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -50,7 +51,7 @@ public class PartyService {
     }
 
     public Page<PartyResponseDTO> getPartyList(Integer page, Integer size) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Direction.DESC, "createdAt"));
         Page<PartyEntity> partyEntities = partyRepository.findAll(pageable);
         return partyEntities.map(partyMapper::convertToResponseDTO);
     }
@@ -87,7 +88,7 @@ public class PartyService {
             throw new PartyGetCustomException("출발지, 도착지, 출발시간에 대한 정보 중 2개 이상 넣어주세요!");
         }
 
-        Page<PartyEntity> partyEntities;
+        Page<PartyEntity> partyEntities = null;
 
         // 모든 정보가 있는 경우
         if (!missingDeparture && !missingDestination && !missingDepartureTime) {
@@ -126,7 +127,7 @@ public class PartyService {
 
         }
 
-        throw new PartyGetCustomException("출발지, 도착지, 출발시간에 대한 정보를 올바르게 넣어주세요!");
+        return partyEntities.map(partyMapper::convertToResponseDTO);
 
     }
 
