@@ -69,6 +69,10 @@ public class PartyService {
 
         Pageable pageable = PageRequest.of(page, size);
 
+        if (userDepartureTime != null && userDepartureTime.isBefore(LocalDateTime.now())) {
+            throw new IllegalArgumentException("출발 시간은 현재 시간보다 이후여야 합니다.");
+        }
+
         // 각 그룹(출발지, 도착지, 출발시간)의 누락 여부 확인
         boolean missingDeparture = (userDepartureLng == null || userDepartureLat == null);
         boolean missingDestination = (userDestinationLng == null || userDestinationLat == null);
