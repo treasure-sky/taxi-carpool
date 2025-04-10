@@ -12,6 +12,7 @@ import edu.kangwon.university.taxicarpool.map.exception.KakaoApiParseException;
 import edu.kangwon.university.taxicarpool.member.exception.DuplicatedEmailException;
 import edu.kangwon.university.taxicarpool.member.exception.DuplicatedNicknameException;
 import edu.kangwon.university.taxicarpool.member.exception.MemberNotFoundException;
+import edu.kangwon.university.taxicarpool.party.partyException.DuplicatedPartyNameException;
 import edu.kangwon.university.taxicarpool.party.partyException.MemberNotInPartyException;
 import edu.kangwon.university.taxicarpool.party.partyException.PartyAlreadyDeletedException;
 import edu.kangwon.university.taxicarpool.party.partyException.PartyEmptyException;
@@ -262,6 +263,15 @@ public class GlobalExceptionHandler {
         );
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+    }
+
+    @ExceptionHandler(DuplicatedPartyNameException.class)
+    public ResponseEntity<ErrorResponseDTO> handleDuplicatedPartyNameException(
+        DuplicatedPartyNameException ex, HttpServletRequest request) {
+        ErrorResponseDTO errorResponse = new ErrorResponseDTO(HttpStatus.CONFLICT.value(),
+            ex.getMessage(),
+            request.getRequestURI());
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
     }
 
     // 그 외 잡히지 않은 모든 예외에 대한 전역 핸들러

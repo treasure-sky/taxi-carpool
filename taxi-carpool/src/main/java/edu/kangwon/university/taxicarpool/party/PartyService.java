@@ -6,6 +6,7 @@ import edu.kangwon.university.taxicarpool.member.exception.MemberNotFoundExcepti
 import edu.kangwon.university.taxicarpool.party.PartyDTO.PartyCreateRequestDTO;
 import edu.kangwon.university.taxicarpool.party.PartyDTO.PartyResponseDTO;
 import edu.kangwon.university.taxicarpool.party.PartyDTO.PartyUpdateRequestDTO;
+import edu.kangwon.university.taxicarpool.party.partyException.DuplicatedPartyNameException;
 import edu.kangwon.university.taxicarpool.party.partyException.MemberNotInPartyException;
 import edu.kangwon.university.taxicarpool.party.partyException.PartyAlreadyDeletedException;
 import edu.kangwon.university.taxicarpool.party.partyException.PartyEmptyException;
@@ -133,6 +134,10 @@ public class PartyService {
 
     @Transactional
     public PartyResponseDTO createParty(PartyCreateRequestDTO createRequestDTO) {
+
+        if (partyRepository.existsByNameAndIsDeletedFalse(createRequestDTO.getName())) {
+            throw new DuplicatedPartyNameException("같은 이름의 파티가 이미 존재합니다.");
+        }
 
         PartyEntity partyEntity = partyMapper.convertToEntity(createRequestDTO);
 
