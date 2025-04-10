@@ -16,7 +16,6 @@ import edu.kangwon.university.taxicarpool.party.partyException.DuplicatedPartyNa
 import edu.kangwon.university.taxicarpool.party.partyException.MemberAlreadyInPartyException;
 import edu.kangwon.university.taxicarpool.party.partyException.MemberNotInPartyException;
 import edu.kangwon.university.taxicarpool.party.partyException.PartyAlreadyDeletedException;
-import edu.kangwon.university.taxicarpool.party.partyException.PartyEmptyException;
 import edu.kangwon.university.taxicarpool.party.partyException.PartyFullException;
 import edu.kangwon.university.taxicarpool.party.partyException.PartyGetCustomException;
 import edu.kangwon.university.taxicarpool.party.partyException.PartyNotFoundException;
@@ -122,15 +121,6 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(PartyAlreadyDeletedException.class)
     public ResponseEntity<ErrorResponseDTO> handlePartyAlreadyDeletedException(
         PartyAlreadyDeletedException ex,
-        HttpServletRequest request) {
-        ErrorResponseDTO errorResponse = new ErrorResponseDTO(HttpStatus.GONE.value(),
-            ex.getMessage(),
-            request.getRequestURI());
-        return ResponseEntity.status(HttpStatus.GONE).body(errorResponse);
-    }
-
-    @ExceptionHandler(PartyEmptyException.class)
-    public ResponseEntity<ErrorResponseDTO> handlePartyEmptyException(PartyEmptyException ex,
         HttpServletRequest request) {
         ErrorResponseDTO errorResponse = new ErrorResponseDTO(HttpStatus.GONE.value(),
             ex.getMessage(),

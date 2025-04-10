@@ -10,7 +10,6 @@ import edu.kangwon.university.taxicarpool.party.partyException.DuplicatedPartyNa
 import edu.kangwon.university.taxicarpool.party.partyException.MemberAlreadyInPartyException;
 import edu.kangwon.university.taxicarpool.party.partyException.MemberNotInPartyException;
 import edu.kangwon.university.taxicarpool.party.partyException.PartyAlreadyDeletedException;
-import edu.kangwon.university.taxicarpool.party.partyException.PartyEmptyException;
 import edu.kangwon.university.taxicarpool.party.partyException.PartyFullException;
 import edu.kangwon.university.taxicarpool.party.partyException.PartyGetCustomException;
 import edu.kangwon.university.taxicarpool.party.partyException.PartyNotFoundException;
