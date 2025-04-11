@@ -12,7 +12,6 @@ import java.util.List;
 public class PartyDTO {
 
     public static class PartyResponseDTO {
-
         private Long id;
 
         private String name;
