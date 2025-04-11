@@ -4,6 +4,13 @@ import edu.kangwon.university.taxicarpool.member.Gender;
 
 public class MemberResponseDTO {
 
+    public MemberResponseDTO(Long id, String email, String nickname, Gender gender) {
+        this.id = id;
+        this.email = email;
+        this.nickname = nickname;
+        this.gender = gender;
+    }
+
     private Long id;
     private String email;
     private String nickname;

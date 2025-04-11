@@ -37,11 +37,12 @@ class MemberServiceTest {
     @Test
     void 멤버_생성_성공() {
         // given
-        MemberCreateDTO dto = new MemberCreateDTO();
-        dto.setEmail("test@kangwon.ac.kr");
-        dto.setPassword("testPassword12");
-        dto.setNickname("testNickname");
-        dto.setGender(Gender.MALE);
+        MemberCreateDTO dto = new MemberCreateDTO(
+            "test@kangwon.ac.kr",
+            "testPassword12",
+            "testNickname",
+            Gender.MALE
+        );
 
         when(passwordEncoder.encode("testPassword12")).thenReturn("encodedPassword12");
         when(memberRepository.existsByEmail(dto.getEmail())).thenReturn(false);
@@ -73,11 +74,12 @@ class MemberServiceTest {
     @Test
     void 중복된_이메일로_멤버_생성시_예외처리() {
         // given
-        MemberCreateDTO dto = new MemberCreateDTO();
-        dto.setEmail("test@kangwon.ac.kr");
-        dto.setPassword("testPassword12");
-        dto.setNickname("testNickname");
-        dto.setGender(Gender.MALE);
+        MemberCreateDTO dto = new MemberCreateDTO(
+            "test@kangwon.ac.kr",
+            "testPassword12",
+            "testNickname",
+            Gender.MALE
+        );
 
         when(memberRepository.existsByEmail(dto.getEmail())).thenReturn(true);
 
@@ -93,11 +95,12 @@ class MemberServiceTest {
     @Test
     void 중복된_닉네임으로_멤버_생성시_예외처리() {
         // given
-        MemberCreateDTO dto = new MemberCreateDTO();
-        dto.setEmail("test@kangwon.ac.kr");
-        dto.setPassword("testPassword12");
-        dto.setNickname("duplicateNickname");
-        dto.setGender(Gender.MALE);
+        MemberCreateDTO dto = new MemberCreateDTO(
+            "test@kangwon.ac.kr",
+            "testPassword12",
+            "duplicateNickname",
+            Gender.MALE
+        );
 
         when(memberRepository.existsByEmail(dto.getEmail())).thenReturn(false);
         when(memberRepository.existsByNickname(dto.getNickname())).thenReturn(true);
@@ -125,7 +128,7 @@ class MemberServiceTest {
         when(memberRepository.findById(memberId)).thenReturn(Optional.of(entity));
 
         // when
-        MemberResponseDTO response = memberService.getMember(memberId);
+        MemberResponseDTO response = memberService.getMemberById(memberId);
 
         // then
         assertThat(response).isNotNull();
@@ -144,7 +147,7 @@ class MemberServiceTest {
         when(memberRepository.findById(memberId)).thenReturn(Optional.empty());
 
         // when & then
-        assertThatThrownBy(() -> memberService.getMember(memberId))
+        assertThatThrownBy(() -> memberService.getMemberById(memberId))
             .isInstanceOf(MemberNotFoundException.class)
             .hasMessageContaining("회원을 찾을 수 없습니다");
 

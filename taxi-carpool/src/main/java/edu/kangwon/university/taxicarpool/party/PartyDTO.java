@@ -1,6 +1,7 @@
 package edu.kangwon.university.taxicarpool.party;
 
 import edu.kangwon.university.taxicarpool.member.MemberEntity;
+import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -44,6 +45,14 @@ public class PartyDTO {
 
         private int maxParticipantCount;
 
+        private double start_x;
+
+        private double start_y;
+
+        private double end_x;
+
+        private double end_y;
+
         public PartyResponseDTO(Long id,
             String name,
             boolean isDeleted,
@@ -59,7 +68,11 @@ public class PartyDTO {
             String endLocation,
             String comment,
             int currentParticipantCount,
-            int maxParticipantCount) {
+            int maxParticipantCount,
+            double start_x,
+            double start_y,
+            double end_x,
+            double end_y) {
             this.id = id;
             this.name = name;
             this.isDeleted = isDeleted;
@@ -76,6 +89,10 @@ public class PartyDTO {
             this.comment = comment;
             this.currentParticipantCount = currentParticipantCount;
             this.maxParticipantCount = maxParticipantCount;
+            this.start_x = start_x;
+            this.start_y = start_y;
+            this.end_x = end_x;
+            this.end_y = end_y;
         }
 
         public Long getId() {
@@ -205,12 +222,43 @@ public class PartyDTO {
         public void setMaxParticipantCount(int maxParticipantCount) {
             this.maxParticipantCount = maxParticipantCount;
         }
+
+        public double getStart_x() {
+            return start_x;
+        }
+
+        public void setStart_x(double start_x) {
+            this.start_x = start_x;
+        }
+
+        public double getStart_y() {
+            return start_y;
+        }
+
+        public void setStart_y(double start_y) {
+            this.start_y = start_y;
+        }
+
+        public double getEnd_x() {
+            return end_x;
+        }
+
+        public void setEnd_x(double end_x) {
+            this.end_x = end_x;
+        }
+
+        public double getEnd_y() {
+            return end_y;
+        }
+
+        public void setEnd_y(double end_y) {
+            this.end_y = end_y;
+        }
     }
 
-    // creatorMemberId 필드 존재
+    // creatorMemberId 필드 존재, hostMemberId필드 삭제 -> creatorMemberId사용의 강제를 위해.
     public static class PartyCreateRequestDTO {
 
-        @NotNull
         @NotBlank(message = "파티 이름은 필수입니다.")
         @Size(max = 20, message = "이름은 공백 포함 최대 20글자까지 가능합니다.")
         private String name;
@@ -218,8 +266,6 @@ public class PartyDTO {
         private boolean isDeleted;
 
         private List<MemberEntity> memberEntities = new ArrayList<>();
-
-        private Long hostMemberId;
 
         private LocalDateTime endDate;
 
@@ -234,15 +280,13 @@ public class PartyDTO {
 
         private boolean destinationChangeIn5Minutes;
 
-        @NotNull
-        @NotBlank(message = "출발 시간 입력은 필수입니다.")
+        @Future(message = "출발 시간은 현재 시간보다 이후여야 합니다.")
+        @NotNull(message = "출발 시간 입력은 필수입니다.")
         private LocalDateTime startDateTime;
 
-        @NotNull
         @NotBlank(message = "출발지 입력은 필수입니다.")
         private String startLocation;
 
-        @NotNull
         @NotBlank(message = "목적지 입력은 필수입니다.")
         private String endLocation;
 
@@ -254,10 +298,17 @@ public class PartyDTO {
         @Max(value = 4, message = "택시의 최대 탑승 인원 수는 4명입니다.")
         private int maxParticipantCount;
 
+        private double start_x;
+
+        private double start_y;
+
+        private double end_x;
+
+        private double end_y;
+
         public PartyCreateRequestDTO(String name,
             boolean isDeleted,
             List<MemberEntity> memberEntities,
-            Long hostMemberId,
             LocalDateTime endDate,
             Long creatorMemberId,
             boolean sameGenderOnly,
@@ -269,11 +320,14 @@ public class PartyDTO {
             String endLocation,
             String comment,
             int currentParticipantCount,
-            int maxParticipantCount) {
+            int maxParticipantCount,
+            double start_x,
+            double start_y,
+            double end_x,
+            double end_y) {
             this.name = name;
             this.isDeleted = isDeleted;
             this.memberEntities = memberEntities;
-            this.hostMemberId = hostMemberId;
             this.endDate = endDate;
             this.creatorMemberId = creatorMemberId;
             this.sameGenderOnly = sameGenderOnly;
@@ -286,6 +340,10 @@ public class PartyDTO {
             this.comment = comment;
             this.currentParticipantCount = currentParticipantCount;
             this.maxParticipantCount = maxParticipantCount;
+            this.start_x = start_x;
+            this.start_y = start_y;
+            this.end_x = end_x;
+            this.end_y = end_y;
         }
 
         public String getName() {
@@ -310,14 +368,6 @@ public class PartyDTO {
 
         public void setMemberEntities(List<MemberEntity> memberEntities) {
             this.memberEntities = memberEntities;
-        }
-
-        public Long getHostMemberId() {
-            return hostMemberId;
-        }
-
-        public void setHostMemberId(Long hostMemberId) {
-            this.hostMemberId = hostMemberId;
         }
 
         public LocalDateTime getEndDate() {
@@ -415,12 +465,43 @@ public class PartyDTO {
         public void setMaxParticipantCount(int maxParticipantCount) {
             this.maxParticipantCount = maxParticipantCount;
         }
+
+        public double getStart_x() {
+            return start_x;
+        }
+
+        public void setStart_x(double start_x) {
+            this.start_x = start_x;
+        }
+
+        public double getStart_y() {
+            return start_y;
+        }
+
+        public void setStart_y(double start_y) {
+            this.start_y = start_y;
+        }
+
+        public double getEnd_x() {
+            return end_x;
+        }
+
+        public void setEnd_x(double end_x) {
+            this.end_x = end_x;
+        }
+
+        public double getEnd_y() {
+            return end_y;
+        }
+
+        public void setEnd_y(double end_y) {
+            this.end_y = end_y;
+        }
     }
 
     // UpdateRequestDTO에는 현재 인원수에 대한 필드가 없음 -> 파티의 인원수에 관한 로직은 무조건 join/leave 엔트포인트 사용을 강제를 위해
     public static class PartyUpdateRequestDTO {
 
-        @NotNull
         @NotBlank(message = "파티 이름은 필수입니다.")
         private String name;
 
@@ -440,15 +521,12 @@ public class PartyDTO {
 
         private boolean destinationChangeIn5Minutes;
 
-        @NotNull
-        @NotBlank(message = "출발 시간 입력은 필수입니다.")
+        @NotNull(message = "출발 시간 입력은 필수입니다.")
         private LocalDateTime startDateTime;
 
-        @NotNull
         @NotBlank(message = "출발지 입력은 필수입니다.")
         private String startLocation;
 
-        @NotNull
         @NotBlank(message = "목적지 입력은 필수입니다.")
         private String endLocation;
 
@@ -457,6 +535,14 @@ public class PartyDTO {
 
         @Max(value = 4, message = "택시의 최대 탑승 인원 수는 4명입니다.")
         private int maxParticipantCount;
+
+        private double start_x;
+
+        private double start_y;
+
+        private double end_x;
+
+        private double end_y;
 
         public PartyUpdateRequestDTO(
             String name,
@@ -472,7 +558,12 @@ public class PartyDTO {
             String startLocation,
             String endLocation,
             String comment,
-            int maxParticipantCount) {
+            int maxParticipantCount,
+            double start_x,
+            double start_y,
+            double end_x,
+            double end_y
+        ) {
             this.name = name;
             this.isDeleted = isDeleted;
             this.memberEntities = memberEntities;
@@ -487,6 +578,10 @@ public class PartyDTO {
             this.endLocation = endLocation;
             this.comment = comment;
             this.maxParticipantCount = maxParticipantCount;
+            this.start_x = start_x;
+            this.start_y = start_y;
+            this.end_x = end_x;
+            this.end_y = end_y;
         }
 
         public String getName() {
@@ -599,6 +694,38 @@ public class PartyDTO {
 
         public void setMaxParticipantCount(int maxParticipantCount) {
             this.maxParticipantCount = maxParticipantCount;
+        }
+
+        public double getStart_x() {
+            return start_x;
+        }
+
+        public void setStart_x(double start_x) {
+            this.start_x = start_x;
+        }
+
+        public double getStart_y() {
+            return start_y;
+        }
+
+        public void setStart_y(double start_y) {
+            this.start_y = start_y;
+        }
+
+        public double getEnd_x() {
+            return end_x;
+        }
+
+        public void setEnd_x(double end_x) {
+            this.end_x = end_x;
+        }
+
+        public double getEnd_y() {
+            return end_y;
+        }
+
+        public void setEnd_y(double end_y) {
+            this.end_y = end_y;
         }
     }
 }
