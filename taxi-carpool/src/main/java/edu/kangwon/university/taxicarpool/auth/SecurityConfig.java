@@ -37,7 +37,14 @@ public class SecurityConfig {
             .csrf(csrf -> csrf.disable()) // 필요에 따라 설정해야한다고 함.
             .authorizeHttpRequests(auth -> auth
                 // 회원가입/로그인 엔드포인트는 인증 없이 접근 가능하게
-                .requestMatchers("/api/auth/**").permitAll()
+                .requestMatchers(
+                    "/",                        // 루트
+                    "/api/auth/**",             // 회원가입, 로그인
+                    "/swagger-ui/**",           // 스웨거 UI리소스
+                    "/v3/api-docs/**",          // 스웨거 API 문서
+                    "/swagger-resources/**",    // 스웨거 리소스
+                    "/webjars/**"               // 스웨거 관련 정적 리소스
+                ).permitAll()
                 // 그 외 모든 요청은 인증 필요
                 .anyRequest().authenticated()
             )
