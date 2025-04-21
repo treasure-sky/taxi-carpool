@@ -40,6 +40,7 @@ public class SecurityConfig {
                 .requestMatchers(
                     "/",                        // 루트
                     "/api/auth/**",             // 회원가입, 로그인
+                    "/api/email/**",            // 이메일 인증
                     "/swagger-ui/**",           // 스웨거 UI리소스
                     "/v3/api-docs/**",          // 스웨거 API 문서
                     "/swagger-resources/**",    // 스웨거 리소스
