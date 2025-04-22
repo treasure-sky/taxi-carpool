@@ -4,10 +4,14 @@ import edu.kangwon.university.taxicarpool.party.PartyDTO.PartyCreateRequestDTO;
 import edu.kangwon.university.taxicarpool.party.PartyDTO.PartyResponseDTO;
 import edu.kangwon.university.taxicarpool.party.PartyDTO.PartyUpdateRequestDTO;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
+import java.time.LocalDateTime;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -21,6 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/party")
+@Validated
 public class PartyController {
 
     private final PartyService partyService;
@@ -40,10 +45,27 @@ public class PartyController {
 
     @GetMapping
     public ResponseEntity<Page<PartyResponseDTO>> getPartyList(
-        @RequestParam(defaultValue = "0") int page,
-        @RequestParam(defaultValue = "10") int size
+        @RequestParam(defaultValue = "0") @Min(value = 0, message = "페이지 번호는 0 이상이어야 합니다.") Integer page,
+        @RequestParam(defaultValue = "10") @Min(value = 1, message = "페이지 크기는 1 이상이어야 합니다.") Integer size
     ) {
         Page<PartyResponseDTO> partyList = partyService.getPartyList(page, size);
+        return ResponseEntity.ok(partyList);
+    }
+
+    @GetMapping("/custom")
+    public ResponseEntity<Page<PartyResponseDTO>> getCustomPartyList(
+        @RequestParam(required = false) Double userDepartureLng,
+        @RequestParam(required = false) Double userDepartureLat,
+        @RequestParam(required = false) Double userDestinationLng,
+        @RequestParam(required = false) Double userDestinationLat,
+        @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime userDepartureTime,
+        @RequestParam(defaultValue = "0") @Min(value = 0, message = "페이지 번호는 0 이상이어야 합니다.") Integer page,
+        @RequestParam(defaultValue = "10") @Min(value = 1, message = "페이지 크기는 1 이상이어야 합니다.") Integer size
+    ) {
+        Page<PartyResponseDTO> partyList = partyService.getCustomPartyList(userDepartureLng,
+            userDepartureLat,
+            userDestinationLng, userDestinationLat,
+            userDepartureTime, page, size);
         return ResponseEntity.ok(partyList);
     }
 

@@ -11,6 +11,7 @@ import io.jsonwebtoken.SignatureException;
 import io.jsonwebtoken.security.Keys;
 import java.security.Key;
 import java.util.Date;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -22,7 +23,8 @@ public class JwtUtil {
     private final long ACCESS_EXPIRATION = 1000L * 60 * 60 * 2; // 일단 2시간 유효로 해둠.
     private final long REFRESH_EXPIRATION = 1000L * 60 * 60 * 24 * 7; // 일주일 유효
     // 토큰 검증 시(시그니처 만들 때) 사용할 시크릿 키(32바이트 이상)
-    private final String SECRET_KEY = "12345678901234567890123456789012";
+    @Value("${jwt.secret}")
+    private String SECRET_KEY;
 
     // 엑세스 토큰 생성 메서드
     public String generateAccessToken(String email) {
