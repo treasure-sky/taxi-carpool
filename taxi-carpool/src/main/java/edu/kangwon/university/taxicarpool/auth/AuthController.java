@@ -1,5 +1,7 @@
 package edu.kangwon.university.taxicarpool.auth;
 
+import edu.kangwon.university.taxicarpool.member.dto.MemberCreateDTO;
+import edu.kangwon.university.taxicarpool.member.dto.MemberResponseDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -20,10 +22,9 @@ public class AuthController {
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<SignUpDTO.SignUpResponseDTO> signUp(
-        @Validated @RequestBody SignUpDTO.SignUpRequestDTO signUpRequest) {
-
-        SignUpDTO.SignUpResponseDTO response = authService.signUp(signUpRequest);
+    public ResponseEntity<MemberResponseDTO> signUp(
+        @Validated @RequestBody MemberCreateDTO memberCreateDTO) {
+        MemberResponseDTO response = authService.signUp(memberCreateDTO);
         return ResponseEntity.ok(response);
     }
 
