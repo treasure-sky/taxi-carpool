@@ -32,6 +32,7 @@ jobs:
       run: |
         echo "${{ secrets.EC2_KEY }}" > key.pem
         chmod 600 key.pem
+      working-directory: ./taxi-carpool
 
     - name: Add EC2 Host to Known Hosts
       run: |
