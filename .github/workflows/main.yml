@@ -47,16 +47,16 @@ jobs:
       working-directory: ./taxi-carpool
 
     - name: Make Directories on EC2
-      run: ssh -i ../key.pem ec2-user@${{ secrets.EC2_HOST }} "mkdir -p /home/ec2-user/deploys /home/ec2-user/logs"
+      run: ssh -i key.pem ec2-user@${{ secrets.EC2_HOST }} "mkdir -p /home/ec2-user/deploys /home/ec2-user/logs"
       working-directory: ./taxi-carpool
 
     - name: Upload JAR to EC2
-      run: scp -i ../key.pem build/libs/taxi-carpool-0.0.1-SNAPSHOT.jar ec2-user@${{ secrets.EC2_HOST }}:/home/ec2-user/deploys/taxi-carpool-0.0.1-SNAPSHOT.jar
+      run: scp -i key.pem build/libs/taxi-carpool-0.0.1-SNAPSHOT.jar ec2-user@${{ secrets.EC2_HOST }}:/home/ec2-user/deploys/taxi-carpool-0.0.1-SNAPSHOT.jar
       working-directory: ./taxi-carpool
     
     - name: Start Spring App on EC2
       run: |
-        ssh -i ../key.pem ec2-user@${{ secrets.EC2_HOST }} "
+        ssh -i key.pem ec2-user@${{ secrets.EC2_HOST }} "
           pkill -f 'java' || true &&
           nohup \
             SPRING_DATASOURCE_URL=${{ secrets.SPRING_DATASOURCE_URL }} \
