@@ -55,19 +55,24 @@ jobs:
     - name: Upload JAR to EC2
       run: scp -i key.pem build/libs/taxi-carpool-0.0.1-SNAPSHOT.jar ec2-user@${{ secrets.EC2_HOST }}:/home/ec2-user/deploys/taxi-carpool-0.0.1-SNAPSHOT.jar
       working-directory: ./taxi-carpool
-    
+
     - name: Start Spring App on EC2
       run: |
-        ssh -i key.pem ec2-user@${{ secrets.EC2_HOST }} "
-          pkill -f 'java' || true &&
-          nohup \
-            SPRING_DATASOURCE_URL=${{ secrets.SPRING_DATASOURCE_URL }} \
-            SPRING_DATASOURCE_USERNAME=${{ secrets.SPRING_DATASOURCE_USERNAME }} \
-            SPRING_DATASOURCE_PASSWORD=${{ secrets.SPRING_DATASOURCE_PASSWORD }} \
-            EMAIL_VERIFICATION_GOOGLE_ID=${{ secrets.EMAIL_VERIFICATION_GOOGLE_ID }} \
-            EMAIL_VERIFICATION_GOOGLE_PW=${{ secrets.EMAIL_VERIFICATION_GOOGLE_PW }} \
-            EMAIL_VERIFICATION_GOOGLE_ADDRESS=${{ secrets.EMAIL_VERIFICATION_GOOGLE_ADDRESS }} \
-            KAKAO_APP_REST_KEY=${{ secrets.KAKAO_APP_REST_KEY }} \
-            JWT_SECRET=${{ secrets.JWT_SECRET }} \
-            java -Dspring.profiles.active=prod -jar /home/ec2-user/deploys/taxi-carpool-0.0.1-SNAPSHOT.jar > /home/ec2-user/logs/log.txt 2>&1 &"
+        ssh -i key.pem ec2-user@${{ secrets.EC2_HOST }} << 'EOF'
+        set -eux
+        pkill -f java || true
+    
+        export SPRING_DATASOURCE_URL='${{ secrets.SPRING_DATASOURCE_URL }}'
+        export SPRING_DATASOURCE_USERNAME='${{ secrets.SPRING_DATASOURCE_USERNAME }}'
+        export SPRING_DATASOURCE_PASSWORD='${{ secrets.SPRING_DATASOURCE_PASSWORD }}'
+        export EMAIL_VERIFICATION_GOOGLE_ID='${{ secrets.EMAIL_VERIFICATION_GOOGLE_ID }}'
+        export EMAIL_VERIFICATION_GOOGLE_PW='${{ secrets.EMAIL_VERIFICATION_GOOGLE_PW }}'
+        export EMAIL_VERIFICATION_GOOGLE_ADDRESS='${{ secrets.EMAIL_VERIFICATION_GOOGLE_ADDRESS }}'
+        export KAKAO_APP_REST_KEY='${{ secrets.KAKAO_APP_REST_KEY }}'
+        export JWT_SECRET='${{ secrets.JWT_SECRET }}'
+        
+        nohup java -Dspring.profiles.active=prod \
+          -jar /home/ec2-user/deploys/taxi-carpool-0.0.1-SNAPSHOT.jar \
+          > /home/ec2-user/logs/log.txt 2>&1 &
+        EOF
       working-directory: ./taxi-carpool
