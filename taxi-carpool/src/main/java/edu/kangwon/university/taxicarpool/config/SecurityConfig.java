@@ -1,5 +1,7 @@
-package edu.kangwon.university.taxicarpool.auth;
+package edu.kangwon.university.taxicarpool.config;
 
+import edu.kangwon.university.taxicarpool.auth.JwtAuthenticationFilter;
+import edu.kangwon.university.taxicarpool.auth.JwtUtil;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -41,8 +43,9 @@ public class SecurityConfig {
                     "/",                        // 루트
                     "/api/auth/**",             // 회원가입, 로그인
                     "/api/email/**",            // 이메일 인증
+                    "/swagger-ui.html",
                     "/swagger-ui/**",           // 스웨거 UI리소스
-                    "/v3/api-docs/**",          // 스웨거 API 문서
+                    "/api-docs/**",          // 스웨거 API 문서
                     "/swagger-resources/**",    // 스웨거 리소스
                     "/webjars/**"               // 스웨거 관련 정적 리소스
                 ).permitAll()
