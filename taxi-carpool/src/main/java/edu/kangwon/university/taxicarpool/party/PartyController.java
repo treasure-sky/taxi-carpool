@@ -3,6 +3,11 @@ package edu.kangwon.university.taxicarpool.party;
 import edu.kangwon.university.taxicarpool.party.PartyDTO.PartyCreateRequestDTO;
 import edu.kangwon.university.taxicarpool.party.PartyDTO.PartyResponseDTO;
 import edu.kangwon.university.taxicarpool.party.PartyDTO.PartyUpdateRequestDTO;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import java.time.LocalDateTime;
@@ -22,7 +27,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-
+@Tag(name = "Party", description = "카풀방 생성·조회·수정·삭제·참여 API")
+@SecurityRequirement(name = "bearerAuth")
 @RestController
 @RequestMapping("/api/party")
 @Validated
@@ -35,32 +41,36 @@ public class PartyController {
         this.partyService = partyService;
     }
 
+    @Operation(summary = "파티 조회", description = "ID로 특정 파티 정보를 가져옵니다.")
     @GetMapping("/{partyId}")
     public ResponseEntity<PartyResponseDTO> getParty(
+        @Parameter(description = "조회할 파티 ID", required = true)
         @PathVariable("partyId") Long partyId
     ) {
         PartyResponseDTO partyResponse = partyService.getParty(partyId);
         return ResponseEntity.ok(partyResponse);
     }
 
+    @Operation(summary = "파티 리스트 조회", description = "모든 파티를 페이지 단위로 조회합니다.")
     @GetMapping
     public ResponseEntity<Page<PartyResponseDTO>> getPartyList(
-        @RequestParam(defaultValue = "0") @Min(value = 0, message = "페이지 번호는 0 이상이어야 합니다.") Integer page,
-        @RequestParam(defaultValue = "10") @Min(value = 1, message = "페이지 크기는 1 이상이어야 합니다.") Integer size
+        @Parameter(description = "페이지 번호 (0부터 시작)") @RequestParam(defaultValue = "0") @Min(value = 0, message = "페이지 번호는 0 이상이어야 합니다.") Integer page,
+        @Parameter(description = "페이지 크기 (최소 1)") @RequestParam(defaultValue = "10") @Min(value = 1, message = "페이지 크기는 1 이상이어야 합니다.") Integer size
     ) {
         Page<PartyResponseDTO> partyList = partyService.getPartyList(page, size);
         return ResponseEntity.ok(partyList);
     }
 
+    @Operation(summary = "커스텀 파티 조회", description = "위치·시간 필터 적용 조회")
     @GetMapping("/custom")
     public ResponseEntity<Page<PartyResponseDTO>> getCustomPartyList(
-        @RequestParam(required = false) Double userDepartureLng,
-        @RequestParam(required = false) Double userDepartureLat,
-        @RequestParam(required = false) Double userDestinationLng,
-        @RequestParam(required = false) Double userDestinationLat,
-        @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime userDepartureTime,
-        @RequestParam(defaultValue = "0") @Min(value = 0, message = "페이지 번호는 0 이상이어야 합니다.") Integer page,
-        @RequestParam(defaultValue = "10") @Min(value = 1, message = "페이지 크기는 1 이상이어야 합니다.") Integer size
+        @Parameter(description = "출발지 경도") @RequestParam(required = false) Double userDepartureLng,
+        @Parameter(description = "출발지 위도") @RequestParam(required = false) Double userDepartureLat,
+        @Parameter(description = "도착지 경도") @RequestParam(required = false) Double userDestinationLng,
+        @Parameter(description = "도착지 위도") @RequestParam(required = false) Double userDestinationLat,
+        @Parameter(description = "출발 시간 (ISO 날짜시간)") @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime userDepartureTime,
+        @Parameter(description = "페이지 번호") @RequestParam(defaultValue = "0") @Min(value = 0, message = "페이지 번호는 0 이상이어야 합니다.") Integer page,
+        @Parameter(description = "페이지 크기") @RequestParam(defaultValue = "10") @Min(value = 1, message = "페이지 크기는 1 이상이어야 합니다.") Integer size
     ) {
         Page<PartyResponseDTO> partyList = partyService.getCustomPartyList(userDepartureLng,
             userDepartureLat,
@@ -69,45 +79,52 @@ public class PartyController {
         return ResponseEntity.ok(partyList);
     }
 
+    @Operation(summary = "파티 생성", description = "새 카풀방을 만듭니다.")
     @PostMapping
     public ResponseEntity<PartyResponseDTO> createParty(
+        @Parameter(description = "생성 요청 DTO", required = true,
+            schema = @Schema(implementation = PartyCreateRequestDTO.class))
         @RequestBody @Valid PartyCreateRequestDTO createRequestDTO
     ) {
         return ResponseEntity.ok(partyService.createParty(createRequestDTO));
     }
 
+    @Operation(summary = "파티 수정", description = "카풀방 정보를 업데이트합니다.")
     @PutMapping("/{partyId}")
     public ResponseEntity<PartyResponseDTO> updateParty(
+        @Parameter(description = "업데이트 요청 DTO", required = true,
+            schema = @Schema(implementation = PartyUpdateRequestDTO.class))
         @RequestBody @Valid PartyUpdateRequestDTO updateRequestDTO,
-        @RequestParam Long memberId,
-        @PathVariable Long partyId
+        @Parameter(description = "멤버 ID", required = true) @RequestParam Long memberId,
+        @Parameter(description = "파티 ID", required = true) @PathVariable Long partyId
     ) {
         return ResponseEntity.ok(partyService.updateParty(partyId, memberId, updateRequestDTO));
     }
 
+    @Operation(summary = "파티 삭제", description = "카풀방을 삭제합니다.")
     @DeleteMapping("/{partyId}")
     public ResponseEntity<Map<String, Object>> deleteParty(
-        @PathVariable Long partyId,
-        @RequestParam Long memberId
+        @Parameter(description = "파티 ID", required = true) @PathVariable Long partyId,
+        @Parameter(description = "멤버 ID", required = true) @RequestParam Long memberId
     ) {
         return ResponseEntity.ok(partyService.deleteParty(partyId, memberId));
     }
 
-    // 파티방에 멤버 추가하는 엔트포인트
+    @Operation(summary = "파티 참여", description = "멤버를 카풀방에 참여시킵니다.")
     @PostMapping("/{partyId}/join")
     public ResponseEntity<PartyResponseDTO> joinParty(
-        @PathVariable Long partyId,
-        @RequestParam Long memberId
+        @Parameter(description = "파티 ID", required = true) @PathVariable Long partyId,
+        @Parameter(description = "멤버 ID", required = true) @RequestParam Long memberId
     ) {
         PartyResponseDTO result = partyService.joinParty(partyId, memberId);
         return ResponseEntity.ok(result);
     }
 
-    // 파티방에서 멤버가 퇴장할 때 엔드포인트
+    @Operation(summary = "파티 퇴장", description = "멤버를 카풀방에서 퇴장시킵니다.")
     @PostMapping("/{partyId}/leave")
     public ResponseEntity<PartyResponseDTO> leaveParty(
-        @PathVariable Long partyId,
-        @RequestParam Long memberId
+        @Parameter(description = "파티 ID", required = true) @PathVariable Long partyId,
+        @Parameter(description = "멤버 ID", required = true) @RequestParam Long memberId
     ) {
         PartyResponseDTO result = partyService.leaveParty(partyId, memberId);
         return ResponseEntity.ok(result);
