@@ -13,6 +13,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class AuthService {
@@ -102,12 +103,11 @@ public class AuthService {
     }
 
     // 로그아웃
-    public void logout(String email) {
-        // 1) 이메일로 Member 조회
-        MemberEntity member = memberService.getMemberEntityByEmail(email);
+    @Transactional
+    public void logout(String refreshToken) {
 
-        // 2) 리프레쉬 토큰 엔티티 조회
-        Optional<RefreshTokenEntity> optionalToken = refreshTokenRepository.findByMember(member);
+        // 리프레쉬 토큰 엔티티 조회
+        Optional<RefreshTokenEntity> optionalToken = refreshTokenRepository.findByRefreshToken(refreshToken);
         if (optionalToken.isPresent()) {
             RefreshTokenEntity tokenEntity = optionalToken.get();
 
@@ -115,7 +115,7 @@ public class AuthService {
             tokenEntity.setExpiryDate(LocalDateTime.now());
             refreshTokenRepository.save(tokenEntity);
         } else {
-            // 토큰없는 로그아웃
+            //
             throw new TokenInvalidException("재로그인 후 로그아웃 해주세요.");
         }
     }

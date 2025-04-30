@@ -90,7 +90,7 @@ public class AuthController {
         )
         @RequestBody LogoutDTO.LogoutRequestDTO logoutRequest
     ) {
-        authService.logout(logoutRequest.getEmail());
+        authService.logout(logoutRequest.getRefreshToken());
         return ResponseEntity.ok("로그아웃 완료");
     }
 }
