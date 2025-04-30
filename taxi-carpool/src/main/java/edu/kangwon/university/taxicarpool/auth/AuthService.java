@@ -56,8 +56,8 @@ public class AuthService {
 
         // 회원가입 DB를 거쳐서 회원임이 검증된 이후.
         // 엑세스 토큰, 리프래쉬 토큰 생성
-        String accessToken = jwtUtil.generateAccessToken(member.getEmail());
-        String refreshToken = jwtUtil.generateRefreshToken(member.getEmail());
+        String accessToken = jwtUtil.generateAccessToken(member.getId());
+        String refreshToken = jwtUtil.generateRefreshToken(member.getId());
 
         // 리프래쉬 토큰 만료 시점 (1주) generateRefreshToken()에서 생성한 거 말고
         // 이중으로 하나 더 넣어둔 것임.(로그아웃 로직도 관리해야돼서)
@@ -94,8 +94,8 @@ public class AuthService {
         }
 
         // 새 액세스 토큰 발급
-        String email = tokenEntity.getMember().getEmail();
-        String newAccessToken = jwtUtil.generateAccessToken(email);
+        Long id = tokenEntity.getMember().getId();
+        String newAccessToken = jwtUtil.generateAccessToken(id);
 
         // 응답 DTO
         return new LoginDTO.RefreshResponseDTO(newAccessToken, tokenEntity.getRefreshToken());
