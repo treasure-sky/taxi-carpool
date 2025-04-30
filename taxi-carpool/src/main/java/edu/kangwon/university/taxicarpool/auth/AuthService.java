@@ -7,7 +7,7 @@ import edu.kangwon.university.taxicarpool.email.EmailVerificationService;
 import edu.kangwon.university.taxicarpool.member.MemberEntity;
 import edu.kangwon.university.taxicarpool.member.MemberService;
 import edu.kangwon.university.taxicarpool.member.dto.MemberCreateDTO;
-import edu.kangwon.university.taxicarpool.member.dto.MemberResponseDTO;
+import edu.kangwon.university.taxicarpool.member.dto.MemberDetailDTO;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,7 +37,7 @@ public class AuthService {
     }
 
     // 회원가입
-    public MemberResponseDTO signUp(MemberCreateDTO request) {
+    public MemberDetailDTO signUp(MemberCreateDTO request) {
 
         // 이메일 인증여부 확인
         emailVerificationService.isEmailVerified(request.getEmail());

@@ -1,9 +1,11 @@
 package edu.kangwon.university.taxicarpool.member;
 
-import edu.kangwon.university.taxicarpool.member.dto.MemberResponseDTO;
+import edu.kangwon.university.taxicarpool.member.dto.MemberDetailDTO;
+import edu.kangwon.university.taxicarpool.member.dto.MemberPublicDTO;
 import edu.kangwon.university.taxicarpool.member.dto.MemberUpdateDTO;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -22,24 +24,34 @@ public class MemberController {
         this.memberService = memberService;
     }
 
+    // 타인 조회
     @GetMapping("/{memberId}")
-    public ResponseEntity<MemberResponseDTO> getMember(@PathVariable Long memberId) {
-        MemberResponseDTO member = memberService.getMemberById(memberId);
-        return ResponseEntity.ok(member);
+    public ResponseEntity<MemberPublicDTO> getPublicInfo(@PathVariable Long memberId) {
+        MemberPublicDTO publicInfo = memberService.getMemberById(memberId);
+        return ResponseEntity.ok(publicInfo);
+    }
+
+    // 로그인된 본인의 정보 조회
+    @GetMapping("/me")
+    public ResponseEntity<MemberDetailDTO> getMyInfo() {
+        Long memberId = (Long) SecurityContextHolder.getContext().getAuthentication()
+            .getPrincipal();
+        MemberDetailDTO myInfo = memberService.getDetailMember(memberId);
+        return ResponseEntity.ok(myInfo);
     }
 
     @PutMapping("/{memberId}")
-    public ResponseEntity<MemberResponseDTO> updateMember(
+    public ResponseEntity<MemberDetailDTO> updateMember(
         @PathVariable Long memberId,
         @RequestBody @Valid MemberUpdateDTO updateDTO
     ) {
-        MemberResponseDTO updated = memberService.updateMember(memberId, updateDTO);
+        MemberDetailDTO updated = memberService.updateMember(memberId, updateDTO);
         return ResponseEntity.ok(updated);
     }
 
     @DeleteMapping("/{memberId}")
-    public ResponseEntity<MemberResponseDTO> deleteMember(@PathVariable Long memberId) {
-        MemberResponseDTO deleted = memberService.deleteMember(memberId);
+    public ResponseEntity<MemberDetailDTO> deleteMember(@PathVariable Long memberId) {
+        MemberDetailDTO deleted = memberService.deleteMember(memberId);
         return ResponseEntity.ok(deleted);
     }
 }

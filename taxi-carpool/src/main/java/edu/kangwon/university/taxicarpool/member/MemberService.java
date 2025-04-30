@@ -1,7 +1,8 @@
 package edu.kangwon.university.taxicarpool.member;
 
 import edu.kangwon.university.taxicarpool.member.dto.MemberCreateDTO;
-import edu.kangwon.university.taxicarpool.member.dto.MemberResponseDTO;
+import edu.kangwon.university.taxicarpool.member.dto.MemberDetailDTO;
+import edu.kangwon.university.taxicarpool.member.dto.MemberPublicDTO;
 import edu.kangwon.university.taxicarpool.member.dto.MemberUpdateDTO;
 import edu.kangwon.university.taxicarpool.member.exception.DuplicatedEmailException;
 import edu.kangwon.university.taxicarpool.member.exception.DuplicatedNicknameException;
@@ -22,7 +23,7 @@ public class MemberService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    public MemberResponseDTO createMember(MemberCreateDTO memberCreateDTO) {
+    public MemberDetailDTO createMember(MemberCreateDTO memberCreateDTO) {
 
         // 이미 이메일이 존재하면 예외 처리
         if (memberRepository.existsByEmail(memberCreateDTO.getEmail())) {
@@ -49,7 +50,7 @@ public class MemberService {
         MemberEntity saved = memberRepository.save(entity);
 
         // 저장된 결과를 DTO로 변환하여 반환
-        MemberResponseDTO responseDTO = new MemberResponseDTO(
+        MemberDetailDTO responseDTO = new MemberDetailDTO(
             saved.getId(),
             saved.getEmail(),
             saved.getNickname(),
@@ -60,7 +61,7 @@ public class MemberService {
     }
 
 
-    public MemberResponseDTO updateMember(Long memberId, MemberUpdateDTO updateDTO) {
+    public MemberDetailDTO updateMember(Long memberId, MemberUpdateDTO updateDTO) {
         MemberEntity existedEntity = memberRepository.findById(memberId)
             .orElseThrow(() -> new MemberNotFoundException("회원을 찾을 수 없습니다: " + memberId));
 
@@ -76,7 +77,7 @@ public class MemberService {
 
         MemberEntity updated = memberRepository.save(existedEntity);
 
-        MemberResponseDTO responseDTO = new MemberResponseDTO(
+        MemberDetailDTO responseDTO = new MemberDetailDTO(
             updated.getId(),
             updated.getEmail(),
             updated.getNickname(),
@@ -86,13 +87,13 @@ public class MemberService {
         return responseDTO;
     }
 
-    public MemberResponseDTO deleteMember(Long memberId) {
+    public MemberDetailDTO deleteMember(Long memberId) {
         MemberEntity entity = memberRepository.findById(memberId)
             .orElseThrow(() -> new MemberNotFoundException("회원을 찾을 수 없습니다: " + memberId));
 
         memberRepository.delete(entity);
 
-        MemberResponseDTO responseDTO = new MemberResponseDTO(
+        MemberDetailDTO responseDTO = new MemberDetailDTO(
             entity.getId(),
             entity.getEmail(),
             entity.getNickname(),
@@ -102,12 +103,24 @@ public class MemberService {
         return responseDTO;
     }
 
-    public MemberResponseDTO getMemberById(Long memberId) {
+    public MemberPublicDTO getMemberById(Long memberId) {
 
         MemberEntity entity = memberRepository.findById(memberId)
             .orElseThrow(() -> new MemberNotFoundException("회원을 찾을 수 없습니다: " + memberId));
 
-        MemberResponseDTO responseDTO = new MemberResponseDTO(
+        MemberPublicDTO responseDTO = new MemberPublicDTO(
+            entity.getId(),
+            entity.getNickname()
+        );
+
+        return responseDTO;
+    }
+
+    public MemberDetailDTO getDetailMember(Long memberId) {
+        MemberEntity entity = memberRepository.findById(memberId)
+            .orElseThrow(() -> new MemberNotFoundException("회원을 찾을 수 없습니다: " + memberId));
+
+        MemberDetailDTO responseDTO = new MemberDetailDTO(
             entity.getId(),
             entity.getEmail(),
             entity.getNickname(),
