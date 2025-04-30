@@ -7,23 +7,23 @@ public class LogoutDTO {
 
     public static class LogoutRequestDTO {
 
-        @NotBlank(message = "이메일 공백 오류")
-        @Email(message = "이메일 형식을 지켜주세요.")
-        private String email;
+        @NotBlank(message = "재로그인 후 로그아웃 해주세요.") // 토큰 없는 로그아웃 요청
+        private String refreshToken;
 
         public LogoutRequestDTO() {
         }
 
-        public LogoutRequestDTO(String email) {
-            this.email = email;
+        public LogoutRequestDTO(String refreshToken) {
+            this.refreshToken = refreshToken;
         }
 
-        public String getEmail() {
-            return email;
+        public @NotBlank(message = "재로그인 후 로그아웃 해주세요.") String getRefreshToken() {
+            return refreshToken;
         }
 
-        public void setEmail(String email) {
-            this.email = email;
+        public void setRefreshToken(
+            @NotBlank(message = "재로그인 후 로그아웃 해주세요.") String refreshToken) {
+            this.refreshToken = refreshToken;
         }
     }
 
