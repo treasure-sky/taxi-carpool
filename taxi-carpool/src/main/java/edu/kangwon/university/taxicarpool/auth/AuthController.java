@@ -1,15 +1,18 @@
 package edu.kangwon.university.taxicarpool.auth;
 
 import edu.kangwon.university.taxicarpool.member.dto.MemberCreateDTO;
-import edu.kangwon.university.taxicarpool.member.dto.MemberResponseDTO;
+import edu.kangwon.university.taxicarpool.member.dto.MemberDetailDTO;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import io.swagger.v3.oas.annotations.media.*;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @Tag(name = "Authentication", description = "회원가입·로그인·토큰 갱신·로그아웃 API")
 @RestController
@@ -28,7 +31,7 @@ public class AuthController {
         description = "새로운 회원을 등록하고 회원 정보를 반환합니다."
     )
     @PostMapping("/signup")
-    public ResponseEntity<MemberResponseDTO> signUp(
+    public ResponseEntity<MemberDetailDTO> signUp(
         @Validated
         @io.swagger.v3.oas.annotations.parameters.RequestBody(
             description = "가입할 회원 정보",
@@ -37,7 +40,7 @@ public class AuthController {
         )
         @RequestBody MemberCreateDTO memberCreateDTO
     ) {
-        MemberResponseDTO response = authService.signUp(memberCreateDTO);
+        MemberDetailDTO response = authService.signUp(memberCreateDTO);
         return ResponseEntity.ok(response);
     }
 

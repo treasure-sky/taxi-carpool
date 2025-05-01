@@ -27,13 +27,13 @@ public class JwtUtil {
     private String SECRET_KEY;
 
     // 엑세스 토큰 생성 메서드
-    public String generateAccessToken(String email) {
+    public String generateAccessToken(Long id) {
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + ACCESS_EXPIRATION);
 
-        // 헤더랑 페이로드, 이메일(사용자 정보)로 시그니처 만듦.
+        // 헤더랑 페이로드, 사용자 정보(id)로 시그니처 만듦.
         return Jwts.builder()
-            .setSubject(email)         // 토큰 식별자 (이메일 등)
+            .setSubject(String.valueOf(id))         // 토큰 식별자 (id 등)
             .setIssuedAt(now)          // 발급 시간
             .setExpiration(expiryDate) // 만료 시간
             .signWith(getSigningKey(), SignatureAlgorithm.HS256)
@@ -41,12 +41,12 @@ public class JwtUtil {
     }
 
     // 리프래쉬 토큰 생성 메서드 (만료 기간 1주)
-    public String generateRefreshToken(String email) {
+    public String generateRefreshToken(Long id) {
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + REFRESH_EXPIRATION);
 
         return Jwts.builder()
-            .setSubject(email)
+            .setSubject(String.valueOf(id))
             .setIssuedAt(now)
             .setExpiration(expiryDate)
             .signWith(getSigningKey(), SignatureAlgorithm.HS256)
@@ -59,13 +59,14 @@ public class JwtUtil {
         return Keys.hmacShaKeyFor(SECRET_KEY.getBytes());
     }
 
-    public String getEmailFromToken(String token) {
-        return Jwts.parserBuilder()
+    public Long getIdFromToken(String token) {
+        String subject = Jwts.parserBuilder()
             .setSigningKey(getSigningKey())
             .build()
             .parseClaimsJws(token)
             .getBody()
             .getSubject();
+        return Long.parseLong(subject);
     }
 
     // 토큰 검증 (추후에 통합으로 변경하기)
