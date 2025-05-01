@@ -8,8 +8,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -40,11 +40,12 @@ public class MemberController {
         return ResponseEntity.ok(myInfo);
     }
 
-    @PutMapping("/{memberId}")
+    @PatchMapping("/me")
     public ResponseEntity<MemberDetailDTO> updateMember(
-        @PathVariable Long memberId,
         @RequestBody @Valid MemberUpdateDTO updateDTO
     ) {
+        Long memberId = (Long) SecurityContextHolder.getContext().getAuthentication()
+            .getPrincipal();
         MemberDetailDTO updated = memberService.updateMember(memberId, updateDTO);
         return ResponseEntity.ok(updated);
     }

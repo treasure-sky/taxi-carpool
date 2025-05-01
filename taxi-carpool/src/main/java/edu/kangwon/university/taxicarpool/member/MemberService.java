@@ -62,29 +62,38 @@ public class MemberService {
 
 
     public MemberDetailDTO updateMember(Long memberId, MemberUpdateDTO updateDTO) {
+        if (updateDTO.isEmpty()) {
+            throw new IllegalArgumentException("수정할 닉네임이나 비밀번호 중 하나 이상은 반드시 제공되어야 합니다.");
+        }
+
         MemberEntity existedEntity = memberRepository.findById(memberId)
             .orElseThrow(() -> new MemberNotFoundException("회원을 찾을 수 없습니다: " + memberId));
 
-        // 기존 닉네임으로 변경시에는 예외처리하지 않음
-        if (!existedEntity.getNickname().equals(updateDTO.getNewNickname())
-            && memberRepository.existsByNickname(updateDTO.getNewNickname())) {
-            throw new DuplicatedNicknameException("이미 사용 중인 닉네임입니다: " + updateDTO.getNewNickname());
-        }
-        existedEntity.setNickname(updateDTO.getNewNickname());
+        // 닉네임이 필드로 들어왔고, 신규 닉네임과 변경 닉네임 다를 때
+        if (updateDTO.getNewNickname() != null && !updateDTO.getNewNickname()
+            .equals(existedEntity.getNickname())) {
 
-        String encodedPassword = passwordEncoder.encode(updateDTO.getNewPassword());
-        existedEntity.setPassword(encodedPassword);
+            // 이미 DB에 존재하는 닉네임이면
+            if (memberRepository.existsByNickname(updateDTO.getNewNickname())) {
+                throw new DuplicatedNicknameException(
+                    "이미 사용 중인 닉네임입니다: " + updateDTO.getNewNickname());
+            }
+            existedEntity.setNickname(updateDTO.getNewNickname());
+        }
+
+        if (updateDTO.getNewPassword() != null && !updateDTO.getNewPassword().isBlank()) {
+            String encodedPassword = passwordEncoder.encode(updateDTO.getNewPassword());
+            existedEntity.setPassword(encodedPassword);
+        }
 
         MemberEntity updated = memberRepository.save(existedEntity);
 
-        MemberDetailDTO responseDTO = new MemberDetailDTO(
+        return new MemberDetailDTO(
             updated.getId(),
             updated.getEmail(),
             updated.getNickname(),
             updated.getGender()
         );
-
-        return responseDTO;
     }
 
     public MemberDetailDTO deleteMember(Long memberId) {
