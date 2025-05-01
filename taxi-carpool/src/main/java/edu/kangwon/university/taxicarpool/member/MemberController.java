@@ -50,8 +50,10 @@ public class MemberController {
         return ResponseEntity.ok(updated);
     }
 
-    @DeleteMapping("/{memberId}")
-    public ResponseEntity<MemberDetailDTO> deleteMember(@PathVariable Long memberId) {
+    @DeleteMapping("/me")
+    public ResponseEntity<MemberDetailDTO> deleteMember() {
+        Long memberId = (Long) SecurityContextHolder.getContext().getAuthentication()
+            .getPrincipal();
         MemberDetailDTO deleted = memberService.deleteMember(memberId);
         return ResponseEntity.ok(deleted);
     }
