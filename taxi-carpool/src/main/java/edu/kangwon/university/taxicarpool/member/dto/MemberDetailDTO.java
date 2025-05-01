@@ -2,9 +2,9 @@ package edu.kangwon.university.taxicarpool.member.dto;
 
 import edu.kangwon.university.taxicarpool.member.Gender;
 
-public class MemberResponseDTO {
+public class MemberDetailDTO {
 
-    public MemberResponseDTO(Long id, String email, String nickname, Gender gender) {
+    public MemberDetailDTO(Long id, String email, String nickname, Gender gender) {
         this.id = id;
         this.email = email;
         this.nickname = nickname;

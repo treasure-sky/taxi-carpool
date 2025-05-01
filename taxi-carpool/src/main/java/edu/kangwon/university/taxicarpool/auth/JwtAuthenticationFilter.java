@@ -34,14 +34,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             try {
                 // 2) 토큰 검증
                 if (jwtUtil.validateToken(token)) {
-                    // 3) 토큰에서 사용자 식별값(email) 추출
-                    String email = jwtUtil.getEmailFromToken(token);
+                    // 3) 토큰에서 사용자 식별값(id) 추출
+                    Long id = jwtUtil.getIdFromToken(token);
 
                     // 4) 인증 객체 생성 (권한이 필요하면 loadUserByUsername() 등을 통해 가져올 수 있음)
                     UsernamePasswordAuthenticationToken authentication =
-                        new UsernamePasswordAuthenticationToken(email, null, null);
+                        new UsernamePasswordAuthenticationToken(id, null, null);
                     // 참고로 인수는 다음과 같다.
-                    // Principal(사용자 식별 정보, 여기서는 email), Credentials(비밀번호 등 인증 수단, 여기서는 null), Authorities(권한 목록, 여기서는 null)
+                    // Principal(사용자 식별 정보, 여기서는 id), Credentials(비밀번호 등 인증 수단, 여기서는 null), Authorities(권한 목록, 여기서는 null)
 
                     // 5) SecurityContextHolder에 등록(그래야 한 번의 request에서 필요한 사용자 정보를 공유하여 꺼내쓸 수 있음.)
                     SecurityContextHolder.getContext().setAuthentication(authentication);

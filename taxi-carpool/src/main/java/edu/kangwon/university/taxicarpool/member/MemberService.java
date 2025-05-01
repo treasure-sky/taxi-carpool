@@ -1,7 +1,8 @@
 package edu.kangwon.university.taxicarpool.member;
 
 import edu.kangwon.university.taxicarpool.member.dto.MemberCreateDTO;
-import edu.kangwon.university.taxicarpool.member.dto.MemberResponseDTO;
+import edu.kangwon.university.taxicarpool.member.dto.MemberDetailDTO;
+import edu.kangwon.university.taxicarpool.member.dto.MemberPublicDTO;
 import edu.kangwon.university.taxicarpool.member.dto.MemberUpdateDTO;
 import edu.kangwon.university.taxicarpool.member.exception.DuplicatedEmailException;
 import edu.kangwon.university.taxicarpool.member.exception.DuplicatedNicknameException;
@@ -22,7 +23,7 @@ public class MemberService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    public MemberResponseDTO createMember(MemberCreateDTO memberCreateDTO) {
+    public MemberDetailDTO createMember(MemberCreateDTO memberCreateDTO) {
 
         // 이미 이메일이 존재하면 예외 처리
         if (memberRepository.existsByEmail(memberCreateDTO.getEmail())) {
@@ -49,7 +50,7 @@ public class MemberService {
         MemberEntity saved = memberRepository.save(entity);
 
         // 저장된 결과를 DTO로 변환하여 반환
-        MemberResponseDTO responseDTO = new MemberResponseDTO(
+        MemberDetailDTO responseDTO = new MemberDetailDTO(
             saved.getId(),
             saved.getEmail(),
             saved.getNickname(),
@@ -60,39 +61,48 @@ public class MemberService {
     }
 
 
-    public MemberResponseDTO updateMember(Long memberId, MemberUpdateDTO updateDTO) {
+    public MemberDetailDTO updateMember(Long memberId, MemberUpdateDTO updateDTO) {
+        if (updateDTO.isEmpty()) {
+            throw new IllegalArgumentException("수정할 닉네임이나 비밀번호 중 하나 이상은 반드시 제공되어야 합니다.");
+        }
+
         MemberEntity existedEntity = memberRepository.findById(memberId)
             .orElseThrow(() -> new MemberNotFoundException("회원을 찾을 수 없습니다: " + memberId));
 
-        // 기존 닉네임으로 변경시에는 예외처리하지 않음
-        if (!existedEntity.getNickname().equals(updateDTO.getNewNickname())
-            && memberRepository.existsByNickname(updateDTO.getNewNickname())) {
-            throw new DuplicatedNicknameException("이미 사용 중인 닉네임입니다: " + updateDTO.getNewNickname());
-        }
-        existedEntity.setNickname(updateDTO.getNewNickname());
+        // 닉네임이 필드로 들어왔고, 신규 닉네임과 변경 닉네임 다를 때
+        if (updateDTO.getNewNickname() != null && !updateDTO.getNewNickname()
+            .equals(existedEntity.getNickname())) {
 
-        String encodedPassword = passwordEncoder.encode(updateDTO.getNewPassword());
-        existedEntity.setPassword(encodedPassword);
+            // 이미 DB에 존재하는 닉네임이면
+            if (memberRepository.existsByNickname(updateDTO.getNewNickname())) {
+                throw new DuplicatedNicknameException(
+                    "이미 사용 중인 닉네임입니다: " + updateDTO.getNewNickname());
+            }
+            existedEntity.setNickname(updateDTO.getNewNickname());
+        }
+
+        if (updateDTO.getNewPassword() != null && !updateDTO.getNewPassword().isBlank()) {
+            String encodedPassword = passwordEncoder.encode(updateDTO.getNewPassword());
+            existedEntity.setPassword(encodedPassword);
+        }
 
         MemberEntity updated = memberRepository.save(existedEntity);
 
-        MemberResponseDTO responseDTO = new MemberResponseDTO(
+        return new MemberDetailDTO(
             updated.getId(),
             updated.getEmail(),
             updated.getNickname(),
             updated.getGender()
         );
-
-        return responseDTO;
     }
 
-    public MemberResponseDTO deleteMember(Long memberId) {
+    public MemberDetailDTO deleteMember(Long memberId) {
         MemberEntity entity = memberRepository.findById(memberId)
             .orElseThrow(() -> new MemberNotFoundException("회원을 찾을 수 없습니다: " + memberId));
 
         memberRepository.delete(entity);
 
-        MemberResponseDTO responseDTO = new MemberResponseDTO(
+        MemberDetailDTO responseDTO = new MemberDetailDTO(
             entity.getId(),
             entity.getEmail(),
             entity.getNickname(),
@@ -102,12 +112,24 @@ public class MemberService {
         return responseDTO;
     }
 
-    public MemberResponseDTO getMemberById(Long memberId) {
+    public MemberPublicDTO getMemberById(Long memberId) {
 
         MemberEntity entity = memberRepository.findById(memberId)
             .orElseThrow(() -> new MemberNotFoundException("회원을 찾을 수 없습니다: " + memberId));
 
-        MemberResponseDTO responseDTO = new MemberResponseDTO(
+        MemberPublicDTO responseDTO = new MemberPublicDTO(
+            entity.getId(),
+            entity.getNickname()
+        );
+
+        return responseDTO;
+    }
+
+    public MemberDetailDTO getDetailMember(Long memberId) {
+        MemberEntity entity = memberRepository.findById(memberId)
+            .orElseThrow(() -> new MemberNotFoundException("회원을 찾을 수 없습니다: " + memberId));
+
+        MemberDetailDTO responseDTO = new MemberDetailDTO(
             entity.getId(),
             entity.getEmail(),
             entity.getNickname(),

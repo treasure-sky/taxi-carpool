@@ -7,12 +7,13 @@ import edu.kangwon.university.taxicarpool.email.EmailVerificationService;
 import edu.kangwon.university.taxicarpool.member.MemberEntity;
 import edu.kangwon.university.taxicarpool.member.MemberService;
 import edu.kangwon.university.taxicarpool.member.dto.MemberCreateDTO;
-import edu.kangwon.university.taxicarpool.member.dto.MemberResponseDTO;
+import edu.kangwon.university.taxicarpool.member.dto.MemberDetailDTO;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class AuthService {
@@ -37,7 +38,7 @@ public class AuthService {
     }
 
     // 회원가입
-    public MemberResponseDTO signUp(MemberCreateDTO request) {
+    public MemberDetailDTO signUp(MemberCreateDTO request) {
 
         // 이메일 인증여부 확인
         emailVerificationService.isEmailVerified(request.getEmail());
@@ -56,8 +57,8 @@ public class AuthService {
 
         // 회원가입 DB를 거쳐서 회원임이 검증된 이후.
         // 엑세스 토큰, 리프래쉬 토큰 생성
-        String accessToken = jwtUtil.generateAccessToken(member.getEmail());
-        String refreshToken = jwtUtil.generateRefreshToken(member.getEmail());
+        String accessToken = jwtUtil.generateAccessToken(member.getId());
+        String refreshToken = jwtUtil.generateRefreshToken(member.getId());
 
         // 리프래쉬 토큰 만료 시점 (1주) generateRefreshToken()에서 생성한 거 말고
         // 이중으로 하나 더 넣어둔 것임.(로그아웃 로직도 관리해야돼서)
@@ -94,20 +95,19 @@ public class AuthService {
         }
 
         // 새 액세스 토큰 발급
-        String email = tokenEntity.getMember().getEmail();
-        String newAccessToken = jwtUtil.generateAccessToken(email);
+        Long id = tokenEntity.getMember().getId();
+        String newAccessToken = jwtUtil.generateAccessToken(id);
 
         // 응답 DTO
         return new LoginDTO.RefreshResponseDTO(newAccessToken, tokenEntity.getRefreshToken());
     }
 
     // 로그아웃
-    public void logout(String email) {
-        // 1) 이메일로 Member 조회
-        MemberEntity member = memberService.getMemberEntityByEmail(email);
+    @Transactional
+    public void logout(String refreshToken) {
 
-        // 2) 리프레쉬 토큰 엔티티 조회
-        Optional<RefreshTokenEntity> optionalToken = refreshTokenRepository.findByMember(member);
+        // 리프레쉬 토큰 엔티티 조회
+        Optional<RefreshTokenEntity> optionalToken = refreshTokenRepository.findByRefreshToken(refreshToken);
         if (optionalToken.isPresent()) {
             RefreshTokenEntity tokenEntity = optionalToken.get();
 
@@ -115,7 +115,7 @@ public class AuthService {
             tokenEntity.setExpiryDate(LocalDateTime.now());
             refreshTokenRepository.save(tokenEntity);
         } else {
-            // 토큰없는 로그아웃
+            //
             throw new TokenInvalidException("재로그인 후 로그아웃 해주세요.");
         }
     }
