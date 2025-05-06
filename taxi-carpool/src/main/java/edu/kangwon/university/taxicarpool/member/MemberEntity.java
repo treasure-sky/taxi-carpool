@@ -1,5 +1,6 @@
 package edu.kangwon.university.taxicarpool.member;
 
+import edu.kangwon.university.taxicarpool.chatting.MessageEntity;
 import edu.kangwon.university.taxicarpool.party.PartyEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -10,7 +11,10 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.validation.constraints.NotNull;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 public class MemberEntity {
@@ -47,6 +51,9 @@ public class MemberEntity {
     @ManyToOne
     @JoinColumn(name = "party_id")
     private PartyEntity partyEntity;
+
+    @OneToMany(mappedBy = "sender")
+    private List<MessageEntity> sentMessages = new ArrayList<>();
 
     public Long getId() {
         return id;
@@ -88,4 +95,7 @@ public class MemberEntity {
         this.gender = gender;
     }
 
+    public List<MessageEntity> getSentMessages() {
+        return sentMessages;
+    }
 }
