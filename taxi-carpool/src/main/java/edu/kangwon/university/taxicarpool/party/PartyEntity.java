@@ -1,6 +1,8 @@
 package edu.kangwon.university.taxicarpool.party;
 
+import edu.kangwon.university.taxicarpool.chatting.MessageEntity;
 import edu.kangwon.university.taxicarpool.member.MemberEntity;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
@@ -10,6 +12,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.OneToMany;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -133,6 +136,9 @@ public class PartyEntity {
 
     @Column(name = "end_latitude")
     private double end_y;
+
+    @OneToMany(mappedBy = "party", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<MessageEntity> messages = new ArrayList<>();
 
     @CreatedDate
     @Column(name = "created_at", updatable = false)
@@ -300,6 +306,10 @@ public class PartyEntity {
 
     public void setEnd_y(double end_y) {
         this.end_y = end_y;
+    }
+
+    public List<MessageEntity> getMessages() {
+        return messages;
     }
 
     public PartyEntity updateParty(

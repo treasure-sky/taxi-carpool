@@ -1,5 +1,7 @@
 package edu.kangwon.university.taxicarpool.config;
 
+import static org.springframework.security.config.Customizer.withDefaults;
+
 import edu.kangwon.university.taxicarpool.auth.JwtAuthenticationFilter;
 import edu.kangwon.university.taxicarpool.auth.JwtUtil;
 import org.springframework.context.annotation.Bean;
@@ -10,6 +12,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 
 @Configuration
@@ -36,6 +41,7 @@ public class SecurityConfig {
         JwtAuthenticationFilter jwtFilter = new JwtAuthenticationFilter(jwtUtil);
 
         http
+            .cors(withDefaults())
             .csrf(csrf -> csrf.disable()) // 필요에 따라 설정해야한다고 함.
             .authorizeHttpRequests(auth -> auth
                 // 회원가입/로그인 엔드포인트는 인증 없이 접근 가능하게
@@ -58,6 +64,19 @@ public class SecurityConfig {
             .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
+    }
+
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration config = new CorsConfiguration();
+        config.addAllowedOriginPattern("*");           // 모든 출처 허용
+        config.addAllowedMethod("*");                  // 모든 HTTP 메서드 허용
+        config.addAllowedHeader("*");                  // 모든 헤더 허용
+        config.setAllowCredentials(true);              // 쿠키/자격증명 허용
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", config);
+        return source;
     }
 
 }
