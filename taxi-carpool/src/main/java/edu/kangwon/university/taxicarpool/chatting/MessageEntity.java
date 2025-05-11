@@ -31,14 +31,13 @@ public class MessageEntity {
     @NotNull
     private PartyEntity party;
 
-
     // 회원 탈퇴시 null 가능
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "sender_id")
     private MemberEntity sender;
 
+    // enter나 leave인 경우 content=null 가능
     @Column(name = "content", length = 1000)
-    @NotNull
     private String content;
 
     @CreatedDate
@@ -54,11 +53,10 @@ public class MessageEntity {
     protected MessageEntity() {
     }
 
-    public MessageEntity(PartyEntity party, MemberEntity sender, LocalDateTime createdAt,
-        MessageType type) {
+    public MessageEntity(PartyEntity party, MemberEntity sender, String content, MessageType type) {
         this.party = party;
         this.sender = sender;
-        this.createdAt = createdAt;
+        this.content = content;
         this.type = type;
     }
 
