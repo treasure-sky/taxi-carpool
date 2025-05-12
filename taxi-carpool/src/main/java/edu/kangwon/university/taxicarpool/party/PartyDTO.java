@@ -214,9 +214,6 @@ public class PartyDTO {
     // creatorMemberId 필드 존재, hostMemberId필드 삭제 -> creatorMemberId사용의 강제를 위해.
     public static class PartyCreateRequestDTO {
 
-        // x
-        private Long creatorMemberId;
-
         // 아래 4개 옵션들 NotNull해야하나..?
         private boolean sameGenderOnly;
 
@@ -243,7 +240,6 @@ public class PartyDTO {
         private MapPlaceDTO endPlace;
 
         public PartyCreateRequestDTO(
-            Long creatorMemberId,
             boolean sameGenderOnly,
             boolean costShareBeforeDropOff,
             boolean quietMode,
@@ -254,7 +250,6 @@ public class PartyDTO {
             int maxParticipantCount,
             MapPlaceDTO startPlace,
             MapPlaceDTO endPlace) {
-            this.creatorMemberId = creatorMemberId;
             this.sameGenderOnly = sameGenderOnly;
             this.costShareBeforeDropOff = costShareBeforeDropOff;
             this.quietMode = quietMode;
@@ -265,14 +260,6 @@ public class PartyDTO {
             this.maxParticipantCount = maxParticipantCount;
             this.startPlace = startPlace;
             this.endPlace = endPlace;
-        }
-
-        public Long getCreatorMemberId() {
-            return creatorMemberId;
-        }
-
-        public void setCreatorMemberId(Long creatorMemberId) {
-            this.creatorMemberId = creatorMemberId;
         }
 
         public boolean isSameGenderOnly() {
