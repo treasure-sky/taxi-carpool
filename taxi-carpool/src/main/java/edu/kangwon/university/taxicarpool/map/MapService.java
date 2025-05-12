@@ -72,8 +72,8 @@ public class MapService {
                 MapPlaceDTO place = new MapPlaceDTO(
                     doc.get("place_name").asText(),
                     doc.get("road_address_name").asText(),
-                    doc.get("x").asText(),
-                    doc.get("y").asText()
+                    doc.get("x").asDouble(),
+                    doc.get("y").asDouble()
                 );
                 places.add(place);
             }
