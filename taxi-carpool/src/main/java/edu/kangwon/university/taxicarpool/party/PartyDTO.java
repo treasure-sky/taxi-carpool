@@ -1,5 +1,6 @@
 package edu.kangwon.university.taxicarpool.party;
 
+import edu.kangwon.university.taxicarpool.map.MapPlaceDTO;
 import edu.kangwon.university.taxicarpool.member.MemberEntity;
 import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.Max;
@@ -13,6 +14,7 @@ import java.util.List;
 public class PartyDTO {
 
     public static class PartyResponseDTO {
+
         private Long id;
 
         private String name;
@@ -35,25 +37,18 @@ public class PartyDTO {
 
         private LocalDateTime startDateTime;
 
-        private String startLocation;
-
-        private String endLocation;
-
         private String comment;
 
         private int currentParticipantCount;
 
         private int maxParticipantCount;
 
-        private double start_x;
+        private MapPlaceDTO startPlace;
 
-        private double start_y;
+        private MapPlaceDTO endPlace;
 
-        private double end_x;
-
-        private double end_y;
-
-        public PartyResponseDTO(Long id,
+        public PartyResponseDTO(
+            Long id,
             String name,
             boolean isDeleted,
             List<MemberEntity> memberEntities,
@@ -64,15 +59,11 @@ public class PartyDTO {
             boolean quietMode,
             boolean destinationChangeIn5Minutes,
             LocalDateTime startDateTime,
-            String startLocation,
-            String endLocation,
             String comment,
             int currentParticipantCount,
             int maxParticipantCount,
-            double start_x,
-            double start_y,
-            double end_x,
-            double end_y) {
+            MapPlaceDTO startPlace,
+            MapPlaceDTO endPlace) {
             this.id = id;
             this.name = name;
             this.isDeleted = isDeleted;
@@ -84,15 +75,11 @@ public class PartyDTO {
             this.quietMode = quietMode;
             this.destinationChangeIn5Minutes = destinationChangeIn5Minutes;
             this.startDateTime = startDateTime;
-            this.startLocation = startLocation;
-            this.endLocation = endLocation;
             this.comment = comment;
             this.currentParticipantCount = currentParticipantCount;
             this.maxParticipantCount = maxParticipantCount;
-            this.start_x = start_x;
-            this.start_y = start_y;
-            this.end_x = end_x;
-            this.end_y = end_y;
+            this.startPlace = startPlace;
+            this.endPlace = endPlace;
         }
 
         public Long getId() {
@@ -183,22 +170,6 @@ public class PartyDTO {
             this.startDateTime = startDateTime;
         }
 
-        public String getStartLocation() {
-            return startLocation;
-        }
-
-        public void setStartLocation(String startLocation) {
-            this.startLocation = startLocation;
-        }
-
-        public String getEndLocation() {
-            return endLocation;
-        }
-
-        public void setEndLocation(String endLocation) {
-            this.endLocation = endLocation;
-        }
-
         public String getComment() {
             return comment;
         }
@@ -223,36 +194,20 @@ public class PartyDTO {
             this.maxParticipantCount = maxParticipantCount;
         }
 
-        public double getStart_x() {
-            return start_x;
+        public MapPlaceDTO getStartPlace() {
+            return startPlace;
         }
 
-        public void setStart_x(double start_x) {
-            this.start_x = start_x;
+        public void setStartPlace(MapPlaceDTO startPlace) {
+            this.startPlace = startPlace;
         }
 
-        public double getStart_y() {
-            return start_y;
+        public MapPlaceDTO getEndPlace() {
+            return endPlace;
         }
 
-        public void setStart_y(double start_y) {
-            this.start_y = start_y;
-        }
-
-        public double getEnd_x() {
-            return end_x;
-        }
-
-        public void setEnd_x(double end_x) {
-            this.end_x = end_x;
-        }
-
-        public double getEnd_y() {
-            return end_y;
-        }
-
-        public void setEnd_y(double end_y) {
-            this.end_y = end_y;
+        public void setEndPlace(MapPlaceDTO endPlace) {
+            this.endPlace = endPlace;
         }
     }
 
@@ -284,12 +239,6 @@ public class PartyDTO {
         @NotNull(message = "출발 시간 입력은 필수입니다.")
         private LocalDateTime startDateTime;
 
-        @NotBlank(message = "출발지 입력은 필수입니다.")
-        private String startLocation;
-
-        @NotBlank(message = "목적지 입력은 필수입니다.")
-        private String endLocation;
-
         @Size(max = 30, message = "설명은 최대 30글자입니다.")
         private String comment;
 
@@ -298,13 +247,9 @@ public class PartyDTO {
         @Max(value = 4, message = "택시의 최대 탑승 인원 수는 4명입니다.")
         private int maxParticipantCount;
 
-        private double start_x;
+        private MapPlaceDTO startPlace;
 
-        private double start_y;
-
-        private double end_x;
-
-        private double end_y;
+        private MapPlaceDTO endPlace;
 
         public PartyCreateRequestDTO(String name,
             boolean isDeleted,
@@ -316,15 +261,11 @@ public class PartyDTO {
             boolean quietMode,
             boolean destinationChangeIn5Minutes,
             LocalDateTime startDateTime,
-            String startLocation,
-            String endLocation,
             String comment,
             int currentParticipantCount,
             int maxParticipantCount,
-            double start_x,
-            double start_y,
-            double end_x,
-            double end_y) {
+            MapPlaceDTO startPlace,
+            MapPlaceDTO endPlace) {
             this.name = name;
             this.isDeleted = isDeleted;
             this.memberEntities = memberEntities;
@@ -335,15 +276,11 @@ public class PartyDTO {
             this.quietMode = quietMode;
             this.destinationChangeIn5Minutes = destinationChangeIn5Minutes;
             this.startDateTime = startDateTime;
-            this.startLocation = startLocation;
-            this.endLocation = endLocation;
             this.comment = comment;
             this.currentParticipantCount = currentParticipantCount;
             this.maxParticipantCount = maxParticipantCount;
-            this.start_x = start_x;
-            this.start_y = start_y;
-            this.end_x = end_x;
-            this.end_y = end_y;
+            this.startPlace = startPlace;
+            this.endPlace = endPlace;
         }
 
         public String getName() {
@@ -426,22 +363,6 @@ public class PartyDTO {
             this.startDateTime = startDateTime;
         }
 
-        public String getStartLocation() {
-            return startLocation;
-        }
-
-        public void setStartLocation(String startLocation) {
-            this.startLocation = startLocation;
-        }
-
-        public String getEndLocation() {
-            return endLocation;
-        }
-
-        public void setEndLocation(String endLocation) {
-            this.endLocation = endLocation;
-        }
-
         public String getComment() {
             return comment;
         }
@@ -466,36 +387,20 @@ public class PartyDTO {
             this.maxParticipantCount = maxParticipantCount;
         }
 
-        public double getStart_x() {
-            return start_x;
+        public MapPlaceDTO getStartPlace() {
+            return startPlace;
         }
 
-        public void setStart_x(double start_x) {
-            this.start_x = start_x;
+        public void setStartPlace(MapPlaceDTO startPlace) {
+            this.startPlace = startPlace;
         }
 
-        public double getStart_y() {
-            return start_y;
+        public MapPlaceDTO getEndPlace() {
+            return endPlace;
         }
 
-        public void setStart_y(double start_y) {
-            this.start_y = start_y;
-        }
-
-        public double getEnd_x() {
-            return end_x;
-        }
-
-        public void setEnd_x(double end_x) {
-            this.end_x = end_x;
-        }
-
-        public double getEnd_y() {
-            return end_y;
-        }
-
-        public void setEnd_y(double end_y) {
-            this.end_y = end_y;
+        public void setEndPlace(MapPlaceDTO endPlace) {
+            this.endPlace = endPlace;
         }
     }
 
@@ -524,25 +429,15 @@ public class PartyDTO {
         @NotNull(message = "출발 시간 입력은 필수입니다.")
         private LocalDateTime startDateTime;
 
-        @NotBlank(message = "출발지 입력은 필수입니다.")
-        private String startLocation;
-
-        @NotBlank(message = "목적지 입력은 필수입니다.")
-        private String endLocation;
-
         @Size(max = 30, message = "설명은 최대 30글자입니다.")
         private String comment;
 
         @Max(value = 4, message = "택시의 최대 탑승 인원 수는 4명입니다.")
         private int maxParticipantCount;
 
-        private double start_x;
+        private MapPlaceDTO startPlace;
 
-        private double start_y;
-
-        private double end_x;
-
-        private double end_y;
+        private MapPlaceDTO endPlace;
 
         public PartyUpdateRequestDTO(
             String name,
@@ -555,14 +450,10 @@ public class PartyDTO {
             boolean quietMode,
             boolean destinationChangeIn5Minutes,
             LocalDateTime startDateTime,
-            String startLocation,
-            String endLocation,
             String comment,
             int maxParticipantCount,
-            double start_x,
-            double start_y,
-            double end_x,
-            double end_y
+            MapPlaceDTO startPlace,
+            MapPlaceDTO endPlace
         ) {
             this.name = name;
             this.isDeleted = isDeleted;
@@ -574,14 +465,10 @@ public class PartyDTO {
             this.quietMode = quietMode;
             this.destinationChangeIn5Minutes = destinationChangeIn5Minutes;
             this.startDateTime = startDateTime;
-            this.startLocation = startLocation;
-            this.endLocation = endLocation;
             this.comment = comment;
             this.maxParticipantCount = maxParticipantCount;
-            this.start_x = start_x;
-            this.start_y = start_y;
-            this.end_x = end_x;
-            this.end_y = end_y;
+            this.startPlace = startPlace;
+            this.endPlace = endPlace;
         }
 
         public String getName() {
@@ -664,22 +551,6 @@ public class PartyDTO {
             this.startDateTime = startDateTime;
         }
 
-        public String getStartLocation() {
-            return startLocation;
-        }
-
-        public void setStartLocation(String startLocation) {
-            this.startLocation = startLocation;
-        }
-
-        public String getEndLocation() {
-            return endLocation;
-        }
-
-        public void setEndLocation(String endLocation) {
-            this.endLocation = endLocation;
-        }
-
         public String getComment() {
             return comment;
         }
@@ -696,36 +567,20 @@ public class PartyDTO {
             this.maxParticipantCount = maxParticipantCount;
         }
 
-        public double getStart_x() {
-            return start_x;
+        public MapPlaceDTO getStartPlace() {
+            return startPlace;
         }
 
-        public void setStart_x(double start_x) {
-            this.start_x = start_x;
+        public void setStartPlace(MapPlaceDTO startPlace) {
+            this.startPlace = startPlace;
         }
 
-        public double getStart_y() {
-            return start_y;
+        public MapPlaceDTO getEndPlace() {
+            return endPlace;
         }
 
-        public void setStart_y(double start_y) {
-            this.start_y = start_y;
-        }
-
-        public double getEnd_x() {
-            return end_x;
-        }
-
-        public void setEnd_x(double end_x) {
-            this.end_x = end_x;
-        }
-
-        public double getEnd_y() {
-            return end_y;
-        }
-
-        public void setEnd_y(double end_y) {
-            this.end_y = end_y;
+        public void setEndPlace(MapPlaceDTO endPlace) {
+            this.endPlace = endPlace;
         }
     }
 }
