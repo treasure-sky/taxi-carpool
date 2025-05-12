@@ -57,10 +57,7 @@ public class PartyMapper {
             ep.getY());
 
         return new PartyEntity(
-            createRequestDTO.getName(),
-            createRequestDTO.getMemberEntities(),
             null,
-            createRequestDTO.getEndDate(),
             createRequestDTO.isSameGenderOnly(),
             createRequestDTO.isCostShareBeforeDropOff(),
             createRequestDTO.isQuietMode(),
