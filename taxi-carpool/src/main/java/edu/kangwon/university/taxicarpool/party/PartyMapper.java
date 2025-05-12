@@ -5,6 +5,9 @@ import edu.kangwon.university.taxicarpool.map.MapPlaceDTO;
 import edu.kangwon.university.taxicarpool.party.PartyDTO.PartyCreateRequestDTO;
 import edu.kangwon.university.taxicarpool.party.PartyDTO.PartyResponseDTO;
 import edu.kangwon.university.taxicarpool.party.PartyDTO.PartyUpdateRequestDTO;
+import edu.kangwon.university.taxicarpool.member.MemberEntity;
+import java.util.List;
+import java.util.stream.Collectors;
 import org.springframework.stereotype.Component;
 
 
@@ -27,11 +30,15 @@ public class PartyMapper {
             endPlace.getY()
         );
 
+        List<Long> memberIds = partyEntity.getMemberEntities().stream()
+            .map(MemberEntity::getId)
+            .collect(Collectors.toList());
+
         return new PartyResponseDTO(
             partyEntity.getId(),
             partyEntity.getName(),
             partyEntity.isDeleted(),
-            partyEntity.getMemberEntities(),
+            memberIds,
             partyEntity.getHostMemberId(),
             partyEntity.getEndDate(),
             partyEntity.isSameGenderOnly(),
