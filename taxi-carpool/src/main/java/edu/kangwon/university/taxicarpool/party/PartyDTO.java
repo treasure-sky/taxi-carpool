@@ -214,16 +214,7 @@ public class PartyDTO {
     // creatorMemberId 필드 존재, hostMemberId필드 삭제 -> creatorMemberId사용의 강제를 위해.
     public static class PartyCreateRequestDTO {
 
-        @NotBlank(message = "파티 이름은 필수입니다.")
-        @Size(max = 20, message = "이름은 공백 포함 최대 20글자까지 가능합니다.")
-        private String name;
-
-        private boolean isDeleted;
-
-        private List<MemberEntity> memberEntities = new ArrayList<>();
-
-        private LocalDateTime endDate;
-
+        // x
         private Long creatorMemberId;
 
         // 아래 4개 옵션들 NotNull해야하나..?
@@ -251,10 +242,7 @@ public class PartyDTO {
 
         private MapPlaceDTO endPlace;
 
-        public PartyCreateRequestDTO(String name,
-            boolean isDeleted,
-            List<MemberEntity> memberEntities,
-            LocalDateTime endDate,
+        public PartyCreateRequestDTO(
             Long creatorMemberId,
             boolean sameGenderOnly,
             boolean costShareBeforeDropOff,
@@ -266,10 +254,6 @@ public class PartyDTO {
             int maxParticipantCount,
             MapPlaceDTO startPlace,
             MapPlaceDTO endPlace) {
-            this.name = name;
-            this.isDeleted = isDeleted;
-            this.memberEntities = memberEntities;
-            this.endDate = endDate;
             this.creatorMemberId = creatorMemberId;
             this.sameGenderOnly = sameGenderOnly;
             this.costShareBeforeDropOff = costShareBeforeDropOff;
@@ -281,38 +265,6 @@ public class PartyDTO {
             this.maxParticipantCount = maxParticipantCount;
             this.startPlace = startPlace;
             this.endPlace = endPlace;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public void setName(String name) {
-            this.name = name;
-        }
-
-        public boolean isDeleted() {
-            return isDeleted;
-        }
-
-        public void setDeleted(boolean deleted) {
-            isDeleted = deleted;
-        }
-
-        public List<MemberEntity> getMemberEntities() {
-            return memberEntities;
-        }
-
-        public void setMemberEntities(List<MemberEntity> memberEntities) {
-            this.memberEntities = memberEntities;
-        }
-
-        public LocalDateTime getEndDate() {
-            return endDate;
-        }
-
-        public void setEndDate(LocalDateTime endDate) {
-            this.endDate = endDate;
         }
 
         public Long getCreatorMemberId() {

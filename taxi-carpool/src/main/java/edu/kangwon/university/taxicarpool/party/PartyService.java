@@ -139,10 +139,6 @@ public class PartyService {
     @Transactional
     public PartyResponseDTO createParty(PartyCreateRequestDTO createRequestDTO) {
 
-        if (partyRepository.existsByNameAndIsDeletedFalse(createRequestDTO.getName())) {
-            throw new DuplicatedPartyNameException("같은 이름의 파티가 이미 존재합니다.");
-        }
-
         PartyEntity partyEntity = partyMapper.convertToEntity(createRequestDTO);
 
         // 프론트로부터 파티를 만드는 멤버의 Id(creatorMemberId)를 createRequestDTO 내부 필드(creatorMemberId)에 넣어서 보내달라고 해야함.

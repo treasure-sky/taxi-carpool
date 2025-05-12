@@ -65,6 +65,32 @@ public class PartyEntity {
         this.endPlace = endPlace;
     }
 
+    public PartyEntity(
+        Long hostMemberId,
+        boolean sameGenderOnly,
+        boolean costShareBeforeDropOff,
+        boolean quietMode,
+        boolean destinationChange5Minutes,
+        LocalDateTime startDateTime,
+        String comment,
+        int currentParticipantCount,
+        int maxParticipantCount,
+        MapPlace startPlace,
+        MapPlace endPlace
+    ) {
+        this.hostMemberId = hostMemberId;
+        this.sameGenderOnly = sameGenderOnly;
+        this.costShareBeforeDropOff = costShareBeforeDropOff;
+        this.quietMode = quietMode;
+        this.destinationChangeIn5Minutes = destinationChange5Minutes;
+        this.startDateTime = startDateTime;
+        this.comment = comment;
+        this.currentParticipantCount = currentParticipantCount;
+        this.maxParticipantCount = maxParticipantCount;
+        this.startPlace = startPlace;
+        this.endPlace = endPlace;
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "party_id")
