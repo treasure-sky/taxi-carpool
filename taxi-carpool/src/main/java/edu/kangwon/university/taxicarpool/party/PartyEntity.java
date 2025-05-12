@@ -128,17 +128,19 @@ public class PartyEntity {
 
     @Embedded
     @AttributeOverrides({
-        @AttributeOverride(name = "address", column = @Column(name = "start_location")),
-        @AttributeOverride(name = "longitude", column = @Column(name = "start_longitude")),
-        @AttributeOverride(name = "latitude", column = @Column(name = "start_latitude"))
+        @AttributeOverride(name = "name", column = @Column(name = "start_location")),
+        @AttributeOverride(name = "roadAddressName", column = @Column(name = "start_road_address_name")),
+        @AttributeOverride(name = "x", column = @Column(name = "start_longitude")),
+        @AttributeOverride(name = "y", column = @Column(name = "start_latitude"))
     })
     private MapPlace startPlace;
 
     @Embedded
     @AttributeOverrides({
-        @AttributeOverride(name = "address", column = @Column(name = "end_location")),
-        @AttributeOverride(name = "longitude", column = @Column(name = "end_longitude")),
-        @AttributeOverride(name = "latitude", column = @Column(name = "end_latitude"))
+        @AttributeOverride(name = "name", column = @Column(name = "end_location")),
+        @AttributeOverride(name = "roadAddressName", column = @Column(name = "end_road_address_name")),
+        @AttributeOverride(name = "x", column = @Column(name = "end_longitude")),
+        @AttributeOverride(name = "y", column = @Column(name = "end_latitude"))
     })
     private MapPlace endPlace;
 
