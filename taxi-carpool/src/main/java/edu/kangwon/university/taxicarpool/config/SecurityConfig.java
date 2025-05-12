@@ -6,6 +6,7 @@ import edu.kangwon.university.taxicarpool.auth.JwtAuthenticationFilter;
 import edu.kangwon.university.taxicarpool.auth.JwtUtil;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -45,24 +46,28 @@ public class SecurityConfig {
             .csrf(csrf -> csrf.disable()) // 필요에 따라 설정해야한다고 함.
             .authorizeHttpRequests(auth -> auth
                 // 회원가입/로그인 엔드포인트는 인증 없이 접근 가능하게
-//                .requestMatchers(
-//                    "/",                        // 루트
-//                    "/api/auth/**",             // 회원가입, 로그인
-//                    "/api/email/**",            // 이메일 인증
-//                    "/swagger-ui.html",
-//                    "/swagger-ui/**",           // 스웨거 UI리소스
-//                    "/api-docs/**",          // 스웨거 API 문서
-//                    "/swagger-resources/**",    // 스웨거 리소스
-//                    "/webjars/**"               // 스웨거 관련 정적 리소스
-//                )
-                    .anyRequest().permitAll()
+                .requestMatchers(
+                    "/",                        // 루트
+                    "/api/auth/**",             // 회원가입, 로그인
+                    "/api/email/**",            // 이메일 인증
+                    "/swagger-ui.html",
+                    "/swagger-ui/**",           // 스웨거 UI리소스
+                    "/api-docs/**",          // 스웨거 API 문서
+                    "/swagger-resources/**",    // 스웨거 리소스
+                    "/webjars/**"              // 스웨거 관련 정적 리소스
+                ).permitAll()
+
+                .requestMatchers(HttpMethod.GET,
+                    "/api/party/**",
+                    "/api/map/search"
+                ).permitAll()
                 // 그 외 모든 요청은 인증 필요
-//                .anyRequest().authenticated()
-            );
+                .anyRequest().authenticated()
+            )
             // JWT 필터를 UsernamePasswordAuthenticationFilter 앞에 추가
             // 난 수동으로 회원가입 DB접근으로 검증해서 UsernamePasswordAuthenticationFilter 안 쓰이긴 함.
             // 나중에 .formLogin().disable()로 막아두는 것 고민하기.
-            // .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+            .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
