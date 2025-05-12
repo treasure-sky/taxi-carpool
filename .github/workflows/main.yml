@@ -61,8 +61,6 @@ jobs:
         ssh -i key.pem ec2-user@${{ secrets.EC2_HOST }} << 'EOF'
         set -eux
         pkill -f java || true
-
-        sleep 3
     
         export SPRING_DATASOURCE_URL='${{ secrets.SPRING_DATASOURCE_URL }}'
         export SPRING_DATASOURCE_USERNAME='${{ secrets.SPRING_DATASOURCE_USERNAME }}'

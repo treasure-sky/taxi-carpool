@@ -1,5 +1,7 @@
 package edu.kangwon.university.taxicarpool.party;
 
+import edu.kangwon.university.taxicarpool.map.MapPlace;
+import edu.kangwon.university.taxicarpool.map.MapPlaceDTO;
 import edu.kangwon.university.taxicarpool.party.PartyDTO.PartyCreateRequestDTO;
 import edu.kangwon.university.taxicarpool.party.PartyDTO.PartyResponseDTO;
 import edu.kangwon.university.taxicarpool.party.PartyDTO.PartyUpdateRequestDTO;
@@ -10,6 +12,21 @@ import org.springframework.stereotype.Component;
 public class PartyMapper {
 
     public PartyResponseDTO convertToResponseDTO(PartyEntity partyEntity) {
+        MapPlace startPlace = partyEntity.getStartPlace();
+        MapPlace endPlace = partyEntity.getEndPlace();
+        MapPlaceDTO startDto = new MapPlaceDTO(
+            startPlace.getName(),
+            startPlace.getRoadAddressName(),
+            startPlace.getX(),
+            startPlace.getY()
+        );
+        MapPlaceDTO endDto = new MapPlaceDTO(
+            endPlace.getName(),
+            endPlace.getRoadAddressName(),
+            endPlace.getX(),
+            endPlace.getY()
+        );
+
         return new PartyResponseDTO(
             partyEntity.getId(),
             partyEntity.getName(),
@@ -22,19 +39,23 @@ public class PartyMapper {
             partyEntity.isQuietMode(),
             partyEntity.isDestinationChangeIn5Minutes(),
             partyEntity.getStartDateTime(),
-            partyEntity.getStartLocation(),
-            partyEntity.getEndLocation(),
             partyEntity.getComment(),
             partyEntity.getCurrentParticipantCount(),
             partyEntity.getMaxParticipantCount(),
-            partyEntity.getStart_x(),
-            partyEntity.getStart_y(),
-            partyEntity.getEnd_x(),
-            partyEntity.getEnd_y()
+            startDto,
+            endDto
         );
     }
 
     public PartyEntity convertToEntity(PartyCreateRequestDTO createRequestDTO) {
+
+        MapPlaceDTO sp = createRequestDTO.getStartPlace();
+        MapPlaceDTO ep = createRequestDTO.getEndPlace();
+        MapPlace startPlace = new MapPlace(sp.getName(), sp.getRoadAddressName(), sp.getX(),
+            sp.getY());
+        MapPlace endPlace = new MapPlace(ep.getName(), ep.getRoadAddressName(), ep.getX(),
+            ep.getY());
+
         return new PartyEntity(
             createRequestDTO.getName(),
             createRequestDTO.getMemberEntities(),
@@ -45,21 +66,24 @@ public class PartyMapper {
             createRequestDTO.isQuietMode(),
             createRequestDTO.isDestinationChangeIn5Minutes(),
             createRequestDTO.getStartDateTime(),
-            createRequestDTO.getStartLocation(),
-            createRequestDTO.getEndLocation(),
             createRequestDTO.getComment(),
             createRequestDTO.getCurrentParticipantCount(),
             createRequestDTO.getMaxParticipantCount(),
-            createRequestDTO.getStart_x(),
-            createRequestDTO.getStart_y(),
-            createRequestDTO.getEnd_x(),
-            createRequestDTO.getEnd_y()
+            startPlace,
+            endPlace
         );
     }
 
     // 현재 인원수 필드 없음: 파티방에 멤버의 참여,퇴장은 join/leave 엔트포인트 사용의 강제를 위해
     public PartyEntity convertToEntityByUpdate(PartyEntity partyEntity,
         PartyUpdateRequestDTO partyUpdateRequestDTO) {
+        MapPlaceDTO sp = partyUpdateRequestDTO.getStartPlace();
+        MapPlaceDTO ep = partyUpdateRequestDTO.getEndPlace();
+        MapPlace startPlace = new MapPlace(sp.getName(), sp.getRoadAddressName(), sp.getX(),
+            sp.getY());
+        MapPlace endPlace = new MapPlace(ep.getName(), ep.getRoadAddressName(), ep.getX(),
+            ep.getY());
+
         return partyEntity.updateParty(
             partyUpdateRequestDTO.getName(),
             partyUpdateRequestDTO.isDeleted(),
@@ -71,14 +95,10 @@ public class PartyMapper {
             partyUpdateRequestDTO.isQuietMode(),
             partyUpdateRequestDTO.isDestinationChangeIn5Minutes(),
             partyUpdateRequestDTO.getStartDateTime(),
-            partyUpdateRequestDTO.getStartLocation(),
-            partyUpdateRequestDTO.getEndLocation(),
             partyUpdateRequestDTO.getComment(),
             partyUpdateRequestDTO.getMaxParticipantCount(),
-            partyUpdateRequestDTO.getStart_x(),
-            partyUpdateRequestDTO.getStart_y(),
-            partyUpdateRequestDTO.getEnd_x(),
-            partyUpdateRequestDTO.getEnd_y()
+            startPlace,
+            endPlace
         );
     }
 }
