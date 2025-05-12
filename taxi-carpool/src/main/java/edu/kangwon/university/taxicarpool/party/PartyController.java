@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -86,7 +87,9 @@ public class PartyController {
             schema = @Schema(implementation = PartyCreateRequestDTO.class))
         @RequestBody @Valid PartyCreateRequestDTO createRequestDTO
     ) {
-        return ResponseEntity.ok(partyService.createParty(createRequestDTO));
+        Long memberId = (Long) SecurityContextHolder
+            .getContext().getAuthentication().getPrincipal();
+        return ResponseEntity.ok(partyService.createParty(createRequestDTO, memberId));
     }
 
     @Operation(summary = "파티 수정", description = "카풀방 정보를 업데이트합니다.")
@@ -95,37 +98,40 @@ public class PartyController {
         @Parameter(description = "업데이트 요청 DTO", required = true,
             schema = @Schema(implementation = PartyUpdateRequestDTO.class))
         @RequestBody @Valid PartyUpdateRequestDTO updateRequestDTO,
-        @Parameter(description = "멤버 ID", required = true) @RequestParam Long memberId,
         @Parameter(description = "파티 ID", required = true) @PathVariable Long partyId
     ) {
+        Long memberId = (Long) SecurityContextHolder
+            .getContext().getAuthentication().getPrincipal();
         return ResponseEntity.ok(partyService.updateParty(partyId, memberId, updateRequestDTO));
     }
 
     @Operation(summary = "파티 삭제", description = "카풀방을 삭제합니다.")
     @DeleteMapping("/{partyId}")
     public ResponseEntity<Map<String, Object>> deleteParty(
-        @Parameter(description = "파티 ID", required = true) @PathVariable Long partyId,
-        @Parameter(description = "멤버 ID", required = true) @RequestParam Long memberId
+        @Parameter(description = "파티 ID", required = true) @PathVariable Long partyId
     ) {
+        Long memberId = (Long) SecurityContextHolder
+            .getContext().getAuthentication().getPrincipal();
         return ResponseEntity.ok(partyService.deleteParty(partyId, memberId));
     }
 
     @Operation(summary = "파티 참여", description = "멤버를 카풀방에 참여시킵니다.")
     @PostMapping("/{partyId}/join")
     public ResponseEntity<PartyResponseDTO> joinParty(
-        @Parameter(description = "파티 ID", required = true) @PathVariable Long partyId,
-        @Parameter(description = "멤버 ID", required = true) @RequestParam Long memberId
+        @Parameter(description = "파티 ID", required = true) @PathVariable Long partyId
     ) {
-        PartyResponseDTO result = partyService.joinParty(partyId, memberId);
-        return ResponseEntity.ok(result);
+        Long memberId = (Long) SecurityContextHolder
+            .getContext().getAuthentication().getPrincipal();
+        return ResponseEntity.ok(partyService.joinParty(partyId, memberId));
     }
 
     @Operation(summary = "파티 퇴장", description = "멤버를 카풀방에서 퇴장시킵니다.")
     @PostMapping("/{partyId}/leave")
     public ResponseEntity<PartyResponseDTO> leaveParty(
-        @Parameter(description = "파티 ID", required = true) @PathVariable Long partyId,
-        @Parameter(description = "멤버 ID", required = true) @RequestParam Long memberId
+        @Parameter(description = "파티 ID", required = true) @PathVariable Long partyId
     ) {
+        Long memberId = (Long) SecurityContextHolder
+            .getContext().getAuthentication().getPrincipal();
         PartyResponseDTO result = partyService.leaveParty(partyId, memberId);
         return ResponseEntity.ok(result);
     }
