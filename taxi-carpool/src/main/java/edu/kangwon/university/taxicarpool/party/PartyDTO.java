@@ -21,7 +21,7 @@ public class PartyDTO {
 
         private boolean isDeleted;
 
-        private List<MemberEntity> memberEntities = new ArrayList<>();
+        private List<Long> memberIds;
 
         private Long hostMemberId;
 
@@ -51,7 +51,7 @@ public class PartyDTO {
             Long id,
             String name,
             boolean isDeleted,
-            List<MemberEntity> memberEntities,
+            List<Long> memberIds,
             Long hostMemberId,
             LocalDateTime endDate,
             boolean sameGenderOnly,
@@ -67,7 +67,7 @@ public class PartyDTO {
             this.id = id;
             this.name = name;
             this.isDeleted = isDeleted;
-            this.memberEntities = memberEntities;
+            this.memberIds = memberIds;
             this.hostMemberId = hostMemberId;
             this.endDate = endDate;
             this.sameGenderOnly = sameGenderOnly;
@@ -106,12 +106,12 @@ public class PartyDTO {
             isDeleted = deleted;
         }
 
-        public List<MemberEntity> getMemberEntities() {
-            return memberEntities;
+        public List<Long> getMemberIds() {
+            return memberIds;
         }
 
-        public void setMemberEntities(List<MemberEntity> memberEntities) {
-            this.memberEntities = memberEntities;
+        public void setMemberIds(List<Long> memberIds) {
+            this.memberIds = memberIds;
         }
 
         public Long getHostMemberId() {
