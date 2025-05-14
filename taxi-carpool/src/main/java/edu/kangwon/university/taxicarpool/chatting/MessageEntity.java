@@ -36,13 +36,12 @@ public class MessageEntity {
     @JoinColumn(name = "sender_id")
     private MemberEntity sender;
 
-    // enter나 leave인 경우 content=null 가능
     @Column(name = "content", length = 1000)
+    @NotNull
     private String content;
 
     @CreatedDate
     @Column(name = "created_at", updatable = false)
-    @NotNull
     private LocalDateTime createdAt;
 
     @Enumerated(EnumType.STRING)
