@@ -1,8 +1,12 @@
 package edu.kangwon.university.taxicarpool.chatting;
 
+import edu.kangwon.university.taxicarpool.chatting.dto.MessageResponseDTO;
 import edu.kangwon.university.taxicarpool.member.MemberEntity;
 import edu.kangwon.university.taxicarpool.party.PartyEntity;
 import edu.kangwon.university.taxicarpool.party.PartyRepository;
+import edu.kangwon.university.taxicarpool.party.partyException.MemberNotInPartyException;
+import edu.kangwon.university.taxicarpool.party.partyException.PartyNotFoundException;
+import java.util.List;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -45,6 +49,48 @@ public class ChattingService {
         // WebSocket을 통해 메시지 브로드캐스트
         messagingTemplate.convertAndSend("/sub/party/" + partyEntity.getId(),
             messageMapper.convertToResponseDTO(message));
+    }
+
+    /**
+     * 메시지 히스토리 조회
+     */
+    @Transactional(readOnly = true)
+    public List<MessageResponseDTO> getMessageHistory(Long partyId, Long memberId,
+        Long afterMessageId) {
+
+        validateMemberInParty(partyId, memberId);
+
+        List<MessageEntity> messages;
+
+        if (afterMessageId == null) {
+            // afterMessageId가 null인 경우 모든 메시지를 가져옴
+            messages = messageRepository.findByPartyIdOrderByIdAsc(partyId);
+        } else {
+            // afterMessageId가 주어진 경우 해당 ID보다 큰 메시지들을 가져옴
+            messages = messageRepository.findByPartyIdAndIdGreaterThanOrderByIdAsc(partyId,
+                afterMessageId);
+        }
+
+        return messages.stream()
+            .map(messageMapper::convertToResponseDTO).toList();
+
+    }
+
+    /**
+     * 사용자가 파티에 속해 있는지 검증
+     *
+     * @throws MemberNotInPartyException 사용자가 파티에 속해있지 않은 경우
+     */
+    private void validateMemberInParty(Long partyId, Long memberId) {
+        PartyEntity party = partyRepository.findById(partyId)
+            .orElseThrow(() -> new PartyNotFoundException("파티를 찾을 수 없습니다."));
+
+        boolean isMember = party.getMemberEntities().stream()
+            .anyMatch(member -> member.getId().equals(memberId));
+
+        if (!isMember) {
+            throw new MemberNotInPartyException("해당 파티의 멤버가 아닙니다.");
+        }
     }
 
 }
