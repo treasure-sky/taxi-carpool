@@ -1,6 +1,10 @@
 package edu.kangwon.university.taxicarpool.config;
 
+import edu.kangwon.university.taxicarpool.chatting.JwtHandshakeInterceptor;
+import edu.kangwon.university.taxicarpool.chatting.JwtStompInterceptor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.messaging.simp.config.ChannelRegistration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
@@ -9,6 +13,16 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 @Configuration
 @EnableWebSocketMessageBroker // STOMP 메시지 브로커 활성화
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
+
+    private final JwtStompInterceptor jwtStompInterceptor;
+    private final JwtHandshakeInterceptor jwtHandshakeInterceptor;
+
+    @Autowired
+    public WebSocketConfig(JwtStompInterceptor jwtStompInterceptor,
+        JwtHandshakeInterceptor jwtHandshakeInterceptor) {
+        this.jwtStompInterceptor = jwtStompInterceptor;
+        this.jwtHandshakeInterceptor = jwtHandshakeInterceptor;
+    }
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry registry) {
@@ -25,7 +39,15 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         // WebSocket 엔드포인트 설정(이렇게만 해줘도 통신 터널을 열어두는 로직 반영됨)
         registry.addEndpoint("/chat")
+            .addInterceptors(jwtHandshakeInterceptor)
             .setAllowedOriginPatterns("*")
             .withSockJS();
     }
+
+    @Override
+    public void configureClientInboundChannel(ChannelRegistration registration) {
+        // STOMP CONNECT 프레임을 가로채서 JWT 검증
+        registration.interceptors(jwtStompInterceptor);
+    }
+
 }
