@@ -14,12 +14,16 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     public void configureMessageBroker(MessageBrokerRegistry registry) {
         // STOMP 메시지 브로커 설정
         registry.enableSimpleBroker("/sub"); // 구독
+        // 1. 메시지 브로커 활성화
+        // 2. 구독 경로 설정(앱->서버)
+        // 3. 서버->앱 메시지 전송 경로
         registry.setApplicationDestinationPrefixes("/pub"); // 발행
+        // 1. 앱->서버 메시지 전송 경로
     }
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        // WebSocket 엔드포인트 설정
+        // WebSocket 엔드포인트 설정(이렇게만 해줘도 통신 터널을 열어두는 로직 반영됨)
         registry.addEndpoint("/chat")
             .setAllowedOriginPatterns("*")
             .withSockJS();

@@ -1,7 +1,10 @@
 package edu.kangwon.university.taxicarpool.chatting;
 
 import edu.kangwon.university.taxicarpool.chatting.dto.MessageResponseDTO;
+import edu.kangwon.university.taxicarpool.chatting.dto.ParticipantResponseDTO;
 import edu.kangwon.university.taxicarpool.member.MemberEntity;
+import edu.kangwon.university.taxicarpool.member.MemberRepository;
+import edu.kangwon.university.taxicarpool.member.exception.MemberNotFoundException;
 import edu.kangwon.university.taxicarpool.party.PartyEntity;
 import edu.kangwon.university.taxicarpool.party.PartyRepository;
 import edu.kangwon.university.taxicarpool.party.partyException.MemberNotInPartyException;
@@ -18,14 +21,16 @@ public class ChattingService {
     private final PartyRepository partyRepository;
     private final MessageMapper messageMapper;
     private final SimpMessagingTemplate messagingTemplate;
+    private final MemberRepository memberRepository;
 
     ChattingService(MessageRepository messageRepository,
         PartyRepository partyRepository, MessageMapper messageMapper,
-        SimpMessagingTemplate messagingTemplate) {
+        SimpMessagingTemplate messagingTemplate, MemberRepository memberRepository) {
         this.messageRepository = messageRepository;
         this.partyRepository = partyRepository;
         this.messageMapper = messageMapper;
         this.messagingTemplate = messagingTemplate;
+        this.memberRepository = memberRepository;
     }
 
     /**
@@ -91,6 +96,35 @@ public class ChattingService {
         if (!isMember) {
             throw new MemberNotInPartyException("해당 파티의 멤버가 아닙니다.");
         }
+    }
+
+    @Transactional
+    public MessageResponseDTO sendMessage(Long partyId, Long memberId, String content) {
+        // 1) 파티 & 멤버 권한 검증
+        validateMemberInParty(partyId, memberId);
+
+        // 2) 엔티티 조회
+        PartyEntity party = partyRepository.findById(partyId)
+            .orElseThrow(() -> new PartyNotFoundException("파티를 찾을 수 없습니다."));
+        MemberEntity sender = memberRepository.findById(memberId)
+            .orElseThrow(() -> new MemberNotFoundException("멤버를 찾을 수 없습니다."));
+
+        // 3) 메시지 저장
+        MessageEntity message = new MessageEntity(party, sender, content, MessageType.TALK);
+        messageRepository.save(message);
+
+        // 4) DTO 변환 후 반환
+        return messageMapper.convertToResponseDTO(message);
+    }
+
+    @Transactional(readOnly = true)
+    public List<ParticipantResponseDTO> getParticipants(Long partyId) {
+        PartyEntity party = partyRepository.findById(partyId)
+            .orElseThrow(() -> new PartyNotFoundException("파티를 찾을 수 없습니다."));
+
+        return party.getMemberEntities().stream()
+            .map(m -> new ParticipantResponseDTO(m.getId(), m.getNickname()))
+            .toList();
     }
 
 }

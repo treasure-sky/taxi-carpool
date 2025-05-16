@@ -1,6 +1,7 @@
 package edu.kangwon.university.taxicarpool.chatting;
 
 import edu.kangwon.university.taxicarpool.chatting.dto.MessageResponseDTO;
+import edu.kangwon.university.taxicarpool.chatting.dto.ParticipantResponseDTO;
 import java.util.List;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -31,6 +32,13 @@ public class ChattingController {
             afterMessageId);
 
         return ResponseEntity.ok(messages);
+    }
+
+    @GetMapping("/participants")
+    public ResponseEntity<List<ParticipantResponseDTO>> getParticipants(
+        @PathVariable Long partyId) {
+        List<ParticipantResponseDTO> list = chattingService.getParticipants(partyId);
+        return ResponseEntity.ok(list);
     }
 
 }
