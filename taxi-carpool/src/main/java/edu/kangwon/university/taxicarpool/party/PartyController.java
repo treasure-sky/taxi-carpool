@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -136,5 +137,13 @@ public class PartyController {
         return ResponseEntity.ok(result);
     }
 
+    @Operation(summary = "내 파티 목록 조회", description = "로그인한 사용자가 속한 모든 파티를 조회합니다.")
+    @GetMapping("/my-parties")
+    public ResponseEntity<List<PartyResponseDTO>> getMyParties() {
+        Long memberId = (Long) SecurityContextHolder.getContext().getAuthentication()
+            .getPrincipal();
+        List<PartyResponseDTO> myParties = partyService.getMyParties(memberId);
+        return ResponseEntity.ok(myParties);
+    }
 
 }

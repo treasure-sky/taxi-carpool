@@ -9,8 +9,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
 import jakarta.validation.constraints.NotNull;
 import java.util.ArrayList;
@@ -48,9 +47,8 @@ public class MemberEntity {
     @Enumerated(EnumType.STRING)
     private Gender gender;
 
-    @ManyToOne
-    @JoinColumn(name = "party_id")
-    private PartyEntity partyEntity;
+    @ManyToMany(mappedBy = "memberEntities")
+    private List<PartyEntity> parties = new ArrayList<>();
 
     @OneToMany(mappedBy = "sender")
     private List<MessageEntity> sentMessages = new ArrayList<>();
@@ -97,5 +95,13 @@ public class MemberEntity {
 
     public List<MessageEntity> getSentMessages() {
         return sentMessages;
+    }
+
+    public List<PartyEntity> getParties() {
+        return parties;
+    }
+
+    public void setParties(List<PartyEntity> parties) {
+        this.parties = parties;
     }
 }
