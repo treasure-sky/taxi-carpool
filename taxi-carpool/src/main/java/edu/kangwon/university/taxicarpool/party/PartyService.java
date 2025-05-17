@@ -33,7 +33,6 @@ public class PartyService {
 
     private final PartyRepository partyRepository;
     private final PartyMapper partyMapper;
-    // 추후에 merge되면 memberService로 바꿔서 해도 괜찮을듯
     private final MemberRepository memberRepository;
     private final ChattingService chattingService;
 
