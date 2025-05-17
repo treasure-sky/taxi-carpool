@@ -26,26 +26,26 @@ public class JwtStompInterceptor implements ChannelInterceptor {
     @Override
     public Message<?> preSend(Message<?> message, MessageChannel channel) {
         StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);
-        if (StompCommand.CONNECT.equals(accessor.getCommand())) {
+        StompCommand command = accessor.getCommand();
+
+        // CONNECT 요청
+        if (StompCommand.CONNECT.equals(command)) {
             List<String> authHeaders = accessor.getNativeHeader("Authorization");
-            String token = (authHeaders != null && !authHeaders.isEmpty())
-                ? authHeaders.get(0).substring(7)
-                : null;
-
-            try {
-                jwtUtil.validateToken(token);
-            } catch (TokenExpiredException e) {
-                // 새로운 메시지를 담은 예외를 던져서 CONNECT 자체를 거부
-                throw new TokenExpiredException("WebSocket 연결 실패: Access Token이 만료되었습니다.", e);
-            } catch (TokenInvalidException e) {
-                throw new TokenInvalidException("WebSocket 연결 실패: 유효하지 않은 토큰입니다.", e);
+            if (authHeaders == null || authHeaders.isEmpty() || !authHeaders.get(0).startsWith("Bearer ")) {
+                throw new TokenInvalidException("WebSocket 연결 실패: 토큰이 없습니다.");
             }
-
+            String token = authHeaders.get(0).substring(7);
+            jwtUtil.validateToken(token);
             Long userId = jwtUtil.getIdFromToken(token);
-            accessor.setUser(
-                new UsernamePasswordAuthenticationToken(userId, null, null)
-            );
+            accessor.setUser(new UsernamePasswordAuthenticationToken(userId, null, null));
         }
+        // SUBSCRIBE나 SEND 요청일 때도 user가 없으면 차단
+        else if (StompCommand.SUBSCRIBE.equals(command) || StompCommand.SEND.equals(command)) {
+            if (accessor.getUser() == null) {
+                throw new TokenInvalidException("WebSocket 연결 실패: 토큰이 없습니다.");
+            }
+        }
+
         return message;
     }
 
