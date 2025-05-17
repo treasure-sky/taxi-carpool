@@ -37,7 +37,9 @@ public class ChattingController {
     @GetMapping("/participants")
     public ResponseEntity<List<ParticipantResponseDTO>> getParticipants(
         @PathVariable Long partyId) {
-        List<ParticipantResponseDTO> list = chattingService.getParticipants(partyId);
+        Long memberId = (Long) SecurityContextHolder.getContext().getAuthentication()
+            .getPrincipal();
+        List<ParticipantResponseDTO> list = chattingService.getParticipants(partyId, memberId);
         return ResponseEntity.ok(list);
     }
 
