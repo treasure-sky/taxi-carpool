@@ -170,6 +170,9 @@ public class PartyEntity {
     })
     private MapPlace endPlace;
 
+    @Column(name = "notification")
+    private String notification;
+
     public String getName() {
         return name;
     }
@@ -300,6 +303,14 @@ public class PartyEntity {
 
     public void setEndPlace(MapPlace endPlace) {
         this.endPlace = endPlace;
+    }
+
+    public String getNotification() {
+        return notification;
+    }
+
+    public void setNotification(String notification) {
+        this.notification = notification;
     }
 
     public PartyEntity updateParty(

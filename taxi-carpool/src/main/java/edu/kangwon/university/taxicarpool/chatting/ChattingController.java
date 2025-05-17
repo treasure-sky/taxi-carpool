@@ -1,12 +1,16 @@
 package edu.kangwon.university.taxicarpool.chatting;
 
 import edu.kangwon.university.taxicarpool.chatting.dto.MessageResponseDTO;
+import edu.kangwon.university.taxicarpool.chatting.dto.NotificationRequestDTO;
+import edu.kangwon.university.taxicarpool.chatting.dto.NotificationResponseDTO;
 import edu.kangwon.university.taxicarpool.chatting.dto.ParticipantResponseDTO;
 import java.util.List;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -41,6 +45,20 @@ public class ChattingController {
             .getPrincipal();
         List<ParticipantResponseDTO> list = chattingService.getParticipants(partyId, memberId);
         return ResponseEntity.ok(list);
+    }
+
+    @PutMapping("/notification")
+    public ResponseEntity<NotificationResponseDTO> updateNotification(
+        @PathVariable Long partyId,
+        @RequestBody NotificationRequestDTO request
+    ) {
+        Long memberId = (Long) SecurityContextHolder.getContext()
+            .getAuthentication().getPrincipal();
+
+        NotificationResponseDTO response = chattingService
+            .updateNotification(partyId, memberId, request.getNotification());
+
+        return ResponseEntity.ok(response);
     }
 
 }

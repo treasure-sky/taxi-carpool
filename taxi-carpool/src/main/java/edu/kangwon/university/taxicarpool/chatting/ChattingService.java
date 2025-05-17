@@ -1,6 +1,7 @@
 package edu.kangwon.university.taxicarpool.chatting;
 
 import edu.kangwon.university.taxicarpool.chatting.dto.MessageResponseDTO;
+import edu.kangwon.university.taxicarpool.chatting.dto.NotificationResponseDTO;
 import edu.kangwon.university.taxicarpool.chatting.dto.ParticipantResponseDTO;
 import edu.kangwon.university.taxicarpool.member.MemberEntity;
 import edu.kangwon.university.taxicarpool.member.MemberRepository;
@@ -9,6 +10,7 @@ import edu.kangwon.university.taxicarpool.party.PartyEntity;
 import edu.kangwon.university.taxicarpool.party.PartyRepository;
 import edu.kangwon.university.taxicarpool.party.partyException.MemberNotInPartyException;
 import edu.kangwon.university.taxicarpool.party.partyException.PartyNotFoundException;
+import edu.kangwon.university.taxicarpool.party.partyException.UnauthorizedHostAccessException;
 import java.util.List;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
@@ -133,6 +135,30 @@ public class ChattingService {
         return party.getMemberEntities().stream()
             .map(m -> new ParticipantResponseDTO(m.getId(), m.getNickname()))
             .toList();
+    }
+
+    @Transactional
+    public NotificationResponseDTO updateNotification(Long partyId, Long memberId, String notification) {
+
+        PartyEntity party = partyRepository.findById(partyId)
+            .orElseThrow(() -> new PartyNotFoundException("파티를 찾을 수 없습니다."));
+
+        boolean isMember = party.getMemberEntities().stream()
+            .anyMatch(m -> m.getId().equals(memberId));
+        if (!isMember) {
+            throw new MemberNotInPartyException("멤버가 해당 파티의 구성원이 아닙니다.");
+        }
+
+        // 호스트 여부 검사
+        if (!party.getHostMemberId().equals(memberId)) {
+            throw new UnauthorizedHostAccessException("호스트만 공지사항을 수정할 수 있습니다.");
+        }
+
+        // 공지사항 업데이트
+        party.setNotification(notification);
+        PartyEntity saved = partyRepository.save(party);
+
+        return new NotificationResponseDTO(saved.getId(), saved.getNotification());
     }
 
 }
