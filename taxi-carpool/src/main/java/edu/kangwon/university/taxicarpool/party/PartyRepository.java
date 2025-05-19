@@ -92,7 +92,7 @@ public interface PartyRepository extends JpaRepository<PartyEntity, Long> {
         Pageable pageable
     );
 
-    @Query("SELECT p FROM party p JOIN p.memberEntities m WHERE m.id = :memberId AND p.isDeleted = false")
+    @Query("SELECT p FROM party p JOIN p.memberEntities m WHERE m.id = :memberId AND p.isDeleted = false ORDER BY p.startDateTime DESC")
     List<PartyEntity> findAllActivePartiesByMemberId(@Param("memberId") Long memberId);
 
 }
