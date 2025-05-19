@@ -96,7 +96,6 @@ public class PartyEntity {
     @Column(name = "party_id")
     private Long id;
 
-    @NotNull
     @Column(name = "name")
     private String name;
 

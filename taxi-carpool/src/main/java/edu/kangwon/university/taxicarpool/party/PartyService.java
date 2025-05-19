@@ -6,7 +6,6 @@ import edu.kangwon.university.taxicarpool.member.exception.MemberNotFoundExcepti
 import edu.kangwon.university.taxicarpool.party.PartyDTO.PartyCreateRequestDTO;
 import edu.kangwon.university.taxicarpool.party.PartyDTO.PartyResponseDTO;
 import edu.kangwon.university.taxicarpool.party.PartyDTO.PartyUpdateRequestDTO;
-import edu.kangwon.university.taxicarpool.party.partyException.DuplicatedPartyNameException;
 import edu.kangwon.university.taxicarpool.party.partyException.MemberAlreadyInPartyException;
 import edu.kangwon.university.taxicarpool.party.partyException.MemberNotInPartyException;
 import edu.kangwon.university.taxicarpool.party.partyException.PartyAlreadyDeletedException;
@@ -14,7 +13,6 @@ import edu.kangwon.university.taxicarpool.party.partyException.PartyFullExceptio
 import edu.kangwon.university.taxicarpool.party.partyException.PartyGetCustomException;
 import edu.kangwon.university.taxicarpool.party.partyException.PartyNotFoundException;
 import edu.kangwon.university.taxicarpool.party.partyException.UnauthorizedHostAccessException;
-import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
@@ -26,6 +24,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class PartyService {
@@ -137,7 +136,8 @@ public class PartyService {
     }
 
     @Transactional
-    public PartyResponseDTO createParty(PartyCreateRequestDTO createRequestDTO, Long CreatorMemberId) {
+    public PartyResponseDTO createParty(PartyCreateRequestDTO createRequestDTO,
+        Long CreatorMemberId) {
 
         PartyEntity partyEntity = partyMapper.convertToEntity(createRequestDTO);
 
@@ -268,6 +268,26 @@ public class PartyService {
 
         PartyEntity saved = partyRepository.save(party);
         return partyMapper.convertToResponseDTO(saved);
+    }
+
+    /**
+     * 사용자가 속한 모든 파티를 조회합니다.
+     *
+     * @param memberId 사용자 ID
+     * @return 사용자가 속한 모든 파티 목록
+     */
+    @Transactional(readOnly = true)
+    public List<PartyResponseDTO> getMyParties(Long memberId) {
+
+        if (!memberRepository.existsById(memberId)) {
+            throw new MemberNotFoundException("해당 멤버가 존재하지 않습니다: " + memberId);
+        }
+
+        List<PartyEntity> activeParties = partyRepository.findAllActivePartiesByMemberId(memberId);
+
+        return activeParties.stream()
+            .map(partyMapper::convertToResponseDTO)
+            .toList();
     }
 
 

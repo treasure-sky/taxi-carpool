@@ -1,6 +1,7 @@
 package edu.kangwon.university.taxicarpool.party;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -90,5 +91,8 @@ public interface PartyRepository extends JpaRepository<PartyEntity, Long> {
         @Param("userDestinationLat") Double userDestinationLat,
         Pageable pageable
     );
+
+    @Query("SELECT p FROM party p JOIN p.memberEntities m WHERE m.id = :memberId AND p.isDeleted = false")
+    List<PartyEntity> findAllActivePartiesByMemberId(@Param("memberId") Long memberId);
 
 }
