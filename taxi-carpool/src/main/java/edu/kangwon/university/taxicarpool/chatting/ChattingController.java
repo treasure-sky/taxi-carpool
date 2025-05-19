@@ -6,8 +6,6 @@ import edu.kangwon.university.taxicarpool.chatting.dto.NotificationResponseDTO;
 import edu.kangwon.university.taxicarpool.chatting.dto.ParticipantResponseDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
@@ -33,8 +31,16 @@ public class ChattingController {
         this.chattingService = chattingService;
     }
 
+    @Operation(
+        summary = "과거 메세지 조회",
+        description = "특정 파티의 과거 메세지 기록을 가져옵니다.\n"
+            + "afterMessageId=3 이면 4부터 오름차순으로 조회 되며, "
+            + "afterMessageId를 포함하지 않는 경우 전체 메세지가 오름차순으로 조회됩니다."
+    )
     @GetMapping("/messages")
-    public ResponseEntity<List<MessageResponseDTO>> getMessageHistory(@PathVariable Long partyId,
+    public ResponseEntity<List<MessageResponseDTO>> getMessageHistory(
+        @Parameter(description = "조회할 파티 ID") @PathVariable Long partyId,
+        @Parameter(description = "기준이 되는 메세지 ID")
         @RequestParam(required = false) Long afterMessageId) {
         // JWT 토큰에서 사용자 ID 추출
         Long memberId = (Long) SecurityContextHolder.getContext().getAuthentication()
