@@ -1,5 +1,6 @@
 package edu.kangwon.university.taxicarpool.member;
 
+import edu.kangwon.university.taxicarpool.auth.RefreshTokenRepository;
 import edu.kangwon.university.taxicarpool.member.dto.MemberCreateDTO;
 import edu.kangwon.university.taxicarpool.member.dto.MemberDetailDTO;
 import edu.kangwon.university.taxicarpool.member.dto.MemberPublicDTO;
@@ -10,19 +11,24 @@ import edu.kangwon.university.taxicarpool.member.exception.MemberNotFoundExcepti
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class MemberService {
 
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
+    private final RefreshTokenRepository refreshTokenRepository;
 
     @Autowired
-    public MemberService(MemberRepository memberRepository, PasswordEncoder passwordEncoder) {
+    public MemberService(MemberRepository memberRepository, PasswordEncoder passwordEncoder,
+        RefreshTokenRepository refreshTokenRepository) {
         this.memberRepository = memberRepository;
         this.passwordEncoder = passwordEncoder;
+        this.refreshTokenRepository = refreshTokenRepository;
     }
 
+    @Transactional
     public MemberDetailDTO createMember(MemberCreateDTO memberCreateDTO) {
 
         // 이미 이메일이 존재하면 예외 처리
@@ -60,7 +66,7 @@ public class MemberService {
         return responseDTO;
     }
 
-
+    @Transactional
     public MemberDetailDTO updateMember(Long memberId, MemberUpdateDTO updateDTO) {
         if (updateDTO.isEmpty()) {
             throw new IllegalArgumentException("수정할 닉네임이나 비밀번호 중 하나 이상은 반드시 제공되어야 합니다.");
@@ -96,9 +102,12 @@ public class MemberService {
         );
     }
 
+    @Transactional
     public MemberDetailDTO deleteMember(Long memberId) {
         MemberEntity entity = memberRepository.findById(memberId)
             .orElseThrow(() -> new MemberNotFoundException("회원을 찾을 수 없습니다: " + memberId));
+
+        refreshTokenRepository.findByMember(entity).ifPresent(refreshTokenRepository::delete);
 
         memberRepository.delete(entity);
 
@@ -112,6 +121,7 @@ public class MemberService {
         return responseDTO;
     }
 
+    @Transactional(readOnly = true)
     public MemberPublicDTO getMemberById(Long memberId) {
 
         MemberEntity entity = memberRepository.findById(memberId)
@@ -125,6 +135,7 @@ public class MemberService {
         return responseDTO;
     }
 
+    @Transactional(readOnly = true)
     public MemberDetailDTO getDetailMember(Long memberId) {
         MemberEntity entity = memberRepository.findById(memberId)
             .orElseThrow(() -> new MemberNotFoundException("회원을 찾을 수 없습니다: " + memberId));
@@ -139,6 +150,7 @@ public class MemberService {
         return responseDTO;
     }
 
+    @Transactional(readOnly = true)
     public MemberEntity getMemberEntityByEmail(String email) {
         return memberRepository.findByEmail(email)
             .orElseThrow(() -> new MemberNotFoundException("존재하지 않는 이메일입니다: " + email));
