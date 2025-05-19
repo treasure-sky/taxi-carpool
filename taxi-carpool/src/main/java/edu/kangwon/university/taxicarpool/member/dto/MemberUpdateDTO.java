@@ -30,6 +30,7 @@ public class MemberUpdateDTO {
         this.newNickname = newNickname;
     }
 
+    @Schema(hidden = true)
     public boolean isEmpty() {
         return (newPassword == null || newPassword.isBlank()) &&
             (newNickname == null || newNickname.isBlank());
