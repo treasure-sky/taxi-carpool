@@ -275,5 +275,25 @@ public class PartyService {
         return partyMapper.convertToResponseDTO(saved);
     }
 
+    /**
+     * 사용자가 속한 모든 파티를 조회합니다.
+     *
+     * @param memberId 사용자 ID
+     * @return 사용자가 속한 모든 파티 목록
+     */
+    @Transactional(readOnly = true)
+    public List<PartyResponseDTO> getMyParties(Long memberId) {
+
+        if (!memberRepository.existsById(memberId)) {
+            throw new MemberNotFoundException("해당 멤버가 존재하지 않습니다: " + memberId);
+        }
+
+        List<PartyEntity> activeParties = partyRepository.findAllActivePartiesByMemberId(memberId);
+
+        return activeParties.stream()
+            .map(partyMapper::convertToResponseDTO)
+            .toList();
+    }
+
 
 }

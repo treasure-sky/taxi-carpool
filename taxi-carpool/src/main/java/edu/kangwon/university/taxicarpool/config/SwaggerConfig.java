@@ -3,8 +3,10 @@ package edu.kangwon.university.taxicarpool.config;
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeIn;
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
 import io.swagger.v3.oas.annotations.security.SecurityScheme;
+import io.swagger.v3.oas.models.servers.Server;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.OpenAPI;
+import java.util.List;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -24,6 +26,9 @@ public class SwaggerConfig {
             .info(new Info()
                 .title("택시 카풀 API")
                 .description("캡스톤 백엔드 API 명세서")
-                .version("v1.0.0"));
+                .version("v1.0.0"))
+            .servers(List.of(
+                new Server().url("https://knu-carpool.store")
+            ));
     }
 }
