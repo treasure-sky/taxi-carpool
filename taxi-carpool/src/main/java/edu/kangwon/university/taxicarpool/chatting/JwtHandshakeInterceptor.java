@@ -3,15 +3,15 @@ package edu.kangwon.university.taxicarpool.chatting;
 import edu.kangwon.university.taxicarpool.auth.JwtUtil;
 import edu.kangwon.university.taxicarpool.auth.authException.TokenExpiredException;
 import edu.kangwon.university.taxicarpool.auth.authException.TokenInvalidException;
-import java.util.List;
+import jakarta.servlet.http.HttpServletRequest;
+import java.util.Map;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
+import org.springframework.http.server.ServletServerHttpRequest;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.server.HandshakeInterceptor;
-
-import java.util.Map;
 
 @Component
 public class JwtHandshakeInterceptor implements HandshakeInterceptor {
@@ -38,7 +38,7 @@ public class JwtHandshakeInterceptor implements HandshakeInterceptor {
         try {
             jwtUtil.validateToken(token);
             Long userId = jwtUtil.getIdFromToken(token);
-            // 세션 속성에 저장해둘 수도 있음
+            // 웹소켓 세션 attribute에 저장해두기
             attributes.put("userId", userId);
             return true;
         } catch (TokenExpiredException e) {
@@ -60,11 +60,18 @@ public class JwtHandshakeInterceptor implements HandshakeInterceptor {
     }
 
     private String extractToken(ServerHttpRequest request) {
-        List<String> auth = request.getHeaders().get("Authorization");
-        if (auth != null && !auth.isEmpty() && auth.get(0).startsWith("Bearer ")) {
-            return auth.get(0).substring(7);
+        // 프론트에서 SockJS()와 같은 메서드를 사용시 헤더추가 불가능
+        // -> 헤더가 아닌 쿼리스트링으로 토큰 전달
+
+        if (request instanceof ServletServerHttpRequest) {
+            HttpServletRequest servletRequest =
+                ((ServletServerHttpRequest) request).getServletRequest();
+            String tokenFromQuery = servletRequest.getParameter(
+                "token"); // 클라이언트에서 "chat?token=asf2fa..." 이런식으로 전송해야 함.
+            if (tokenFromQuery != null && !tokenFromQuery.isEmpty()) {
+                return tokenFromQuery;
+            }
         }
-        // 필요하면 쿼리 파라미터에서도 꺼낼 수 있게 확장 가능
         return null;
     }
 }
