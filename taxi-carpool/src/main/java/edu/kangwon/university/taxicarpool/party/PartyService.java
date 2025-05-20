@@ -1,5 +1,7 @@
 package edu.kangwon.university.taxicarpool.party;
 
+import edu.kangwon.university.taxicarpool.chatting.ChattingService;
+import edu.kangwon.university.taxicarpool.chatting.MessageType;
 import edu.kangwon.university.taxicarpool.member.MemberEntity;
 import edu.kangwon.university.taxicarpool.member.MemberRepository;
 import edu.kangwon.university.taxicarpool.member.exception.MemberNotFoundException;
@@ -31,17 +33,18 @@ public class PartyService {
 
     private final PartyRepository partyRepository;
     private final PartyMapper partyMapper;
-    // 추후에 merge되면 memberService로 바꿔서 해도 괜찮을듯
     private final MemberRepository memberRepository;
+    private final ChattingService chattingService;
 
     @Autowired
     PartyService(PartyRepository partyRepository,
         PartyMapper partyMapper,
-        MemberRepository memberRepository
+        MemberRepository memberRepository, ChattingService chattingService
     ) {
         this.partyRepository = partyRepository;
         this.partyMapper = partyMapper;
         this.memberRepository = memberRepository;
+        this.chattingService = chattingService;
     }
 
     public PartyResponseDTO getParty(Long partyId) {
@@ -220,6 +223,7 @@ public class PartyService {
         }
 
         PartyEntity savedParty = partyRepository.save(party);
+        chattingService.createSystemMessage(party, member, MessageType.ENTER);
         return partyMapper.convertToResponseDTO(savedParty);
     }
 
@@ -267,6 +271,7 @@ public class PartyService {
         }
 
         PartyEntity saved = partyRepository.save(party);
+        chattingService.createSystemMessage(party, member, MessageType.LEAVE);
         return partyMapper.convertToResponseDTO(saved);
     }
 

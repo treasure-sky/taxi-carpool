@@ -89,11 +89,6 @@ public class PartyMapper {
             ep.getY());
 
         return partyEntity.updateParty(
-            partyUpdateRequestDTO.getName(),
-            partyUpdateRequestDTO.isDeleted(),
-            partyUpdateRequestDTO.getMemberEntities(),
-            partyUpdateRequestDTO.getHostMemberId(),
-            partyUpdateRequestDTO.getEndDate(),
             partyUpdateRequestDTO.isSameGenderOnly(),
             partyUpdateRequestDTO.isCostShareBeforeDropOff(),
             partyUpdateRequestDTO.isQuietMode(),
