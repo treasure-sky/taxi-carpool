@@ -346,17 +346,6 @@ public class PartyDTO {
     // UpdateRequestDTO에는 현재 인원수에 대한 필드가 없음 -> 파티의 인원수에 관한 로직은 무조건 join/leave 엔트포인트 사용을 강제를 위해
     public static class PartyUpdateRequestDTO {
 
-        @NotBlank(message = "파티 이름은 필수입니다.")
-        private String name;
-
-        private boolean isDeleted;
-
-        private List<MemberEntity> memberEntities = new ArrayList<>();
-
-        private Long hostMemberId;
-
-        private LocalDateTime endDate;
-
         private boolean sameGenderOnly;
 
         private boolean costShareBeforeDropOff;
@@ -379,11 +368,6 @@ public class PartyDTO {
         private MapPlaceDTO endPlace;
 
         public PartyUpdateRequestDTO(
-            String name,
-            boolean isDeleted,
-            List<MemberEntity> memberEntities,
-            Long hostMemberId,
-            LocalDateTime endDate,
             boolean sameGenderOnly,
             boolean costShareBeforeDropOff,
             boolean quietMode,
@@ -394,11 +378,6 @@ public class PartyDTO {
             MapPlaceDTO startPlace,
             MapPlaceDTO endPlace
         ) {
-            this.name = name;
-            this.isDeleted = isDeleted;
-            this.memberEntities = memberEntities;
-            this.hostMemberId = hostMemberId;
-            this.endDate = endDate;
             this.sameGenderOnly = sameGenderOnly;
             this.costShareBeforeDropOff = costShareBeforeDropOff;
             this.quietMode = quietMode;
@@ -408,46 +387,6 @@ public class PartyDTO {
             this.maxParticipantCount = maxParticipantCount;
             this.startPlace = startPlace;
             this.endPlace = endPlace;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public void setName(String name) {
-            this.name = name;
-        }
-
-        public boolean isDeleted() {
-            return isDeleted;
-        }
-
-        public void setDeleted(boolean deleted) {
-            isDeleted = deleted;
-        }
-
-        public List<MemberEntity> getMemberEntities() {
-            return memberEntities;
-        }
-
-        public void setMemberEntities(List<MemberEntity> memberEntities) {
-            this.memberEntities = memberEntities;
-        }
-
-        public Long getHostMemberId() {
-            return hostMemberId;
-        }
-
-        public void setHostMemberId(Long hostMemberId) {
-            this.hostMemberId = hostMemberId;
-        }
-
-        public LocalDateTime getEndDate() {
-            return endDate;
-        }
-
-        public void setEndDate(LocalDateTime endDate) {
-            this.endDate = endDate;
         }
 
         public boolean isSameGenderOnly() {
