@@ -7,6 +7,9 @@ public class MessageCreateDTO {
 
     private String content;
 
+    public MessageCreateDTO() {
+    }
+
     public MessageCreateDTO(String content) {
         this.content = content;
     }
