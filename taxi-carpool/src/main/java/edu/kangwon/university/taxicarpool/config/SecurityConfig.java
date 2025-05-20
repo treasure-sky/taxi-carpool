@@ -48,6 +48,7 @@ public class SecurityConfig {
                 // 회원가입/로그인 엔드포인트는 인증 없이 접근 가능하게
                 .requestMatchers(
                     "/",                        // 루트
+                    "/chat/**",                 // websocket
                     "/api/auth/**",             // 회원가입, 로그인
                     "/api/email/**",            // 이메일 인증
                     "/swagger-ui.html",

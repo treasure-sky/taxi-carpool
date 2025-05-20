@@ -169,6 +169,9 @@ public class PartyEntity {
     })
     private MapPlace endPlace;
 
+    @Column(name = "notification")
+    private String notification;
+
     public String getName() {
         return name;
     }
@@ -301,12 +304,15 @@ public class PartyEntity {
         this.endPlace = endPlace;
     }
 
+    public String getNotification() {
+        return notification;
+    }
+
+    public void setNotification(String notification) {
+        this.notification = notification;
+    }
+
     public PartyEntity updateParty(
-        String name,
-        boolean isDeleted,
-        List<MemberEntity> memberEntities,
-        Long hostMemberId,
-        LocalDateTime endDate,
         boolean sameGenderOnly,
         boolean costShareBeforeDropOff,
         boolean quietMode,
@@ -317,11 +323,6 @@ public class PartyEntity {
         MapPlace startPlace,
         MapPlace endPlace
     ) {
-        this.name = name;
-        this.isDeleted = isDeleted;
-        this.memberEntities = memberEntities;
-        this.hostMemberId = hostMemberId;
-        this.endDate = endDate;
         this.sameGenderOnly = sameGenderOnly;
         this.costShareBeforeDropOff = costShareBeforeDropOff;
         this.quietMode = quietMode;
