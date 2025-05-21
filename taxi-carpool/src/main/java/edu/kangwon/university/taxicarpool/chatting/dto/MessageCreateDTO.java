@@ -11,6 +11,9 @@ public class MessageCreateDTO {
         this.content = content;
     }
 
+    public MessageCreateDTO() {
+    }
+
     public String getContent() {
         return content;
     }
