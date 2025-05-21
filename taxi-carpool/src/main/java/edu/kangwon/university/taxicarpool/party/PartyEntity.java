@@ -313,11 +313,6 @@ public class PartyEntity {
     }
 
     public PartyEntity updateParty(
-        String name,
-        boolean isDeleted,
-        List<MemberEntity> memberEntities,
-        Long hostMemberId,
-        LocalDateTime endDate,
         boolean sameGenderOnly,
         boolean costShareBeforeDropOff,
         boolean quietMode,
@@ -328,11 +323,6 @@ public class PartyEntity {
         MapPlace startPlace,
         MapPlace endPlace
     ) {
-        this.name = name;
-        this.isDeleted = isDeleted;
-        this.memberEntities = memberEntities;
-        this.hostMemberId = hostMemberId;
-        this.endDate = endDate;
         this.sameGenderOnly = sameGenderOnly;
         this.costShareBeforeDropOff = costShareBeforeDropOff;
         this.quietMode = quietMode;

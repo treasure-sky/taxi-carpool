@@ -1,7 +1,6 @@
 package edu.kangwon.university.taxicarpool.chatting;
 
 import edu.kangwon.university.taxicarpool.auth.JwtUtil;
-import edu.kangwon.university.taxicarpool.auth.authException.TokenExpiredException;
 import edu.kangwon.university.taxicarpool.auth.authException.TokenInvalidException;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
