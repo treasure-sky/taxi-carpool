@@ -36,18 +36,21 @@ public class ChattingController {
         description = "특정 파티의 과거 메세지 기록을 가져옵니다.\n"
             + "afterMessageId=3 이면 4부터 오름차순으로 조회 되며, "
             + "afterMessageId를 포함하지 않는 경우 전체 메세지가 오름차순으로 조회됩니다."
+            + "maxResults는 가져올 메세지의 최대 개수입니다. 기본값은 20입니다."
     )
     @GetMapping("/messages")
     public ResponseEntity<List<MessageResponseDTO>> getMessageHistory(
         @Parameter(description = "조회할 파티 ID") @PathVariable Long partyId,
         @Parameter(description = "기준이 되는 메세지 ID")
-        @RequestParam(required = false) Long afterMessageId) {
+        @RequestParam(required = false) Long afterMessageId,
+        @Parameter(description = "최대 메시지 개수")
+        @RequestParam(required = false, defaultValue = "20") int maxResults) {
         // JWT 토큰에서 사용자 ID 추출
         Long memberId = (Long) SecurityContextHolder.getContext().getAuthentication()
             .getPrincipal();
 
         List<MessageResponseDTO> messages = chattingService.getMessageHistory(partyId, memberId,
-            afterMessageId);
+            afterMessageId, maxResults);
 
         return ResponseEntity.ok(messages);
     }
