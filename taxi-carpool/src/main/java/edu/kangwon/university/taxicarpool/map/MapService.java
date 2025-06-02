@@ -22,17 +22,19 @@ public class MapService {
 
     @Value("${kakao.api.key}")
     private String kakaoApiKey;
+    private final double LATITUDE_KNU = 37.869129;
+    private final double LONGITUDE_KNU = 127.742718;
 
     public MapService(RestTemplate restTemplate) {
         this.restTemplate = restTemplate;
     }
 
-    public MapSearchResponseDTO search(String keyword, double x, double y) {
+    public MapSearchResponseDTO search(String keyword) {
         String url = UriComponentsBuilder.fromUriString(
                 "https://dapi.kakao.com/v2/local/search/keyword.json")
             .queryParam("query", keyword)
-            .queryParam("x", x)
-            .queryParam("y", y)
+            .queryParam("x", LATITUDE_KNU)
+            .queryParam("y", LONGITUDE_KNU)
             .queryParam("radius", 2000) // 일단 반경 2km로 고정
             .queryParam("page", 1)
             .queryParam("size", 15)
