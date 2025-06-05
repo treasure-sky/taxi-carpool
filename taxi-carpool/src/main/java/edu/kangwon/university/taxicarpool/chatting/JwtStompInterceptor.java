@@ -11,6 +11,7 @@ import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ChannelInterceptor;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -37,7 +38,12 @@ public class JwtStompInterceptor implements ChannelInterceptor {
             String token = authHeaders.get(0).substring(7);
             jwtUtil.validateToken(token);
             Long userId = jwtUtil.getIdFromToken(token);
-            accessor.setUser(new UsernamePasswordAuthenticationToken(userId, null, null));
+
+            UsernamePasswordAuthenticationToken authToken =
+                new UsernamePasswordAuthenticationToken(userId, null, null);
+            accessor.setUser(authToken);
+
+            SecurityContextHolder.getContext().setAuthentication(authToken);
         }
         // SUBSCRIBE나 SEND 요청일 때도 user가 없으면 차단
         else if (StompCommand.SUBSCRIBE.equals(command) || StompCommand.SEND.equals(command)) {
