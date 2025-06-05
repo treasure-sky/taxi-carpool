@@ -46,7 +46,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void configureClientInboundChannel(ChannelRegistration registration) {
         // STOMP CONNECT 프레임을 가로채서 JWT 검증
-        registration.interceptors(jwtStompInterceptor);
+        // registration.interceptors(jwtStompInterceptor);
     }
 
 }
