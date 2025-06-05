@@ -40,8 +40,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
         // WebSocket 엔드포인트 설정(이렇게만 해줘도 통신 터널을 열어두는 로직 반영됨)
         registry.addEndpoint("/chat")
             //.addInterceptors(jwtHandshakeInterceptor) // 테스트를 위해 주석처리
-            .setAllowedOriginPatterns("*")
-            .withSockJS();
+            .setAllowedOriginPatterns("*");
     }
 
     @Override
