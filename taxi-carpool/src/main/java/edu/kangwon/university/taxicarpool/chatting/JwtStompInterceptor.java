@@ -37,7 +37,7 @@ public class JwtStompInterceptor implements ChannelInterceptor {
             }
         }
 
-        return MessageBuilder.createMessage(message.getPayload(), accessor.getMessageHeaders());
+        return message;
     }
 
 }
