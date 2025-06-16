@@ -6,11 +6,11 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.security.Principal;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 
 @Tag(name = "ChatWebSocket", description = "WebSocket STOMP 채팅 메시지 발행 API")
@@ -38,10 +38,10 @@ public class ChatWebSocketController {
     public void sendMessage(@Parameter(
         description = "메시지를 발행할 파티 ID", required = true)
     @DestinationVariable Long partyId,
-        @Payload MessageCreateDTO dto
+        @Payload MessageCreateDTO dto,
+        Principal principal
     ) {
-        Long memberId = (Long) SecurityContextHolder.getContext()
-            .getAuthentication().getPrincipal();
+        Long memberId = Long.valueOf(principal.getName());
         // 서비스에서 메시지 저장 + DTO 변환
         MessageResponseDTO response =
             chattingService.sendMessage(partyId, memberId, dto.getContent());
