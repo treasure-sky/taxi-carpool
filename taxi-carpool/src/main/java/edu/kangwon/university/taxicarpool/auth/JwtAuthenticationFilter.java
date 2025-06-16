@@ -11,7 +11,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-// 토큰의 유효성 검사 및 SecurityContextHolder에 등록하는 커스텀 필터임. Config에 등록해서 사용하면 됨.
+// 토큰의 유효성 검사하는 커스텀 필터임. Config에 등록해서 사용하면 됨. 또한 SecurityContextHolder에 등록도 함.
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtUtil jwtUtil;
