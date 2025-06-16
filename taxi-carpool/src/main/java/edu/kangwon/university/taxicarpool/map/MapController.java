@@ -28,11 +28,9 @@ public class MapController {
     )
     @GetMapping("/search")
     public ResponseEntity<MapSearchResponseDTO> searchPlaces(
-        @Parameter(description = "검색 키워드", required = true) @RequestParam String keyword,
-        @Parameter(description = "경도 (longitude)", example = "127.0") @RequestParam double x, // 경도
-        @Parameter(description = "위도 (latitude)", example = "37.0") @RequestParam double y  // 위도
+        @Parameter(description = "검색 키워드", required = true) @RequestParam String keyword
     ) {
-        MapSearchResponseDTO result = mapService.search(keyword, x, y);
+        MapSearchResponseDTO result = mapService.search(keyword);
         return ResponseEntity.ok(result);
     }
 

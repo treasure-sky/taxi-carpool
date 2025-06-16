@@ -12,6 +12,8 @@ import edu.kangwon.university.taxicarpool.party.partyException.MemberNotInPartyE
 import edu.kangwon.university.taxicarpool.party.partyException.PartyNotFoundException;
 import edu.kangwon.university.taxicarpool.party.partyException.UnauthorizedHostAccessException;
 import java.util.List;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -63,19 +65,20 @@ public class ChattingService {
      */
     @Transactional(readOnly = true)
     public List<MessageResponseDTO> getMessageHistory(Long partyId, Long memberId,
-        Long afterMessageId) {
+        Long afterMessageId, int limit) {
 
         validateMemberInParty(partyId, memberId);
 
+        Pageable pageable = PageRequest.of(0, limit);
         List<MessageEntity> messages;
 
         if (afterMessageId == null) {
             // afterMessageId가 null인 경우 모든 메시지를 가져옴
-            messages = messageRepository.findByPartyIdOrderByIdAsc(partyId);
+            messages = messageRepository.findByPartyIdOrderByIdAsc(partyId, pageable);
         } else {
             // afterMessageId가 주어진 경우 해당 ID보다 큰 메시지들을 가져옴
             messages = messageRepository.findByPartyIdAndIdGreaterThanOrderByIdAsc(partyId,
-                afterMessageId);
+                afterMessageId, pageable);
         }
 
         return messages.stream()
@@ -138,7 +141,8 @@ public class ChattingService {
     }
 
     @Transactional
-    public NotificationResponseDTO updateNotification(Long partyId, Long memberId, String notification) {
+    public NotificationResponseDTO updateNotification(Long partyId, Long memberId,
+        String notification) {
 
         PartyEntity party = partyRepository.findById(partyId)
             .orElseThrow(() -> new PartyNotFoundException("파티를 찾을 수 없습니다."));
