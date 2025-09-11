@@ -4,6 +4,7 @@ import edu.kangwon.university.taxicarpool.auth.authException.AuthenticationFaile
 import edu.kangwon.university.taxicarpool.auth.authException.TokenExpiredException;
 import edu.kangwon.university.taxicarpool.auth.authException.TokenInvalidException;
 import edu.kangwon.university.taxicarpool.email.EmailVerificationService;
+import edu.kangwon.university.taxicarpool.email.exception.EmailVerificationNotFoundException;
 import edu.kangwon.university.taxicarpool.member.MemberEntity;
 import edu.kangwon.university.taxicarpool.member.MemberService;
 import edu.kangwon.university.taxicarpool.member.dto.MemberCreateDTO;
@@ -41,7 +42,9 @@ public class AuthService {
     public MemberDetailDTO signUp(MemberCreateDTO request) {
 
         // 이메일 인증여부 확인
-        emailVerificationService.isEmailVerified(request.getEmail());
+        if(!emailVerificationService.isEmailVerified(request.getEmail())) {
+            throw new EmailVerificationNotFoundException("이메일 인증을 먼저 해주세요.");
+        }
 
         return memberService.createMember(request);
     }
@@ -86,7 +89,7 @@ public class AuthService {
         // DB에서 리프래쉬 토큰 조회
         RefreshTokenEntity tokenEntity = refreshTokenRepository.findByRefreshToken(
                 request.getRefreshToken())
-            .orElseThrow(() -> new TokenInvalidException("유효하지 않은 리프래쉬 토큰입니다."));
+            .orElseThrow(() -> new TokenInvalidException("리프래쉬 토큰이 만료되었습니다. 다시 로그인해주세요."));
 
         // 리프래쉬 토큰이 만료됐는지 확인
         // 리프래쉬도 만료되면 재로그인 요청해야함.
