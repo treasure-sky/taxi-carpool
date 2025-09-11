@@ -17,9 +17,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class JwtUtil {
 
-    // 시크릿키는 시그니처를 만들 때, 서버만 알고 있는 시크릿 키를 사용하여
+    // 시크릿키는 시그니처(토큰 검증용 암호학적 서명. 증명서.)를 만들 때, 서버만 알고 있는 시크릿 키를 사용하여
     // HMAC-SHA256(또는 다른 알고리즘) 방식으로 해시를 생성하는 용도
-    // 시크릿키를 일단 간단하게 해놨는데, 실서비스 배포할 때는 .properties나 안전한 방법으로 관리로 바꿔야함.
     private final long ACCESS_EXPIRATION = 1000L * 60 * 60 * 2; // 일단 2시간 유효로 해둠.
     private final long REFRESH_EXPIRATION = 1000L * 60 * 60 * 24 * 7; // 일주일 유효
     // 토큰 검증 시(시그니처 만들 때) 사용할 시크릿 키(32바이트 이상)
