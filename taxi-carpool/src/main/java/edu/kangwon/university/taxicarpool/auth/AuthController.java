@@ -87,7 +87,7 @@ public class AuthController {
     public ResponseEntity<String> logout(
         @Validated
         @io.swagger.v3.oas.annotations.parameters.RequestBody(
-            description = "로그아웃 요청 정보 (email)",
+            description = "로그아웃 요청 정보 (refresh토큰)",
             required = true,
             content = @Content(schema = @Schema(implementation = LogoutDTO.LogoutRequestDTO.class))
         )
