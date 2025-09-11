@@ -13,6 +13,7 @@ import edu.kangwon.university.taxicarpool.party.partyException.MemberNotInPartyE
 import edu.kangwon.university.taxicarpool.party.partyException.PartyAlreadyDeletedException;
 import edu.kangwon.university.taxicarpool.party.partyException.PartyFullException;
 import edu.kangwon.university.taxicarpool.party.partyException.PartyGetCustomException;
+import edu.kangwon.university.taxicarpool.party.partyException.PartyInvalidMaxParticipantException;
 import edu.kangwon.university.taxicarpool.party.partyException.PartyNotFoundException;
 import edu.kangwon.university.taxicarpool.party.partyException.UnauthorizedHostAccessException;
 import java.time.LocalDateTime;
@@ -170,6 +171,11 @@ public class PartyService {
 
         if (!existingPartyEntity.getHostMemberId().equals(memberId)) {
             throw new UnauthorizedHostAccessException("호스트만 수정할 수 있습니다.");
+        }
+
+        // 현재 참여 인원보다 Max인원을 작게 설정하면 안 된다.
+        if(existingPartyEntity.getCurrentParticipantCount() > updateRequestDTO.getMaxParticipantCount()) {
+            throw new PartyInvalidMaxParticipantException("현재 참여 인원보다 작은 최대 인원으로 설정할 수 없습니다.");
         }
 
         partyMapper.convertToEntityByUpdate(existingPartyEntity, updateRequestDTO);
