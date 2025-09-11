@@ -115,7 +115,6 @@ public class AuthService {
             tokenEntity.setExpiryDate(LocalDateTime.now());
             refreshTokenRepository.save(tokenEntity);
         } else {
-            //
             throw new TokenInvalidException("재로그인 후 로그아웃 해주세요.");
         }
     }
