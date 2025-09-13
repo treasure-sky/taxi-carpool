@@ -2,6 +2,7 @@ package edu.kangwon.university.taxicarpool.auth;
 
 import edu.kangwon.university.taxicarpool.auth.authException.TokenExpiredException;
 import edu.kangwon.university.taxicarpool.auth.authException.TokenInvalidException;
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
@@ -11,6 +12,7 @@ import io.jsonwebtoken.SignatureException;
 import io.jsonwebtoken.security.Keys;
 import java.security.Key;
 import java.util.Date;
+import java.util.UUID;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -68,7 +70,7 @@ public class JwtUtil {
         return Long.parseLong(subject);
     }
 
-    // 토큰 검증 (추후에 통합으로 변경하기)
+    // 토큰 검증
     public boolean validateToken(String token) {
         try {
             Jwts.parserBuilder()// 이 빌더에서 내부적으로 만료 기한도 검사함.
@@ -89,6 +91,39 @@ public class JwtUtil {
             // 그 외에 등등
             throw new TokenInvalidException("JWT 처리 중 오류가 발생했습니다.", e);
         }
+    }
+
+    // 커스텀 클레임(jti)을 넣어 1회용 비번 재설정 토큰 생성
+    public String generatePasswordResetToken(Long memberId, String jti, long expirationMillis) {
+        Date now = new Date();
+        Date expiryDate = new Date(now.getTime() + expirationMillis);
+
+        return Jwts.builder()
+            .setSubject(String.valueOf(memberId))
+            .setIssuedAt(now)
+            .setExpiration(expiryDate)
+            .claim("jti", jti) // ★ 1회용 식별자
+            .signWith(getSigningKey(), SignatureAlgorithm.HS256)
+            .compact();
+    }
+
+    // jti포함한 토큰 검증 + Claims 꺼내기
+    public Claims parseClaims(String token) {
+        try {
+            return Jwts.parserBuilder()
+                .setSigningKey(getSigningKey())
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+        } catch (ExpiredJwtException e) {
+            throw new TokenExpiredException("토큰이 만료되었습니다.", e);
+        } catch (JwtException e) {
+            throw new TokenInvalidException("유효하지 않은 토큰입니다.", e);
+        }
+    }
+
+    public static String newJti() {
+        return UUID.randomUUID().toString();
     }
 
 

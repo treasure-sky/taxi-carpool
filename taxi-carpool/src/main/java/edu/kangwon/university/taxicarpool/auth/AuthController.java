@@ -1,5 +1,7 @@
 package edu.kangwon.university.taxicarpool.auth;
 
+import edu.kangwon.university.taxicarpool.auth.dto.LoginDTO;
+import edu.kangwon.university.taxicarpool.auth.dto.LogoutDTO;
 import edu.kangwon.university.taxicarpool.member.dto.MemberCreateDTO;
 import edu.kangwon.university.taxicarpool.member.dto.MemberDetailDTO;
 import io.swagger.v3.oas.annotations.Operation;
