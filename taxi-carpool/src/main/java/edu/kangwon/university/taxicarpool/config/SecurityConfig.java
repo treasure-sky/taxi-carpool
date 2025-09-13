@@ -51,6 +51,8 @@ public class SecurityConfig {
                     "/chat/**",                 // websocket
                     "/api/auth/**",             // 회원가입, 로그인
                     "/api/email/**",            // 이메일 인증
+                    "/api/password/reset-link",
+                    "/api/password/reset",
                     "/swagger-ui.html",
                     "/swagger-ui/**",           // 스웨거 UI리소스
                     "/api-docs/**",          // 스웨거 API 문서
@@ -63,8 +65,7 @@ public class SecurityConfig {
                     "/api/map/search"
                 ).permitAll()
                 // 그 외 모든 요청은 인증 필요
-                //.anyRequest().authenticated()
-                .anyRequest().permitAll()
+                .anyRequest().authenticated()
             )
             // JWT 필터를 UsernamePasswordAuthenticationFilter 앞에 추가
             // 난 수동으로 회원가입 DB접근으로 검증해서 UsernamePasswordAuthenticationFilter 안 쓰이긴 함.

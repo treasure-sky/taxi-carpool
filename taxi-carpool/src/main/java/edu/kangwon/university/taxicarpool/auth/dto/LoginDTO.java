@@ -1,4 +1,4 @@
-package edu.kangwon.university.taxicarpool.auth;
+package edu.kangwon.university.taxicarpool.auth.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
