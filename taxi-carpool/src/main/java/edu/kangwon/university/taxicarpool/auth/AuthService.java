@@ -3,6 +3,7 @@ package edu.kangwon.university.taxicarpool.auth;
 import edu.kangwon.university.taxicarpool.auth.authException.AuthenticationFailedException;
 import edu.kangwon.university.taxicarpool.auth.authException.TokenExpiredException;
 import edu.kangwon.university.taxicarpool.auth.authException.TokenInvalidException;
+import edu.kangwon.university.taxicarpool.auth.dto.LoginDTO;
 import edu.kangwon.university.taxicarpool.email.EmailVerificationService;
 import edu.kangwon.university.taxicarpool.email.exception.EmailVerificationNotFoundException;
 import edu.kangwon.university.taxicarpool.member.MemberEntity;
