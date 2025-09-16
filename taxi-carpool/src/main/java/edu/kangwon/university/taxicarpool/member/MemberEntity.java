@@ -53,6 +53,9 @@ public class MemberEntity {
     @OneToMany(mappedBy = "sender")
     private List<MessageEntity> sentMessages = new ArrayList<>();
 
+    @Column(name = "total_saved_amount", nullable = false)
+    private long totalSavedAmount = 0L;
+
     public Long getId() {
         return id;
     }
@@ -104,4 +107,21 @@ public class MemberEntity {
     public void setParties(List<PartyEntity> parties) {
         this.parties = parties;
     }
+
+    public long getTotalSavedAmount() {
+        return totalSavedAmount;
+    }
+
+    public void setTotalSavedAmount(long totalSavedAmount) {
+        this.totalSavedAmount = totalSavedAmount;
+    }
+
+    /** 절감 금액을 누적하는 편의 메서드 */
+    public void addToTotalSavedAmount(long amountToAdd) {
+        if (amountToAdd < 0) {
+            throw new IllegalArgumentException("누적 절감 금액은 음수가 될 수 없습니다.");
+        }
+        this.totalSavedAmount += amountToAdd;
+    }
+
 }

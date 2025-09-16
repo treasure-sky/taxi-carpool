@@ -60,7 +60,8 @@ public class MemberService {
             saved.getId(),
             saved.getEmail(),
             saved.getNickname(),
-            saved.getGender()
+            saved.getGender(),
+            saved.getTotalSavedAmount()
         );
 
         return responseDTO;
@@ -98,7 +99,8 @@ public class MemberService {
             updated.getId(),
             updated.getEmail(),
             updated.getNickname(),
-            updated.getGender()
+            updated.getGender(),
+            updated.getTotalSavedAmount()
         );
     }
 
@@ -115,7 +117,8 @@ public class MemberService {
             entity.getId(),
             entity.getEmail(),
             entity.getNickname(),
-            entity.getGender()
+            entity.getGender(),
+            entity.getTotalSavedAmount()
         );
 
         return responseDTO;
@@ -144,7 +147,8 @@ public class MemberService {
             entity.getId(),
             entity.getEmail(),
             entity.getNickname(),
-            entity.getGender()
+            entity.getGender(),
+            entity.getTotalSavedAmount()
         );
 
         return responseDTO;

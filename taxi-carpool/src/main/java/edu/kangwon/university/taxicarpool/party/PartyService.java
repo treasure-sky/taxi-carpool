@@ -1,5 +1,7 @@
 package edu.kangwon.university.taxicarpool.party;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.kangwon.university.taxicarpool.chatting.ChattingService;
 import edu.kangwon.university.taxicarpool.chatting.MessageType;
 import edu.kangwon.university.taxicarpool.member.MemberEntity;
@@ -16,22 +18,31 @@ import edu.kangwon.university.taxicarpool.party.partyException.PartyGetCustomExc
 import edu.kangwon.university.taxicarpool.party.partyException.PartyInvalidMaxParticipantException;
 import edu.kangwon.university.taxicarpool.party.partyException.PartyNotFoundException;
 import edu.kangwon.university.taxicarpool.party.partyException.UnauthorizedHostAccessException;
+import org.springframework.http.HttpHeaders;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 
 @Service
 public class PartyService {
 
+    @Value("${kakaomobility.api.key}")
+    private String kakaoMobilityApiKey;
     private final PartyRepository partyRepository;
     private final PartyMapper partyMapper;
     private final MemberRepository memberRepository;
@@ -300,6 +311,101 @@ public class PartyService {
             .map(partyMapper::convertToResponseDTO)
             .toList();
     }
+
+    @Transactional
+    public Map<String, Object> calculateSavings(Long partyId, Long requesterId) {
+        PartyEntity party = partyRepository.findByIdAndIsDeletedFalse(partyId)
+            .orElseThrow(() -> new PartyNotFoundException("해당 파티가 존재하지 않습니다."));
+
+        // 1) 요청자(호스트) 검증
+        if (party.getHostMemberId() == null || !party.getHostMemberId().equals(requesterId)) {
+            throw new UnauthorizedHostAccessException("호스트만 절감 금액 계산을 수행할 수 있습니다.");
+        }
+
+        // 2) 필수 파라미터 구성 (origin, destination, departure_time)
+        if (party.getStartPlace() == null || party.getEndPlace() == null) {
+            throw new IllegalArgumentException("출발/도착 좌표가 없습니다.");
+        }
+        String origin = party.getStartPlace().getX() + "," + party.getStartPlace().getY();        // "경도,위도"
+        String destination = party.getEndPlace().getX() + "," + party.getEndPlace().getY();       // "경도,위도"
+
+        // departure_time: YYYYMMDDHHMM (현재 이후가 요구되므로, 과거면 현재+2분로 보정)
+        LocalDateTime depTime = party.getStartDateTime() != null
+            ? party.getStartDateTime()
+            : LocalDateTime.now().plusMinutes(2);
+        if (!depTime.isAfter(LocalDateTime.now())) {
+            depTime = LocalDateTime.now().plusMinutes(2);
+        }
+        String departureTime = depTime.format(java.time.format.DateTimeFormatter.ofPattern("yyyyMMddHHmm"));
+
+        // 3) 카카오 모빌리티 API 호출
+        String url = UriComponentsBuilder
+            .fromHttpUrl("https://apis-navi.kakaomobility.com/v1/future/directions")
+            .queryParam("origin", origin)
+            .queryParam("destination", destination)
+            .queryParam("departure_time", departureTime)
+            .build(true) // 인코딩 보존
+            .toUriString();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", "KakaoAK " + kakaoMobilityApiKey);
+        headers.set("Content-Type", "application/json");
+
+        RestTemplate restTemplate = new RestTemplate();
+        ResponseEntity<String> response =
+            restTemplate.exchange(url, HttpMethod.GET, new HttpEntity<>(headers), String.class);
+
+        // 4) taxi 요금 추출: routes[0].summary.fare.taxi
+        long totalTaxiFare;
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            JsonNode root = mapper.readTree(response.getBody());
+            JsonNode routes = root.path("routes");
+            if (!routes.isArray() || routes.isEmpty()) {
+                throw new IllegalStateException("경로 정보가 비어있습니다.");
+            }
+            JsonNode fare = routes.get(0).path("summary").path("fare");
+            if (fare.isMissingNode()) {
+                throw new IllegalStateException("요금 정보가 없습니다.");
+            }
+            totalTaxiFare = fare.path("taxi").asLong(0L);
+            if (totalTaxiFare <= 0L) {
+                throw new IllegalStateException("유효한 택시 요금을 가져오지 못했습니다.");
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("카카오 모빌리티 API 응답 파싱 실패: " + e.getMessage(), e);
+        }
+
+        // 5) 절감 금액 계산 및 멤버 누적 반영
+        List<MemberEntity> members = party.getMemberEntities();
+        int participants = (members != null) ? members.size() : 0;
+        if (participants <= 0) {
+            throw new IllegalStateException("파티 참여 인원이 0명입니다.");
+        }
+
+        long eachShare = totalTaxiFare / participants;
+        long savingPerMember = totalTaxiFare - eachShare; // "택시 비용 - (택시 비용 / 인원수)"
+
+        // 누적 반영
+        for (MemberEntity m : members) {
+            m.addToTotalSavedAmount(savingPerMember);
+        }
+        memberRepository.saveAll(members);
+
+        // 6) 응답 구성
+        Map<String, Object> result = new HashMap<>();
+        result.put("partyId", partyId);
+        result.put("participants", participants);
+        result.put("departure_time", departureTime);
+        result.put("origin", origin);
+        result.put("destination", destination);
+        result.put("totalTaxiFare", totalTaxiFare);
+        result.put("eachShare", eachShare);
+        result.put("savingPerMember", savingPerMember);
+
+        return result;
+    }
+
 
 
 }
