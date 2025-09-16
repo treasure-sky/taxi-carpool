@@ -146,4 +146,18 @@ public class PartyController {
         return ResponseEntity.ok(myParties);
     }
 
+    @Operation(
+        summary = "파티 절감 금액 계산",
+        description = "호스트가 완료된 파티에 대해 절감 금액을 계산하고, 각 멤버의 누적 절감액(totalSavedAmount)에 반영합니다."
+    )
+    @PostMapping("/{partyId}/savings")
+    public ResponseEntity<Map<String, Object>> calculateSavings(
+        @Parameter(description = "파티 ID", required = true) @PathVariable Long partyId
+    ) {
+        Long memberId = (Long) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Map<String, Object> result = partyService.calculateSavings(partyId, memberId);
+        return ResponseEntity.ok(result);
+    }
+
+
 }
