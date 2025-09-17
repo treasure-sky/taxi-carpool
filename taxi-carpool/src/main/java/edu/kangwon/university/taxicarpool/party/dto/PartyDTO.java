@@ -44,6 +44,10 @@ public class PartyDTO {
 
         private MapPlaceDTO endPlace;
 
+        private String notification;
+
+        private boolean savingsCalculated;
+
         public PartyResponseDTO(
             Long id,
             String name,
@@ -60,7 +64,9 @@ public class PartyDTO {
             int currentParticipantCount,
             int maxParticipantCount,
             MapPlaceDTO startPlace,
-            MapPlaceDTO endPlace) {
+            MapPlaceDTO endPlace,
+            String notification,
+            boolean savingsCalculated) {
             this.id = id;
             this.name = name;
             this.isDeleted = isDeleted;
@@ -77,6 +83,8 @@ public class PartyDTO {
             this.maxParticipantCount = maxParticipantCount;
             this.startPlace = startPlace;
             this.endPlace = endPlace;
+            this.notification = notification;
+            this.savingsCalculated = savingsCalculated;
         }
 
         public Long getId() {
@@ -205,6 +213,22 @@ public class PartyDTO {
 
         public void setEndPlace(MapPlaceDTO endPlace) {
             this.endPlace = endPlace;
+        }
+
+        public String getNotification() {
+            return notification;
+        }
+
+        public void setNotification(String notification) {
+            this.notification = notification;
+        }
+
+        public boolean isSavingsCalculated() {
+            return savingsCalculated;
+        }
+
+        public void setSavingsCalculated(boolean savingsCalculated) {
+            this.savingsCalculated = savingsCalculated;
         }
     }
 
@@ -364,6 +388,8 @@ public class PartyDTO {
 
         private MapPlaceDTO endPlace;
 
+        private String notification;
+
         public PartyUpdateRequestDTO(
             boolean sameGenderOnly,
             boolean costShareBeforeDropOff,
@@ -373,7 +399,8 @@ public class PartyDTO {
             String comment,
             int maxParticipantCount,
             MapPlaceDTO startPlace,
-            MapPlaceDTO endPlace
+            MapPlaceDTO endPlace,
+            String notification
         ) {
             this.sameGenderOnly = sameGenderOnly;
             this.costShareBeforeDropOff = costShareBeforeDropOff;
@@ -384,6 +411,7 @@ public class PartyDTO {
             this.maxParticipantCount = maxParticipantCount;
             this.startPlace = startPlace;
             this.endPlace = endPlace;
+            this.notification = notification;
         }
 
         public boolean isSameGenderOnly() {
@@ -456,6 +484,14 @@ public class PartyDTO {
 
         public void setEndPlace(MapPlaceDTO endPlace) {
             this.endPlace = endPlace;
+        }
+
+        public String getNotification() {
+            return notification;
+        }
+
+        public void setNotification(String notification) {
+            this.notification = notification;
         }
     }
 }
