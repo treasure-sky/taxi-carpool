@@ -10,6 +10,7 @@ import edu.kangwon.university.taxicarpool.member.exception.MemberNotFoundExcepti
 import edu.kangwon.university.taxicarpool.party.dto.PartyDTO.PartyCreateRequestDTO;
 import edu.kangwon.university.taxicarpool.party.dto.PartyDTO.PartyResponseDTO;
 import edu.kangwon.university.taxicarpool.party.dto.PartyDTO.PartyUpdateRequestDTO;
+import edu.kangwon.university.taxicarpool.party.partyException.KakaoApiException;
 import edu.kangwon.university.taxicarpool.party.partyException.MemberAlreadyInPartyException;
 import edu.kangwon.university.taxicarpool.party.partyException.MemberNotInPartyException;
 import edu.kangwon.university.taxicarpool.party.partyException.PartyAlreadyDeletedException;
@@ -17,7 +18,10 @@ import edu.kangwon.university.taxicarpool.party.partyException.PartyFullExceptio
 import edu.kangwon.university.taxicarpool.party.partyException.PartyGetCustomException;
 import edu.kangwon.university.taxicarpool.party.partyException.PartyInvalidMaxParticipantException;
 import edu.kangwon.university.taxicarpool.party.partyException.PartyNotFoundException;
+import edu.kangwon.university.taxicarpool.party.partyException.SavingsAlreadyCalculatedException;
 import edu.kangwon.university.taxicarpool.party.partyException.UnauthorizedHostAccessException;
+import java.io.IOException;
+import java.util.Optional;
 import org.springframework.http.HttpHeaders;
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -322,12 +326,24 @@ public class PartyService {
             throw new UnauthorizedHostAccessException("호스트만 절감 금액 계산을 수행할 수 있습니다.");
         }
 
+        if (party.isSavingsCalculated()) {
+            throw new SavingsAlreadyCalculatedException("해당 파티("+ partyId +")는 이미 절감 계산이 완료되었습니다.");
+        }
+
         // 2) 필수 파라미터 구성 (origin, destination, departure_time)
         if (party.getStartPlace() == null || party.getEndPlace() == null) {
             throw new IllegalArgumentException("출발/도착 좌표가 없습니다.");
         }
-        String origin = party.getStartPlace().getX() + "," + party.getStartPlace().getY();        // "경도,위도"
-        String destination = party.getEndPlace().getX() + "," + party.getEndPlace().getY();       // "경도,위도"
+
+        double sx = party.getStartPlace().getX();
+        double sy = party.getStartPlace().getY();
+        double ex = party.getEndPlace().getX();
+        double ey = party.getEndPlace().getY();
+        validateCoordinates(sx, sy, "출발지");
+        validateCoordinates(ex, ey, "도착지");
+
+        String origin = sx + "," + sy;
+        String destination = ex + "," + ey;
 
         // departure_time: YYYYMMDDHHMM (현재 이후가 요구되므로, 과거면 현재+2분로 보정)
         LocalDateTime depTime = party.getStartDateTime() != null
@@ -355,32 +371,42 @@ public class PartyService {
         ResponseEntity<String> response =
             restTemplate.exchange(url, HttpMethod.GET, new HttpEntity<>(headers), String.class);
 
-        // 4) taxi 요금 추출: routes[0].summary.fare.taxi
-        long totalTaxiFare;
-        try {
-            ObjectMapper mapper = new ObjectMapper();
-            JsonNode root = mapper.readTree(response.getBody());
-            JsonNode routes = root.path("routes");
-            if (!routes.isArray() || routes.isEmpty()) {
-                throw new IllegalStateException("경로 정보가 비어있습니다.");
-            }
-            JsonNode fare = routes.get(0).path("summary").path("fare");
-            if (fare.isMissingNode()) {
-                throw new IllegalStateException("요금 정보가 없습니다.");
-            }
-            totalTaxiFare = fare.path("taxi").asLong(0L);
-            if (totalTaxiFare <= 0L) {
-                throw new IllegalStateException("유효한 택시 요금을 가져오지 못했습니다.");
-            }
-        } catch (Exception e) {
-            throw new RuntimeException("카카오 모빌리티 API 응답 파싱 실패: " + e.getMessage(), e);
+        response = Optional.ofNullable(response)
+            .filter(res -> res.getStatusCode().is2xxSuccessful())
+            .orElseThrow(() -> new KakaoApiException("카카오 API 호출 실패: 성공(2xx) 응답이 아님. URL=" + url));
+
+        if (response.getBody() == null || response.getBody().isBlank()) {
+            throw new KakaoApiException("카카오 API 호출 실패: 응답 본문이 비어있음. URL=" + url);
         }
+
+        // 4) taxi 요금 추출: routes[0].summary.fare.taxi
+        ObjectMapper mapper = new ObjectMapper();
+        JsonNode root;
+        try {
+            root = mapper.readTree(response.getBody());
+        } catch (IOException e) {
+            throw new KakaoApiException("카카오 모빌리티 API 응답 파싱 실패: JSON 변환 불가", e);
+        }
+
+        JsonNode routes = Optional.ofNullable(root.path("routes"))
+            .filter(JsonNode::isArray)
+            .filter(r -> !r.isEmpty())
+            .orElseThrow(() -> new KakaoApiException("카카오 API 응답 오류: 경로 정보가 비어있습니다."));
+
+        JsonNode fare = Optional.ofNullable(routes.get(0).path("summary").path("fare"))
+            .filter(f -> !f.isMissingNode())
+            .orElseThrow(() -> new KakaoApiException("카카오 API 응답 오류: 요금 정보가 없습니다."));
+
+        long totalTaxiFare = Optional.of(fare.path("taxi").asLong(0L))
+            .filter(f -> f > 0L)
+            .orElseThrow(() -> new KakaoApiException("카카오 API 응답 오류: 유효한 택시 요금을 가져오지 못했습니다."));
+
 
         // 5) 절감 금액 계산 및 멤버 누적 반영
         List<MemberEntity> members = party.getMemberEntities();
         int participants = (members != null) ? members.size() : 0;
         if (participants <= 0) {
-            throw new IllegalStateException("파티 참여 인원이 0명입니다.");
+            throw new MemberNotInPartyException("파티 참여 인원이 0명입니다.");
         }
 
         long eachShare = totalTaxiFare / participants;
@@ -391,6 +417,9 @@ public class PartyService {
             m.addToTotalSavedAmount(savingPerMember);
         }
         memberRepository.saveAll(members);
+
+        party.setSavingsCalculated(true);
+        partyRepository.save(party);
 
         // 6) 응답 구성
         Map<String, Object> result = new HashMap<>();
@@ -406,6 +435,16 @@ public class PartyService {
         return result;
     }
 
-
+    private void validateCoordinates(double x, double y, String label) {
+        // 기본 좌표 유효성: 대략 한반도 범위 내로 제한
+        // 경도: 124 ~ 132 (동서 방향)
+        // 위도: 33 ~ 39 (남북 방향)
+        if (x < 124 || x > 132) {
+            throw new IllegalArgumentException(label + " 경도(x)가 한반도 범위를 벗어났습니다: x=" + x);
+        }
+        if (y < 33 || y > 39) {
+            throw new IllegalArgumentException(label + " 위도(y)가 한반도 범위를 벗어났습니다: y=" + y);
+        }
+    }
 
 }

@@ -172,6 +172,9 @@ public class PartyEntity {
     @Column(name = "notification")
     private String notification;
 
+    @Column(name = "savings_calculated", nullable = false)
+    private boolean savingsCalculated = false;
+
     public String getName() {
         return name;
     }
@@ -312,6 +315,14 @@ public class PartyEntity {
         this.notification = notification;
     }
 
+    public boolean isSavingsCalculated() {
+        return savingsCalculated;
+    }
+
+    public void setSavingsCalculated(boolean savingsCalculated) {
+        this.savingsCalculated = savingsCalculated;
+    }
+
     public PartyEntity updateParty(
         boolean sameGenderOnly,
         boolean costShareBeforeDropOff,
@@ -321,7 +332,8 @@ public class PartyEntity {
         String comment,
         int maxParticipantCount,
         MapPlace startPlace,
-        MapPlace endPlace
+        MapPlace endPlace,
+        String notification
     ) {
         this.sameGenderOnly = sameGenderOnly;
         this.costShareBeforeDropOff = costShareBeforeDropOff;
@@ -332,6 +344,7 @@ public class PartyEntity {
         this.maxParticipantCount = maxParticipantCount;
         this.startPlace = startPlace;
         this.endPlace = endPlace;
+        this.notification = notification;
         return this;
     }
 

@@ -50,7 +50,9 @@ public class PartyMapper {
             partyEntity.getCurrentParticipantCount(),
             partyEntity.getMaxParticipantCount(),
             startDto,
-            endDto
+            endDto,
+            partyEntity.getNotification(),
+            partyEntity.isSavingsCalculated()
         );
     }
 
@@ -97,7 +99,8 @@ public class PartyMapper {
             partyUpdateRequestDTO.getComment(),
             partyUpdateRequestDTO.getMaxParticipantCount(),
             startPlace,
-            endPlace
+            endPlace,
+            partyUpdateRequestDTO.getNotification()
         );
     }
 }
