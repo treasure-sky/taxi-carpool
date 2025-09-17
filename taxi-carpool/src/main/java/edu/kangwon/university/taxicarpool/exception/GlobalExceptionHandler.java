@@ -13,6 +13,7 @@ import edu.kangwon.university.taxicarpool.member.exception.DuplicatedEmailExcept
 import edu.kangwon.university.taxicarpool.member.exception.DuplicatedNicknameException;
 import edu.kangwon.university.taxicarpool.member.exception.MemberNotFoundException;
 import edu.kangwon.university.taxicarpool.party.partyException.DuplicatedPartyNameException;
+import edu.kangwon.university.taxicarpool.party.partyException.KakaoApiException;
 import edu.kangwon.university.taxicarpool.party.partyException.MemberAlreadyInPartyException;
 import edu.kangwon.university.taxicarpool.party.partyException.MemberNotInPartyException;
 import edu.kangwon.university.taxicarpool.party.partyException.PartyAlreadyDeletedException;
@@ -20,6 +21,7 @@ import edu.kangwon.university.taxicarpool.party.partyException.PartyFullExceptio
 import edu.kangwon.university.taxicarpool.party.partyException.PartyGetCustomException;
 import edu.kangwon.university.taxicarpool.party.partyException.PartyInvalidMaxParticipantException;
 import edu.kangwon.university.taxicarpool.party.partyException.PartyNotFoundException;
+import edu.kangwon.university.taxicarpool.party.partyException.SavingsAlreadyCalculatedException;
 import edu.kangwon.university.taxicarpool.party.partyException.UnauthorizedHostAccessException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolationException;
@@ -281,6 +283,28 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(PartyInvalidMaxParticipantException.class)
     public ResponseEntity<ErrorResponseDTO> handlePartyInvalidMaxParticipantException(
         PartyInvalidMaxParticipantException ex, HttpServletRequest request) {
+        ErrorResponseDTO errorResponse = new ErrorResponseDTO(
+            HttpStatus.BAD_REQUEST.value(),
+            ex.getMessage(),
+            request.getRequestURI()
+        );
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+    }
+
+    @ExceptionHandler(KakaoApiException.class)
+    public ResponseEntity<ErrorResponseDTO> handleKakaoApiException(
+        KakaoApiException ex, HttpServletRequest request) {
+        ErrorResponseDTO errorResponse = new ErrorResponseDTO(
+            HttpStatus.BAD_REQUEST.value(),
+            ex.getMessage(),
+            request.getRequestURI()
+        );
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+    }
+
+    @ExceptionHandler(SavingsAlreadyCalculatedException.class)
+    public ResponseEntity<ErrorResponseDTO> handleSavingsAlreadyCalculatedException (
+        SavingsAlreadyCalculatedException ex, HttpServletRequest request) {
         ErrorResponseDTO errorResponse = new ErrorResponseDTO(
             HttpStatus.BAD_REQUEST.value(),
             ex.getMessage(),
