@@ -61,7 +61,6 @@ public class SecurityConfig {
                 ).permitAll()
 
                 .requestMatchers(HttpMethod.GET,
-                    "/api/party/**",
                     "/api/map/search"
                 ).permitAll()
                 // 그 외 모든 요청은 인증 필요
