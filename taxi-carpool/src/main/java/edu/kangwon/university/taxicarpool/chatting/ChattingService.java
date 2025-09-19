@@ -11,6 +11,7 @@ import edu.kangwon.university.taxicarpool.party.PartyRepository;
 import edu.kangwon.university.taxicarpool.party.partyException.MemberNotInPartyException;
 import edu.kangwon.university.taxicarpool.party.partyException.PartyNotFoundException;
 import edu.kangwon.university.taxicarpool.party.partyException.UnauthorizedHostAccessException;
+import edu.kangwon.university.taxicarpool.profanity.ProfanityService;
 import java.util.List;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -26,15 +27,18 @@ public class ChattingService {
     private final MessageMapper messageMapper;
     private final SimpMessagingTemplate messagingTemplate;
     private final MemberRepository memberRepository;
+    private final ProfanityService profanityService;
 
     ChattingService(MessageRepository messageRepository,
         PartyRepository partyRepository, MessageMapper messageMapper,
-        SimpMessagingTemplate messagingTemplate, MemberRepository memberRepository) {
+        SimpMessagingTemplate messagingTemplate, MemberRepository memberRepository,
+        ProfanityService profanityService) {
         this.messageRepository = messageRepository;
         this.partyRepository = partyRepository;
         this.messageMapper = messageMapper;
         this.messagingTemplate = messagingTemplate;
         this.memberRepository = memberRepository;
+        this.profanityService = profanityService;
     }
 
     /**
@@ -118,7 +122,9 @@ public class ChattingService {
             throw new MemberNotInPartyException("멤버가 해당 파티의 구성원이 아닙니다.");
         }
 
-        MessageEntity message = new MessageEntity(party, sender, content, MessageType.TALK);
+        String masked = profanityService.maskSmart(content);
+
+        MessageEntity message = new MessageEntity(party, sender, masked, MessageType.TALK);
         messageRepository.save(message);
 
         return messageMapper.convertToResponseDTO(message);

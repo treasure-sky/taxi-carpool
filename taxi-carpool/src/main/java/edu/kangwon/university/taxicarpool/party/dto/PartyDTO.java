@@ -1,6 +1,7 @@
 package edu.kangwon.university.taxicarpool.party.dto;
 
 import edu.kangwon.university.taxicarpool.map.MapPlaceDTO;
+import edu.kangwon.university.taxicarpool.profanity.NoProfanity;
 import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.NotNull;
@@ -249,6 +250,7 @@ public class PartyDTO {
         private LocalDateTime startDateTime;
 
         @Size(max = 30, message = "설명은 최대 30글자입니다.")
+        @NoProfanity(message = "설명에 비속어가 포함되어 있습니다.")
         private String comment;
 
         private int currentParticipantCount;
@@ -379,6 +381,7 @@ public class PartyDTO {
         private LocalDateTime startDateTime;
 
         @Size(max = 30, message = "설명은 최대 30글자입니다.")
+        @NoProfanity(message = "설명에 비속어가 포함되어 있습니다.")
         private String comment;
 
         @Max(value = 4, message = "택시의 최대 탑승 인원 수는 4명입니다.")
@@ -388,6 +391,7 @@ public class PartyDTO {
 
         private MapPlaceDTO endPlace;
 
+        @NoProfanity(message = "공지에 비속어가 포함되어 있습니다.")
         private String notification;
 
         public PartyUpdateRequestDTO(
