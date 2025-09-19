@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import java.util.List;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -76,7 +77,7 @@ public class ChattingController {
     @PutMapping("/notification")
     public ResponseEntity<NotificationResponseDTO> updateNotification(
         @Parameter(description = "수정할 파티 ID", required = true) @PathVariable Long partyId,
-        @RequestBody NotificationRequestDTO request
+        @RequestBody @Valid NotificationRequestDTO request
     ) {
         Long memberId = (Long) SecurityContextHolder.getContext().getAuthentication()
             .getPrincipal();
