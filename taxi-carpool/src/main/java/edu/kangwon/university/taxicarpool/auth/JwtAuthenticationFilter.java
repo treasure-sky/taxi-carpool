@@ -1,12 +1,15 @@
 package edu.kangwon.university.taxicarpool.auth;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.kangwon.university.taxicarpool.auth.authException.TokenExpiredException;
 import edu.kangwon.university.taxicarpool.auth.authException.TokenInvalidException;
+import edu.kangwon.university.taxicarpool.member.MemberRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Map;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -15,9 +18,11 @@ import org.springframework.web.filter.OncePerRequestFilter;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtUtil jwtUtil;
+    private final MemberRepository memberRepository;
 
-    public JwtAuthenticationFilter(JwtUtil jwtUtil) {
+    public JwtAuthenticationFilter(JwtUtil jwtUtil, MemberRepository memberRepository) {
         this.jwtUtil = jwtUtil;
+        this.memberRepository = memberRepository;
     }
 
     @Override
@@ -36,6 +41,17 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 if (jwtUtil.validateToken(token)) {
                     // 3) 토큰에서 사용자 식별값(id) 추출
                     Long id = jwtUtil.getIdFromToken(token);
+                    int verInToken = jwtUtil.getTokenVersionFromToken(token);
+
+                    // 3-1) DB의 최신 tokenVersion 조회
+                    int verInDb = memberRepository.findTokenVersionById(id);
+
+                    // 3-2) 버전 불일치면 "다른 기기에서 더 최근에 로그인" → 401
+                    if (verInToken != verInDb) {
+                        writeUnauthorized(response, "AUTH-VERSION-MISMATCH",
+                            "다른 기기에서 더 최근에 로그인되어 현재 토큰이 무효화되었습니다. 다시 로그인해주세요.");
+                        return;
+                    }
 
                     // 4) 인증 객체 생성 (권한이 필요하면 loadUserByUsername() 등을 통해 가져올 수 있음)
                     UsernamePasswordAuthenticationToken authentication =
@@ -48,17 +64,30 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 }
             } catch (TokenExpiredException e) {
                 // 토큰 만료 시 401 응답 -> 프론트측에서 이거 받고 Axios를 통해 재요청 보내면 댐.
-                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                response.getWriter().write("Access Token 만료");
+                writeUnauthorized(response, "AUTH-EXPIRED", "Access 토큰이 만료되었습니다.");
                 return;
             } catch (TokenInvalidException e) {
                 // 토큰이 위조되었거나 형식이 잘못됨
-                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                response.getWriter().write("위조 or 형식이 잘못된 토큰");
+                writeUnauthorized(response, "AUTH-INVALID", "유효하지 않은 토큰입니다.");
                 return;
             }
         }
         // 다음 필터로 진행
         filterChain.doFilter(request, response);
     }
+
+    private void writeUnauthorized(HttpServletResponse response, String code, String message) throws IOException {
+        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        response.setCharacterEncoding("UTF-8");
+        response.setContentType("application/json;charset=UTF-8");
+
+        Map<String, Object> body = Map.of(
+            "status", 401,
+            "code", code,
+            "message", message,        // 한글 메시지 OK
+            "timestamp", System.currentTimeMillis()
+        );
+        new ObjectMapper().writeValue(response.getWriter(), body);
+    }
+
 }
