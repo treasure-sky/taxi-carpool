@@ -28,15 +28,15 @@ public class JwtUtil {
     private String SECRET_KEY;
 
     // 엑세스 토큰 생성 메서드
-    public String generateAccessToken(Long id) {
+    public String generateAccessToken(Long id, int tokenVersion) {
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + ACCESS_EXPIRATION);
 
-        // 헤더랑 페이로드, 사용자 정보(id)로 시그니처 만듦.
         return Jwts.builder()
-            .setSubject(String.valueOf(id))         // 토큰 식별자 (id 등)
-            .setIssuedAt(now)          // 발급 시간
-            .setExpiration(expiryDate) // 만료 시간
+            .setSubject(String.valueOf(id))
+            .setIssuedAt(now)
+            .setExpiration(expiryDate)
+            .claim("ver", tokenVersion)
             .signWith(getSigningKey(), SignatureAlgorithm.HS256)
             .compact();
     }
@@ -68,6 +68,15 @@ public class JwtUtil {
             .getBody()
             .getSubject();
         return Long.parseLong(subject);
+    }
+
+    public int getTokenVersionFromToken(String token) {
+        return Jwts.parserBuilder()
+            .setSigningKey(getSigningKey())
+            .build()
+            .parseClaimsJws(token)
+            .getBody()
+            .get("ver", Integer.class);
     }
 
     // 토큰 검증
