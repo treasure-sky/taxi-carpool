@@ -7,6 +7,7 @@ import edu.kangwon.university.taxicarpool.auth.dto.LoginDTO;
 import edu.kangwon.university.taxicarpool.email.EmailVerificationService;
 import edu.kangwon.university.taxicarpool.email.exception.EmailVerificationNotFoundException;
 import edu.kangwon.university.taxicarpool.member.MemberEntity;
+import edu.kangwon.university.taxicarpool.member.MemberRepository;
 import edu.kangwon.university.taxicarpool.member.MemberService;
 import edu.kangwon.university.taxicarpool.member.dto.MemberCreateDTO;
 import edu.kangwon.university.taxicarpool.member.dto.MemberDetailDTO;
@@ -25,18 +26,21 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
     private final RefreshTokenRepository refreshTokenRepository;
+    private final MemberRepository memberRepository;
 
     @Autowired
     public AuthService(MemberService memberService,
         EmailVerificationService emailVerificationService,
         PasswordEncoder passwordEncoder,
         JwtUtil jwtUtil,
-        RefreshTokenRepository refreshTokenRepository) {
+        RefreshTokenRepository refreshTokenRepository,
+        MemberRepository memberRepository) {
         this.memberService = memberService;
         this.emailVerificationService = emailVerificationService;
         this.passwordEncoder = passwordEncoder;
         this.jwtUtil = jwtUtil;
         this.refreshTokenRepository = refreshTokenRepository;
+        this.memberRepository = memberRepository;
     }
 
     // 회원가입
@@ -61,7 +65,10 @@ public class AuthService {
 
         // 회원가입 DB를 거쳐서 회원임이 검증된 이후.
         // 엑세스 토큰, 리프래쉬 토큰 생성
-        String accessToken = jwtUtil.generateAccessToken(member.getId());
+        member.setTokenVersion(member.getTokenVersion() + 1);
+        memberRepository.save(member); // 같은 트랜잭션 내
+        String accessToken = jwtUtil.generateAccessToken(member.getId(), member.getTokenVersion());
+
         String refreshToken = jwtUtil.generateRefreshToken(member.getId());
 
         // 리프래쉬 토큰 만료 시점 (1주) generateRefreshToken()에서 생성한 거 말고
@@ -100,7 +107,10 @@ public class AuthService {
 
         // 새 액세스 토큰 발급
         Long id = tokenEntity.getMember().getId();
-        String newAccessToken = jwtUtil.generateAccessToken(id);
+        MemberEntity fresh = memberRepository.findById(id)
+            .orElseThrow(() -> new TokenInvalidException("회원 정보를 찾을 수 없습니다."));
+
+        String newAccessToken = jwtUtil.generateAccessToken(id, fresh.getTokenVersion());
 
         // 응답 DTO
         return new LoginDTO.RefreshResponseDTO(newAccessToken, tokenEntity.getRefreshToken());

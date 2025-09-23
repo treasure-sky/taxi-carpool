@@ -56,6 +56,9 @@ public class MemberEntity {
     @Column(name = "total_saved_amount", nullable = false)
     private long totalSavedAmount = 0L;
 
+    @Column(nullable = false)
+    private int tokenVersion = 0;
+
     public Long getId() {
         return id;
     }
@@ -114,6 +117,14 @@ public class MemberEntity {
 
     public void setTotalSavedAmount(long totalSavedAmount) {
         this.totalSavedAmount = totalSavedAmount;
+    }
+
+    public int getTokenVersion() {
+        return tokenVersion;
+    }
+
+    public void setTokenVersion(int tokenVersion) {
+        this.tokenVersion = tokenVersion;
     }
 
     /** 절감 금액을 누적하는 편의 메서드 */

@@ -4,6 +4,7 @@ import static org.springframework.security.config.Customizer.withDefaults;
 
 import edu.kangwon.university.taxicarpool.auth.JwtAuthenticationFilter;
 import edu.kangwon.university.taxicarpool.auth.JwtUtil;
+import edu.kangwon.university.taxicarpool.member.MemberRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -23,9 +24,11 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 public class SecurityConfig {
 
     private final JwtUtil jwtUtil;
+    private final MemberRepository memberRepository;
 
-    public SecurityConfig(JwtUtil jwtUtil) {
+    public SecurityConfig(JwtUtil jwtUtil, MemberRepository memberRepository) { // ★ 변경
         this.jwtUtil = jwtUtil;
+        this.memberRepository = memberRepository;
     }
 
     @Bean
@@ -39,7 +42,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         // 커스텀 JWT 필터 생성
-        JwtAuthenticationFilter jwtFilter = new JwtAuthenticationFilter(jwtUtil);
+        JwtAuthenticationFilter jwtFilter = new JwtAuthenticationFilter(jwtUtil, memberRepository);
 
         http
             .cors(withDefaults())
