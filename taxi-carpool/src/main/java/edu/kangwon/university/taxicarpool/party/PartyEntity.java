@@ -3,93 +3,22 @@ package edu.kangwon.university.taxicarpool.party;
 import edu.kangwon.university.taxicarpool.chatting.MessageEntity;
 import edu.kangwon.university.taxicarpool.map.MapPlace;
 import edu.kangwon.university.taxicarpool.member.MemberEntity;
-import jakarta.persistence.AttributeOverride;
-import jakarta.persistence.AttributeOverrides;
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Embedded;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EntityListeners;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
-import jakarta.persistence.ManyToMany;
-import jakarta.persistence.OneToMany;
-import jakarta.validation.constraints.NotNull;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
+import jakarta.persistence.*;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity(name = "party")
 @EntityListeners(AuditingEntityListener.class)
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED) // JPA 프록시용 기본 생성자
 public class PartyEntity {
-
-    public PartyEntity() {
-    }
-
-    public PartyEntity(
-        String name,
-        List<MemberEntity> memberEntities,
-        Long hostMemberId,
-        LocalDateTime endDate,
-        boolean sameGenderOnly,
-        boolean costShareBeforeDropOff,
-        boolean quietMode,
-        boolean destinationChange5Minutes,
-        LocalDateTime startDateTime,
-        String comment,
-        int currentParticipantCount,
-        int maxParticipantCount,
-        MapPlace startPlace,
-        MapPlace endPlace
-    ) {
-        this.name = name;
-        this.isDeleted = false;
-        this.memberEntities = memberEntities;
-        this.hostMemberId = hostMemberId;
-        this.endDate = endDate;
-        this.sameGenderOnly = sameGenderOnly;
-        this.costShareBeforeDropOff = costShareBeforeDropOff;
-        this.quietMode = quietMode;
-        this.destinationChangeIn5Minutes = destinationChange5Minutes;
-        this.startDateTime = startDateTime;
-        this.comment = comment;
-        this.currentParticipantCount = currentParticipantCount;
-        this.maxParticipantCount = maxParticipantCount;
-        this.startPlace = startPlace;
-        this.endPlace = endPlace;
-    }
-
-    public PartyEntity(
-        Long hostMemberId,
-        boolean sameGenderOnly,
-        boolean costShareBeforeDropOff,
-        boolean quietMode,
-        boolean destinationChange5Minutes,
-        LocalDateTime startDateTime,
-        String comment,
-        int currentParticipantCount,
-        int maxParticipantCount,
-        MapPlace startPlace,
-        MapPlace endPlace
-    ) {
-        this.hostMemberId = hostMemberId;
-        this.sameGenderOnly = sameGenderOnly;
-        this.costShareBeforeDropOff = costShareBeforeDropOff;
-        this.quietMode = quietMode;
-        this.destinationChangeIn5Minutes = destinationChange5Minutes;
-        this.startDateTime = startDateTime;
-        this.comment = comment;
-        this.currentParticipantCount = currentParticipantCount;
-        this.maxParticipantCount = maxParticipantCount;
-        this.startPlace = startPlace;
-        this.endPlace = endPlace;
-    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -175,148 +104,46 @@ public class PartyEntity {
     @Column(name = "savings_calculated", nullable = false)
     private boolean savingsCalculated = false;
 
-    public String getName() {
-        return name;
-    }
-
-    public boolean isDeleted() {
-        return isDeleted;
-    }
-
-    public List<MemberEntity> getMemberEntities() {
-        return memberEntities;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public LocalDateTime getEndDate() {
-        return endDate;
-    }
-
-    public Long getHostMemberId() {
-        return hostMemberId;
-    }
-
-    public void setHostMemberId(Long hostMemberId) {
+    public PartyEntity(
+        Long hostMemberId,
+        boolean sameGenderOnly,
+        boolean costShareBeforeDropOff,
+        boolean quietMode,
+        boolean destinationChange5Minutes,
+        LocalDateTime startDateTime,
+        String comment,
+        int currentParticipantCount,
+        int maxParticipantCount,
+        MapPlace startPlace,
+        MapPlace endPlace
+    ) {
         this.hostMemberId = hostMemberId;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public LocalDateTime getLastModifiedAt() {
-        return lastModifiedAt;
-    }
-
-    public boolean isExpired() {
-        return this.endDate != null && this.endDate.isBefore(LocalDateTime.now());
-    }
-
-    public boolean isActive() {
-        return !isDeleted;
+        this.sameGenderOnly = sameGenderOnly;
+        this.costShareBeforeDropOff = costShareBeforeDropOff;
+        this.quietMode = quietMode;
+        this.destinationChangeIn5Minutes = destinationChange5Minutes;
+        this.startDateTime = startDateTime;
+        this.comment = comment;
+        this.currentParticipantCount = currentParticipantCount;
+        this.maxParticipantCount = maxParticipantCount;
+        this.startPlace = startPlace;
+        this.endPlace = endPlace;
     }
 
     public void setDeleted(boolean deleted) {
         isDeleted = deleted;
     }
 
-    public boolean isSameGenderOnly() {
-        return sameGenderOnly;
-    }
-
-    public void setSameGenderOnly(boolean sameGenderOnly) {
-        this.sameGenderOnly = sameGenderOnly;
-    }
-
-    public boolean isCostShareBeforeDropOff() {
-        return costShareBeforeDropOff;
-    }
-
-    public void setCostShareBeforeDropOff(boolean costShareBeforeDropOff) {
-        this.costShareBeforeDropOff = costShareBeforeDropOff;
-    }
-
-    public boolean isQuietMode() {
-        return quietMode;
-    }
-
-    public void setQuietMode(boolean quietMode) {
-        this.quietMode = quietMode;
-    }
-
-    public boolean isDestinationChangeIn5Minutes() {
-        return destinationChangeIn5Minutes;
-    }
-
-    public void setDestinationChangeIn5Minutes(boolean destinationChangeIn5Minutes) {
-        this.destinationChangeIn5Minutes = destinationChangeIn5Minutes;
-    }
-
-    public LocalDateTime getStartDateTime() {
-        return startDateTime;
-    }
-
-    public void setStartDateTime(LocalDateTime startDateTime) {
-        this.startDateTime = startDateTime;
-    }
-
-    public String getComment() {
-        return comment;
-    }
-
-    public void setComment(String comment) {
-        this.comment = comment;
-    }
-
-    public int getCurrentParticipantCount() {
-        return currentParticipantCount;
+    public void setHostMemberId(Long hostMemberId) {
+        this.hostMemberId = hostMemberId;
     }
 
     public void setCurrentParticipantCount(int currentParticipantCount) {
         this.currentParticipantCount = currentParticipantCount;
     }
 
-    public int getMaxParticipantCount() {
-        return maxParticipantCount;
-    }
-
-    public void setMaxParticipantCount(int maxParticipantCount) {
-        this.maxParticipantCount = maxParticipantCount;
-    }
-
-    public List<MessageEntity> getMessages() {
-        return messages;
-    }
-
-    public MapPlace getStartPlace() {
-        return startPlace;
-    }
-
-    public void setStartPlace(MapPlace startPlace) {
-        this.startPlace = startPlace;
-    }
-
-    public MapPlace getEndPlace() {
-        return endPlace;
-    }
-
-    public void setEndPlace(MapPlace endPlace) {
-        this.endPlace = endPlace;
-    }
-
-    public String getNotification() {
-        return notification;
-    }
-
     public void setNotification(String notification) {
         this.notification = notification;
-    }
-
-    public boolean isSavingsCalculated() {
-        return savingsCalculated;
     }
 
     public void setSavingsCalculated(boolean savingsCalculated) {
@@ -347,5 +174,4 @@ public class PartyEntity {
         this.notification = notification;
         return this;
     }
-
 }
