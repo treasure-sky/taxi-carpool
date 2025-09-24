@@ -3,7 +3,6 @@ package edu.kangwon.university.taxicarpool.profanity;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StreamUtils;
-
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.regex.Pattern;
@@ -35,7 +34,7 @@ public class ProfanityService {
     );
 
     // 한글/영문/숫자만 남기고 나머지 제거
-    private static final Pattern NON_KR_EN_NUM = Pattern.compile("[^0-9A-Za-z가-힣]");
+    private static final Pattern NON_KR_EN_NUM = Pattern.compile("[^0-9A-Za-z가-힣ㄱ-ㅎㅏ-ㅣ]");
 
     public ProfanityService() {
         this.blacklist = loadDefaultBlacklist();
@@ -51,9 +50,15 @@ public class ProfanityService {
     public boolean contains(String value, Set<String> allowlist) {
         if (value == null) return false;
         String norm = normalize(value);
+
         for (String bad : blacklist) {
+            if (bad == null || bad.isBlank()) continue;
             if (allowlist != null && allowlist.contains(bad)) continue;
-            if (norm.contains(normalize(bad))) {
+
+            String badNorm = normalize(bad);
+            if (badNorm.isEmpty()) continue;
+
+            if (norm.contains(badNorm)) {
                 return true;
             }
         }
@@ -62,7 +67,7 @@ public class ProfanityService {
 
     /**
      * 변형(띄어쓰기/특수문자/leet/'ㅡ' 삽입 등)을 정규화로 흡수한 뒤,
-     * 원문 내 대응 구간만 ★로 마스킹한다.
+     * 원문 내 대응 구간만 *로 마스킹한다.
      *  - 예: "ㅅㅡ ㅂ", "c!b@l", "씨--발" 등
      */
     public String maskSmart(String value) {
@@ -109,7 +114,7 @@ public class ProfanityService {
 
                 int hitEnd = hit + badNorm.length() - 1;
 
-                // 3) 정규화 인덱스 [hit..hitEnd]를 생산한 원문 인덱스들을 ★ 마킹
+                // 3) 정규화 인덱스 [hit..hitEnd]를 생산한 원문 인덱스들을 * 마킹
                 for (int i = 0; i < mapToNorm.length; i++) {
                     int ni = mapToNorm[i];
                     if (ni >= 0 && ni >= hit && ni <= hitEnd) {
@@ -121,10 +126,10 @@ public class ProfanityService {
             }
         }
 
-        // 4) maskFlags가 true인 원문 문자만 ★로 치환하여 반환
+        // 4) maskFlags가 true인 원문 문자만 *로 치환하여 반환
         StringBuilder out = new StringBuilder(original.length);
         for (int i = 0; i < original.length; i++) {
-            out.append(maskFlags[i] ? '★' : original[i]);
+            out.append(maskFlags[i] ? '*' : original[i]);
         }
         return out.toString();
     }
