@@ -27,7 +27,6 @@ public class MessageEntity {
     @NotNull
     private PartyEntity party;
 
-    // 회원 탈퇴시 null 가능
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "sender_id")
     private MemberEntity sender;
