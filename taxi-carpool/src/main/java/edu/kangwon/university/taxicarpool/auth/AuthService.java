@@ -3,7 +3,10 @@ package edu.kangwon.university.taxicarpool.auth;
 import edu.kangwon.university.taxicarpool.auth.authException.AuthenticationFailedException;
 import edu.kangwon.university.taxicarpool.auth.authException.TokenExpiredException;
 import edu.kangwon.university.taxicarpool.auth.authException.TokenInvalidException;
-import edu.kangwon.university.taxicarpool.auth.dto.LoginDTO;
+import edu.kangwon.university.taxicarpool.auth.dto.LoginRequest;
+import edu.kangwon.university.taxicarpool.auth.dto.LoginResponse;
+import edu.kangwon.university.taxicarpool.auth.dto.RefreshRequestDTO;
+import edu.kangwon.university.taxicarpool.auth.dto.RefreshResponseDTO;
 import edu.kangwon.university.taxicarpool.email.EmailVerificationService;
 import edu.kangwon.university.taxicarpool.email.exception.EmailVerificationNotFoundException;
 import edu.kangwon.university.taxicarpool.member.MemberEntity;
@@ -55,7 +58,7 @@ public class AuthService {
     }
 
     // 로그인
-    public LoginDTO.LoginResponse login(LoginDTO.LoginRequest request) {
+    public LoginResponse login(LoginRequest request) {
 
         MemberEntity member = memberService.getMemberEntityByEmail(request.getEmail());
 
@@ -89,11 +92,11 @@ public class AuthService {
 
         // 응답 DTO
         // 일단 액세스 토큰, 리프래쉬 토큰, 이메일 리턴
-        return new LoginDTO.LoginResponse(accessToken, refreshToken, member.getEmail());
+        return new LoginResponse(accessToken, refreshToken, member.getEmail());
     }
 
     // 리프래쉬 토큰으로 액세스 토큰 재발급
-    public LoginDTO.RefreshResponseDTO refresh(LoginDTO.RefreshRequestDTO request) {
+    public RefreshResponseDTO refresh(RefreshRequestDTO request) {
         // DB에서 리프래쉬 토큰 조회
         RefreshTokenEntity tokenEntity = refreshTokenRepository.findByRefreshToken(
                 request.getRefreshToken())
@@ -113,7 +116,7 @@ public class AuthService {
         String newAccessToken = jwtUtil.generateAccessToken(id, fresh.getTokenVersion());
 
         // 응답 DTO
-        return new LoginDTO.RefreshResponseDTO(newAccessToken, tokenEntity.getRefreshToken());
+        return new RefreshResponseDTO(newAccessToken, tokenEntity.getRefreshToken());
     }
 
     // 로그아웃
