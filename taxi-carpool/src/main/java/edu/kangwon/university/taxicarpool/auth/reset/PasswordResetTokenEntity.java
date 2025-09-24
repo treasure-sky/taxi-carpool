@@ -2,15 +2,22 @@ package edu.kangwon.university.taxicarpool.auth.reset;
 
 import edu.kangwon.university.taxicarpool.member.MemberEntity;
 import jakarta.persistence.*;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "password_reset_token", indexes = {
     @Index(name = "idx_password_reset_token_jti", columnList = "jti", unique = true)
 })
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class PasswordResetTokenEntity {
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(nullable = false, unique = true, length = 100)
@@ -30,8 +37,6 @@ public class PasswordResetTokenEntity {
 
     private LocalDateTime usedAt;
 
-    protected PasswordResetTokenEntity() {}
-
     public PasswordResetTokenEntity(String jti, MemberEntity member, LocalDateTime expiresAt) {
         this.jti = jti;
         this.member = member;
@@ -48,12 +53,4 @@ public class PasswordResetTokenEntity {
         this.used = true;
         this.usedAt = LocalDateTime.now();
     }
-
-    public Long getId() { return id; }
-    public String getJti() { return jti; }
-    public MemberEntity getMember() { return member; }
-    public LocalDateTime getExpiresAt() { return expiresAt; }
-    public LocalDateTime getCreatedAt() { return createdAt; }
-    public boolean isUsed() { return used; }
-    public LocalDateTime getUsedAt() { return usedAt; }
 }

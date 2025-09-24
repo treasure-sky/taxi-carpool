@@ -1,26 +1,13 @@
 package edu.kangwon.university.taxicarpool.chatting.dto;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor              // JSON 역직렬화용
+@AllArgsConstructor             // content 필드 한 개짜리 생성자
 public class MessageCreateDTO {
 
-    // 사용자의 id는 토큰에서 추출
-    // 사용자의 메세지 생성은 하나의 타입만 가지므로 타입도 받지 않음
-
     private String content;
-
-    public MessageCreateDTO(String content) {
-        this.content = content;
-    }
-
-    public MessageCreateDTO() {
-    }
-
-    public String getContent() {
-        return content;
-    }
-
-    public void setContent(String content) {
-        this.content = content;
-    }
-
-
 }

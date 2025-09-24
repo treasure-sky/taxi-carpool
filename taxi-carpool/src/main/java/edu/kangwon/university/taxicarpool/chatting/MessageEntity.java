@@ -2,24 +2,20 @@ package edu.kangwon.university.taxicarpool.chatting;
 
 import edu.kangwon.university.taxicarpool.member.MemberEntity;
 import edu.kangwon.university.taxicarpool.party.PartyEntity;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EntityListeners;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import java.time.LocalDateTime;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import java.time.LocalDateTime;
+
 @Entity
 @EntityListeners(AuditingEntityListener.class)
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class MessageEntity {
 
     @Id
@@ -49,9 +45,6 @@ public class MessageEntity {
     @NotNull
     private MessageType type;
 
-    protected MessageEntity() {
-    }
-
     public MessageEntity(PartyEntity party, MemberEntity sender, String content, MessageType type) {
         this.party = party;
         this.sender = sender;
@@ -59,43 +52,7 @@ public class MessageEntity {
         this.type = type;
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public PartyEntity getParty() {
-        return party;
-    }
-
     public void setParty(PartyEntity party) {
         this.party = party;
-    }
-
-    public MemberEntity getSender() {
-        return sender;
-    }
-
-    public void setSender(MemberEntity sender) {
-        this.sender = sender;
-    }
-
-    public String getContent() {
-        return content;
-    }
-
-    public void setContent(String content) {
-        this.content = content;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public MessageType getType() {
-        return type;
-    }
-
-    public void setType(MessageType type) {
-        this.type = type;
     }
 }
