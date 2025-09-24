@@ -160,9 +160,4 @@ public class MemberService {
             .orElseThrow(() -> new MemberNotFoundException("존재하지 않는 이메일입니다: " + email));
     }
 
-    public boolean existsByEmail(String email) {
-        return memberRepository.existsByEmail(email);
-    }
-
-
 }
