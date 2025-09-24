@@ -63,19 +63,57 @@ public class PartyService {
         this.chattingService = chattingService;
     }
 
+    /**
+     * 단일 파티 정보를 조회합니다.
+     *
+     * <p>삭제되지 않은 파티만 조회하며, 존재하지 않으면 예외를 던집니다.</p>
+     *
+     * @param partyId 조회할 파티 ID
+     * @return 파티 응답 DTO
+     * @throws edu.kangwon.university.taxicarpool.party.partyException.PartyNotFoundException
+     *         해당 파티가 존재하지 않거나 삭제된 경우
+     */
+    @Transactional(readOnly = true)
     public PartyResponseDTO getParty(Long partyId) {
         PartyEntity partyEntity = partyRepository.findByIdAndIsDeletedFalse(partyId)
             .orElseThrow(() -> new PartyNotFoundException("해당 파티가 존재하지 않습니다."));
         return partyMapper.convertToResponseDTO(partyEntity);
     }
 
+    /**
+     * 파티 목록을 페이지네이션으로 조회합니다.
+     *
+     * <p>삭제되지 않은 파티를 생성일 내림차순으로 반환합니다.</p>
+     *
+     * @param page 페이지 번호(0-base)
+     * @param size 페이지 크기
+     * @return 파티 응답 DTO의 페이지
+     */
+    @Transactional(readOnly = true)
     public Page<PartyResponseDTO> getPartyList(Integer page, Integer size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Direction.DESC, "createdAt"));
         Page<PartyEntity> partyEntities = partyRepository.findAllByIsDeletedFalse(pageable);
         return partyEntities.map(partyMapper::convertToResponseDTO);
     }
 
-    @Transactional
+    /**
+     * 사용자 입력(출발지/도착지/출발시간)을 기준으로 커스텀 필터된 파티 목록을 조회합니다.
+     *
+     * <p>세 그룹(출발지, 도착지, 출발시간) 중 최소 1개 이상은 필수이며,
+     * 둘 이상 누락 시 예외가 발생합니다. 과거 출발시간은 허용하지 않습니다.</p>
+     *
+     * @param userDepartureLng 사용자 출발지 경도(x)
+     * @param userDepartureLat 사용자 출발지 위도(y)
+     * @param userDestinationLng 사용자 도착지 경도(x)
+     * @param userDestinationLat 사용자 도착지 위도(y)
+     * @param userDepartureTime 사용자 출발 시간(현재 이후)
+     * @param page 페이지 번호(0-base)
+     * @param size 페이지 크기
+     * @return 조건에 부합하는 파티 응답 DTO의 페이지
+     * @throws edu.kangwon.university.taxicarpool.party.partyException.PartyGetCustomException
+     *         입력 조합이 유효하지 않거나 출발시간이 과거인 경우
+     */
+    @Transactional(readOnly = true)
     public Page<PartyResponseDTO> getCustomPartyList(
         Double userDepartureLng,
         Double userDepartureLat,
@@ -87,7 +125,7 @@ public class PartyService {
         Pageable pageable = PageRequest.of(page, size);
 
         if (userDepartureTime != null && userDepartureTime.isBefore(LocalDateTime.now())) {
-            throw new IllegalArgumentException("출발 시간은 현재 시간보다 이후여야 합니다.");
+            throw new PartyGetCustomException("출발 시간은 현재 시간보다 이후여야 합니다.");
         }
 
         // 각 그룹(출발지, 도착지, 출발시간)의 누락 여부 확인
@@ -106,7 +144,6 @@ public class PartyService {
             missingCount++;
         }
 
-        // 2개 이상의 정보가 누락되었으면 예외 발생
         if (missingCount >= 2) {
             throw new PartyGetCustomException("출발지, 도착지, 출발시간에 대한 정보 중 2개 이상 넣어주세요!");
         }
@@ -123,7 +160,7 @@ public class PartyService {
                 userDepartureTime,
                 pageable);
 
-            // 출발지 정보가 누락된 경우
+        // 출발지 정보가 누락된 경우
         } else if (missingDeparture) {
             partyEntities = partyRepository.findCustomPartyList(
                 userDestinationLng,
@@ -131,7 +168,7 @@ public class PartyService {
                 userDepartureTime,
                 pageable);
 
-            // 도착지 정보가 누락된 경우
+        // 도착지 정보가 누락된 경우
         } else if (missingDestination) {
             partyEntities = partyRepository.findCustomPartyList(
                 userDepartureLng,
@@ -139,7 +176,7 @@ public class PartyService {
                 userDepartureTime,
                 pageable);
 
-            // 출발시간이 누락된 경우
+        // 출발시간이 누락된 경우
         } else if (missingDepartureTime) {
             partyEntities = partyRepository.findCustomPartyList(
                 userDepartureLng,
@@ -154,6 +191,18 @@ public class PartyService {
 
     }
 
+    /**
+     * 파티를 생성합니다.
+     *
+     * <p>호스트 멤버 ID를 파티에 설정하고, 해당 멤버를 초기 참가자로 등록합니다.</p>
+     *
+     * @param createRequestDTO 파티 생성 요청 DTO
+     * @param CreatorMemberId 파티 생성자(호스트) 멤버 ID
+     * @return 생성된 파티의 응답 DTO
+     * @throws java.lang.IllegalArgumentException 호스트 멤버 ID가 null인 경우
+     * @throws edu.kangwon.university.taxicarpool.member.exception.MemberNotFoundException
+     *         호스트 멤버가 존재하지 않는 경우
+     */
     @Transactional
     public PartyResponseDTO createParty(PartyCreateRequestDTO createRequestDTO,
         Long CreatorMemberId) {
@@ -162,22 +211,37 @@ public class PartyService {
 
         if (CreatorMemberId != null) {
             partyEntity.setHostMemberId(
-                CreatorMemberId); // creatorMemberId(파티를 만든 멤버의 ID)를 HostMemberId로 설정
+                CreatorMemberId);
         } else {
             throw new IllegalArgumentException("파티방을 만든 멤버의 Id가 null임.");
         }
 
-        // 처음 방 만든 멤버도 그 파티방의 멤버로 등록하는 것임.(이거 안 해놓으면 프론트한테 요청 2번 요청해야함.)
         MemberEntity member = memberRepository.findById(CreatorMemberId)
             .orElseThrow(() -> new MemberNotFoundException("파티방을 만든 멤버가 존재하지 않습니다."));
         partyEntity.getMemberEntities().add(member);
 
-        partyEntity.setCurrentParticipantCount(1); // 방 만들고, 현재 인원 1명으로 설정
+        partyEntity.setCurrentParticipantCount(1);
 
         PartyEntity savedPartyEntity = partyRepository.save(partyEntity);
         return partyMapper.convertToResponseDTO(savedPartyEntity);
     }
 
+    /**
+     * 파티 정보를 수정합니다.
+     *
+     * <p>호스트만 수정할 수 있으며, 현재 인원보다 작은 최대 인원으로는 설정할 수 없습니다.</p>
+     *
+     * @param partyId 파티 ID
+     * @param memberId 요청자 멤버 ID(호스트)
+     * @param updateRequestDTO 파티 수정 요청 DTO
+     * @return 수정된 파티 응답 DTO
+     * @throws edu.kangwon.university.taxicarpool.party.partyException.PartyNotFoundException
+     *         파티가 존재하지 않는 경우
+     * @throws edu.kangwon.university.taxicarpool.party.partyException.UnauthorizedHostAccessException
+     *         호스트가 아닌 사용자가 수정하려는 경우
+     * @throws edu.kangwon.university.taxicarpool.party.partyException.PartyInvalidMaxParticipantException
+     *         현재 인원보다 작은 최대 인원을 설정한 경우
+     */
     @Transactional
     public PartyResponseDTO updateParty(Long partyId, Long memberId,
         PartyUpdateRequestDTO updateRequestDTO) {
@@ -188,7 +252,6 @@ public class PartyService {
             throw new UnauthorizedHostAccessException("호스트만 수정할 수 있습니다.");
         }
 
-        // 현재 참여 인원보다 Max인원을 작게 설정하면 안 된다.
         if(existingPartyEntity.getCurrentParticipantCount() > updateRequestDTO.getMaxParticipantCount()) {
             throw new PartyInvalidMaxParticipantException("현재 참여 인원보다 작은 최대 인원으로 설정할 수 없습니다.");
         }
@@ -199,7 +262,19 @@ public class PartyService {
         return partyMapper.convertToResponseDTO(savedPartyEntity);
     }
 
-
+    /**
+     * 파티를 삭제(소프트 딜리트)합니다.
+     *
+     * <p>호스트만 삭제할 수 있습니다.</p>
+     *
+     * @param partyId 파티 ID
+     * @param memberId 요청자 멤버 ID(호스트)
+     * @return 삭제 결과 메시지 및 삭제된 파티 ID를 담은 맵
+     * @throws edu.kangwon.university.taxicarpool.party.partyException.PartyNotFoundException
+     *         파티가 존재하지 않는 경우
+     * @throws edu.kangwon.university.taxicarpool.party.partyException.UnauthorizedHostAccessException
+     *         호스트가 아닌 사용자가 삭제하려는 경우
+     */
     @Transactional
     public Map<String, Object> deleteParty(Long partyId, Long memberId) {
         PartyEntity partyEntity = partyRepository.findByIdAndIsDeletedFalse(partyId)
@@ -217,7 +292,26 @@ public class PartyService {
         return response;
     }
 
-    // 멤버가 파티방의 멤버로 참가하는 로직의 메서드
+    /**
+     * 파티에 참가합니다.
+     *
+     * <p>이미 삭제된 파티, 이미 참가한 멤버, 정원이 꽉 찬 경우는 허용되지 않습니다.
+     * 참가에 성공하면 시스템 입장 메시지를 생성합니다.</p>
+     *
+     * @param partyId 파티 ID
+     * @param memberId 참가 멤버 ID
+     * @return 갱신된 파티 응답 DTO
+     * @throws edu.kangwon.university.taxicarpool.party.partyException.PartyNotFoundException
+     *         파티가 존재하지 않는 경우
+     * @throws edu.kangwon.university.taxicarpool.party.partyException.PartyAlreadyDeletedException
+     *         파티가 이미 삭제된 경우
+     * @throws edu.kangwon.university.taxicarpool.member.exception.MemberNotFoundException
+     *         멤버가 존재하지 않는 경우
+     * @throws edu.kangwon.university.taxicarpool.party.partyException.MemberAlreadyInPartyException
+     *         이미 파티에 속한 멤버인 경우
+     * @throws edu.kangwon.university.taxicarpool.party.partyException.PartyFullException
+     *         파티 정원이 가득 찬 경우
+     */
     @Transactional
     public PartyResponseDTO joinParty(Long partyId, Long memberId) {
         PartyEntity party = partyRepository.findByIdAndIsDeletedFalse(partyId)
@@ -234,7 +328,6 @@ public class PartyService {
 
         party.getMemberEntities().add(member);
 
-        // 새로운 멤버가 파티 참가시, 현재인원 1명 추가
         int currentParticipantCount = party.getCurrentParticipantCount();
         if (currentParticipantCount < party.getMaxParticipantCount()) {
             currentParticipantCount += 1;
@@ -248,6 +341,22 @@ public class PartyService {
         return partyMapper.convertToResponseDTO(savedParty);
     }
 
+    /**
+     * 파티에서 탈퇴합니다.
+     *
+     * <p>마지막 인원이 탈퇴하면 파티는 삭제 처리됩니다. 호스트가 탈퇴하는 경우,
+     * 남아있는 첫 번째 멤버가 새 호스트로 승격됩니다. 탈퇴에 성공하면 시스템 퇴장 메시지를 생성합니다.</p>
+     *
+     * @param partyId 파티 ID
+     * @param memberId 탈퇴 멤버 ID
+     * @return 갱신된 파티 응답 DTO
+     * @throws edu.kangwon.university.taxicarpool.party.partyException.PartyNotFoundException
+     *         파티가 존재하지 않는 경우
+     * @throws edu.kangwon.university.taxicarpool.member.exception.MemberNotFoundException
+     *         멤버가 존재하지 않는 경우
+     * @throws edu.kangwon.university.taxicarpool.party.partyException.MemberNotInPartyException
+     *         해당 파티에 속하지 않은 멤버인 경우
+     */
     @Transactional
     public PartyResponseDTO leaveParty(Long partyId, Long memberId) {
         PartyEntity party = partyRepository.findByIdAndIsDeletedFalse(partyId)
@@ -259,11 +368,10 @@ public class PartyService {
             throw new MemberNotInPartyException("이 멤버는 해당 파티에 속해있지 않습니다.");
         }
 
-        // 호스트인 멤버가 파티를 떠나려고 할 때의 로직을 위한 isHostLeaving
+        // 호스트인 멤버가 파티를 떠나려고 할 때
         boolean isHostLeaving = (party.getHostMemberId() != null
             && party.getHostMemberId().equals(memberId));
 
-        // 파티에서 멤버 제거
         party.getMemberEntities().remove(member);
 
         // 파티의 현재 인원 수 감소시키기
@@ -272,20 +380,18 @@ public class PartyService {
             currentParticipantCount -= 1;
             party.setCurrentParticipantCount(currentParticipantCount);
         } else {
-            // 앱의 플로우상 마지막으로 떠나는 멤버가 호스트일수밖에 없어서, 해당 코드가 필요하지 않을 것 같긴한데, 혹시 몰라서 일단 추가해둠.
             party.setDeleted(true);
             return partyMapper.convertToResponseDTO(party);
         }
 
-        // 호스트인 멤버가 파티를 떠나려고 할 때의 로직.
+        // 호스트인 멤버가 파티를 떠나려고 할 때
         if (isHostLeaving) {
             List<MemberEntity> remaining = party.getMemberEntities();
             if (remaining.isEmpty()) {
-                // 아무도 없으면 삭제 처리
                 party.setDeleted(true);
                 return partyMapper.convertToResponseDTO(party);
             } else {
-                // 첫 멤버를 새 호스트로(호스트 제외하고 가장 빨리 들어온 멤버)
+                // 첫 멤버를 새 호스트로
                 MemberEntity nextHost = remaining.get(0);
                 party.setHostMemberId(nextHost.getId());
             }
@@ -297,10 +403,12 @@ public class PartyService {
     }
 
     /**
-     * 사용자가 속한 모든 파티를 조회합니다.
+     * 특정 멤버가 속한 활성 파티 목록을 조회합니다.
      *
-     * @param memberId 사용자 ID
-     * @return 사용자가 속한 모든 파티 목록
+     * @param memberId 멤버 ID
+     * @return 멤버가 참여 중인 활성 파티 응답 DTO 목록
+     * @throws edu.kangwon.university.taxicarpool.member.exception.MemberNotFoundException
+     *         멤버가 존재하지 않는 경우
      */
     @Transactional(readOnly = true)
     public List<PartyResponseDTO> getMyParties(Long memberId) {
@@ -316,12 +424,32 @@ public class PartyService {
             .toList();
     }
 
+    /**
+     * 카카오모빌리티 길찾기 API의 예측 요금을 이용해 파티의 절감 금액을 계산하고 각 멤버의 누적 절감액에 반영합니다.
+     *
+     * <p>호스트만 실행할 수 있으며, 한 번 계산이 완료된 파티는 재계산할 수 없습니다.
+     * 출발/도착 좌표와 출발 시간이 유효해야 하며, 외부 API 호출/파싱 실패 시 예외가 발생합니다.</p>
+     *
+     * @param partyId 파티 ID
+     * @param requesterId 요청자(호스트) 멤버 ID
+     * @return 절감 계산 결과(참여 인원, 출발시간, 원/목적지, 총 요금, 1인당 부담액, 1인당 절감액 등)
+     * @throws edu.kangwon.university.taxicarpool.party.partyException.PartyNotFoundException
+     *         파티가 존재하지 않는 경우
+     * @throws edu.kangwon.university.taxicarpool.party.partyException.UnauthorizedHostAccessException
+     *         호스트가 아닌 사용자가 요청한 경우
+     * @throws edu.kangwon.university.taxicarpool.party.partyException.SavingsAlreadyCalculatedException
+     *         이미 절감 계산이 완료된 경우
+     * @throws java.lang.IllegalArgumentException 출발/도착 좌표가 없거나 범위를 벗어난 경우
+     * @throws edu.kangwon.university.taxicarpool.party.partyException.KakaoApiException
+     *         외부 API 호출 실패/응답 오류/파싱 실패 등
+     * @throws edu.kangwon.university.taxicarpool.party.partyException.MemberNotInPartyException
+     *         파티 참여 인원이 0명인 경우
+     */
     @Transactional
     public Map<String, Object> calculateSavings(Long partyId, Long requesterId) {
         PartyEntity party = partyRepository.findByIdAndIsDeletedFalse(partyId)
             .orElseThrow(() -> new PartyNotFoundException("해당 파티가 존재하지 않습니다."));
 
-        // 1) 요청자(호스트) 검증
         if (party.getHostMemberId() == null || !party.getHostMemberId().equals(requesterId)) {
             throw new UnauthorizedHostAccessException("호스트만 절감 금액 계산을 수행할 수 있습니다.");
         }
@@ -330,7 +458,6 @@ public class PartyService {
             throw new SavingsAlreadyCalculatedException("해당 파티("+ partyId +")는 이미 절감 계산이 완료되었습니다.");
         }
 
-        // 2) 필수 파라미터 구성 (origin, destination, departure_time)
         if (party.getStartPlace() == null || party.getEndPlace() == null) {
             throw new IllegalArgumentException("출발/도착 좌표가 없습니다.");
         }
@@ -345,7 +472,6 @@ public class PartyService {
         String origin = sx + "," + sy;
         String destination = ex + "," + ey;
 
-        // departure_time: YYYYMMDDHHMM (현재 이후가 요구되므로, 과거면 현재+2분로 보정)
         LocalDateTime depTime = party.getStartDateTime() != null
             ? party.getStartDateTime()
             : LocalDateTime.now().plusMinutes(2);
@@ -354,13 +480,13 @@ public class PartyService {
         }
         String departureTime = depTime.format(java.time.format.DateTimeFormatter.ofPattern("yyyyMMddHHmm"));
 
-        // 3) 카카오 모빌리티 API 호출
+        // 카카오 모빌리티 API 호출
         String url = UriComponentsBuilder
             .fromHttpUrl("https://apis-navi.kakaomobility.com/v1/future/directions")
             .queryParam("origin", origin)
             .queryParam("destination", destination)
             .queryParam("departure_time", departureTime)
-            .build(true) // 인코딩 보존
+            .build(true)
             .toUriString();
 
         HttpHeaders headers = new HttpHeaders();
@@ -379,7 +505,7 @@ public class PartyService {
             throw new KakaoApiException("카카오 API 호출 실패: 응답 본문이 비어있음. URL=" + url);
         }
 
-        // 4) taxi 요금 추출: routes[0].summary.fare.taxi
+        // taxi 요금 추출
         ObjectMapper mapper = new ObjectMapper();
         JsonNode root;
         try {
@@ -402,7 +528,7 @@ public class PartyService {
             .orElseThrow(() -> new KakaoApiException("카카오 API 응답 오류: 유효한 택시 요금을 가져오지 못했습니다."));
 
 
-        // 5) 절감 금액 계산 및 멤버 누적 반영
+        // 절감 금액 계산 및 멤버 누적 반영
         List<MemberEntity> members = party.getMemberEntities();
         int participants = (members != null) ? members.size() : 0;
         if (participants <= 0) {
@@ -412,7 +538,6 @@ public class PartyService {
         long eachShare = totalTaxiFare / participants;
         long savingPerMember = totalTaxiFare - eachShare; // "택시 비용 - (택시 비용 / 인원수)"
 
-        // 누적 반영
         for (MemberEntity m : members) {
             m.addToTotalSavedAmount(savingPerMember);
         }
@@ -421,7 +546,6 @@ public class PartyService {
         party.setSavingsCalculated(true);
         partyRepository.save(party);
 
-        // 6) 응답 구성
         Map<String, Object> result = new HashMap<>();
         result.put("partyId", partyId);
         result.put("participants", participants);
@@ -435,10 +559,15 @@ public class PartyService {
         return result;
     }
 
+    /**
+     * 좌표 유효성을 검증합니다(대략적인 한반도 범위).
+     *
+     * @param x 경도
+     * @param y 위도
+     * @param label 검증 대상 라벨(출발지/도착지 등)
+     * @throws java.lang.IllegalArgumentException 좌표가 허용 범위를 벗어난 경우
+     */
     private void validateCoordinates(double x, double y, String label) {
-        // 기본 좌표 유효성: 대략 한반도 범위 내로 제한
-        // 경도: 124 ~ 132 (동서 방향)
-        // 위도: 33 ~ 39 (남북 방향)
         if (x < 124 || x > 132) {
             throw new IllegalArgumentException(label + " 경도(x)가 한반도 범위를 벗어났습니다: x=" + x);
         }
