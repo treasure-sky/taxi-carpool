@@ -17,7 +17,7 @@ import java.util.List;
 @Entity(name = "party")
 @EntityListeners(AuditingEntityListener.class)
 @Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED) // JPA 프록시용 기본 생성자
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class PartyEntity {
 
     @Id

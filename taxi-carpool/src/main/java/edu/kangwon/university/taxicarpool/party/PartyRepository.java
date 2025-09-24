@@ -18,8 +18,6 @@ public interface PartyRepository extends JpaRepository<PartyEntity, Long> {
 
     Optional<PartyEntity> findByIdAndIsDeletedFalse(Long partyId);
 
-    boolean existsByNameAndIsDeletedFalse(String name);
-
     Page<PartyEntity> findAllByIsDeletedFalse(Pageable pageable);
 
     // 모든 파라미터가 온 경우
@@ -48,7 +46,7 @@ public interface PartyRepository extends JpaRepository<PartyEntity, Long> {
         Pageable pageable
     );
 
-    // 출발지 또는 도착지에 대한 파라미터가 오지 않은 경우(오버로딩 한 것. 파라미터의 이름은 일단 도착지로 해둠)
+    // 출발지 또는 도착지에 대한 파라미터가 오지 않은 경우(오버로딩)
     @Query(value = "SELECT p.*, " +
         " ST_Distance_Sphere(" +
         "    ST_GeomFromText(CONCAT('POINT(', p.end_longitude, ' ', p.end_latitude, ')')), " +

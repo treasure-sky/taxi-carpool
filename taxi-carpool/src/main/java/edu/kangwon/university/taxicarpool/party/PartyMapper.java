@@ -80,7 +80,6 @@ public class PartyMapper {
         );
     }
 
-    // 현재 인원수 필드 없음: 파티방에 멤버의 참여,퇴장은 join/leave 엔트포인트 사용의 강제를 위해
     public PartyEntity convertToEntityByUpdate(PartyEntity partyEntity,
         PartyUpdateRequestDTO partyUpdateRequestDTO) {
         MapPlaceDTO sp = partyUpdateRequestDTO.getStartPlace();

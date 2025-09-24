@@ -46,7 +46,6 @@ public class ChattingController {
         @RequestParam(required = false) Long afterMessageId,
         @Parameter(description = "최대 메시지 개수")
         @RequestParam(required = false, defaultValue = "20") int maxResults) {
-        // JWT 토큰에서 사용자 ID 추출
         Long memberId = (Long) SecurityContextHolder.getContext().getAuthentication()
             .getPrincipal();
 

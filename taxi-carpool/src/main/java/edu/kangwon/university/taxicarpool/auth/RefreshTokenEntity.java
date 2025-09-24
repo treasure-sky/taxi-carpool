@@ -22,7 +22,6 @@ public class RefreshTokenEntity {
 
     private String refreshToken;
 
-    // 만료 기한
     private LocalDateTime expiryDate;
 
     public RefreshTokenEntity(MemberEntity member, String refreshToken, LocalDateTime expiryDate) {

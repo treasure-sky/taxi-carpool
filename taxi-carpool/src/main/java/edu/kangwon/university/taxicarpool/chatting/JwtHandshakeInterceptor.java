@@ -64,7 +64,7 @@ public class JwtHandshakeInterceptor implements HandshakeInterceptor {
         ServerHttpResponse response,
         WebSocketHandler wsHandler,
         Exception exception) {
-        // 로직 상 딱히 할 일이 없음
+        // 형식적으로 훅 메서드만 생성
     }
 
     private String extractToken(ServerHttpRequest request) {

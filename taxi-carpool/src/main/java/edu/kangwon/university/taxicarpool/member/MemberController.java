@@ -30,7 +30,6 @@ public class MemberController {
         this.memberService = memberService;
     }
 
-    // 타인 조회
     @Operation(summary = "타인 정보 조회", description = "ID로 타인의 정보를 가져옵니다.")
     @GetMapping("/{memberId}")
     public ResponseEntity<MemberPublicDTO> getPublicInfo(
@@ -39,7 +38,6 @@ public class MemberController {
         return ResponseEntity.ok(publicInfo);
     }
 
-    // 로그인된 본인의 정보 조회
     @Operation(summary = "본인 정보 조회", description = "로그인된 본인 정보를 가져옵니다.")
     @GetMapping("/me")
     public ResponseEntity<MemberDetailDTO> getMyInfo() {
