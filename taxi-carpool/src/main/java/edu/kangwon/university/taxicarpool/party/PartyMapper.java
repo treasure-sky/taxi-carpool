@@ -2,9 +2,9 @@ package edu.kangwon.university.taxicarpool.party;
 
 import edu.kangwon.university.taxicarpool.map.MapPlace;
 import edu.kangwon.university.taxicarpool.map.MapPlaceDTO;
-import edu.kangwon.university.taxicarpool.party.dto.PartyDTO.PartyCreateRequestDTO;
-import edu.kangwon.university.taxicarpool.party.dto.PartyDTO.PartyResponseDTO;
-import edu.kangwon.university.taxicarpool.party.dto.PartyDTO.PartyUpdateRequestDTO;
+import edu.kangwon.university.taxicarpool.party.dto.PartyCreateRequestDTO;
+import edu.kangwon.university.taxicarpool.party.dto.PartyResponseDTO;
+import edu.kangwon.university.taxicarpool.party.dto.PartyUpdateRequestDTO;
 import edu.kangwon.university.taxicarpool.member.MemberEntity;
 import java.util.List;
 import java.util.stream.Collectors;

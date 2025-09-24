@@ -2,31 +2,18 @@ package edu.kangwon.university.taxicarpool.member;
 
 import edu.kangwon.university.taxicarpool.chatting.MessageEntity;
 import edu.kangwon.university.taxicarpool.party.PartyEntity;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.ManyToMany;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class MemberEntity {
-
-    public MemberEntity(String email, String password, String nickname, Gender gender) {
-        this.email = email;
-        this.password = password;
-        this.nickname = nickname;
-        this.gender = gender;
-    }
-
-    public MemberEntity() {
-    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -59,72 +46,32 @@ public class MemberEntity {
     @Column(nullable = false)
     private int tokenVersion = 0;
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
+    public MemberEntity(String email, String password, String nickname, Gender gender) {
         this.email = email;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
         this.password = password;
+        this.nickname = nickname;
+        this.gender = gender;
     }
 
-    public String getNickname() {
-        return nickname;
+    public void setPassword(@NotNull String password) {
+        this.password = password;
     }
 
     public void setNickname(String nickname) {
         this.nickname = nickname;
     }
 
-    public Gender getGender() {
-        return gender;
-    }
-
-    public void setGender(Gender gender) {
-        this.gender = gender;
-    }
-
-    public List<MessageEntity> getSentMessages() {
-        return sentMessages;
-    }
-
-    public List<PartyEntity> getParties() {
-        return parties;
-    }
-
-    public void setParties(List<PartyEntity> parties) {
-        this.parties = parties;
-    }
-
-    public long getTotalSavedAmount() {
-        return totalSavedAmount;
-    }
-
-    public void setTotalSavedAmount(long totalSavedAmount) {
-        this.totalSavedAmount = totalSavedAmount;
-    }
-
-    public int getTokenVersion() {
-        return tokenVersion;
-    }
-
     public void setTokenVersion(int tokenVersion) {
         this.tokenVersion = tokenVersion;
+    }
+
+    public void setEmail(@NotNull String email) {
+        this.email = email;
+    }
+
+    public void setGender(
+        @NotNull Gender gender) {
+        this.gender = gender;
     }
 
     /** 절감 금액을 누적하는 편의 메서드 */
@@ -134,5 +81,4 @@ public class MemberEntity {
         }
         this.totalSavedAmount += amountToAdd;
     }
-
 }
