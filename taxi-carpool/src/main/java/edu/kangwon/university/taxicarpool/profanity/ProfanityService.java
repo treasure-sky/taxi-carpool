@@ -21,9 +21,8 @@ public class ProfanityService {
 
     private static final String DEFAULT_DICT_PATH = "profanity.txt";
 
-    private final Set<String> blacklist;   // 일반 금칙어
+    private final Set<String> blacklist;
 
-    // 흔한 변형 문자 치환(leet speak 대응)
     private static final Map<Character, Character> LEET = Map.of(
         '1','l', '!','i', '3','e', '4','a', '@','a',
         '5','s', '7','t', '0','o', '$','s'
@@ -33,12 +32,10 @@ public class ProfanityService {
         'ㅡ', '-', '_', '~'
     );
 
-    // 한글/영문/숫자만 남기고 나머지 제거
     private static final Pattern NON_KR_EN_NUM = Pattern.compile("[^0-9A-Za-z가-힣ㄱ-ㅎㅏ-ㅣ]");
 
     public ProfanityService() {
         this.blacklist = loadDefaultBlacklist();
-        // 심각 단어는 정책에 맞게 따로 관리 (여기선 예시로 비워둠)
     }
 
     /**
@@ -145,7 +142,7 @@ public class ProfanityService {
         String stripped = NON_KR_EN_NUM.matcher(lowered).replaceAll("");
         StringBuilder sb = new StringBuilder(stripped.length());
         for (char c : stripped.toCharArray()) {
-            if (IGNORE_CHARS.contains(c)) continue; // 무시
+            if (IGNORE_CHARS.contains(c)) continue;
             sb.append(LEET.getOrDefault(c, c));
         }
         return sb.toString();

@@ -29,7 +29,6 @@ public class NoProfanityValidator implements ConstraintValidator<NoProfanity, St
     public boolean isValid(String value, ConstraintValidatorContext ctx) {
         if (!StringUtils.hasText(value)) return true;
 
-        // 허용 단어 제외하고 탐지
         return !profanityService.contains(value, allowlist);
     }
 }
