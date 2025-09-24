@@ -54,7 +54,19 @@ public class PasswordResetService {
     }
 
     /**
-     * 비밀번호 재설정 링크 발송 (존재 여부는 항상 동일한 응답으로 은닉)
+     * 비밀번호 재설정 링크를 이메일로 발송합니다.
+     *
+     * <p>요청한 이메일의 존재 여부는 외부에 드러나지 않도록 동일한 응답을 지향합니다.
+     * 내부적으로 jti를 생성해 DB에 저장하고, jti가 포함된 단기 만료 JWT를 링크에 부착해 전송합니다.</p>
+     *
+     * @param email 재설정 링크를 받을 이메일
+     * @throws edu.kangwon.university.taxicarpool.member.exception.MemberNotFoundException 이메일에 해당하는
+     *                                                                                     회원이 없을 때
+     *                                                                                     (구현에 따라
+     *                                                                                     내부에서 처리될
+     *                                                                                     수 있음)
+     * @throws edu.kangwon.university.taxicarpool.email.exception.EmailSendFailedException 메일 전송에
+     *                                                                                     실패한 경우
      */
     @Transactional
     public void sendResetLink(String email) {
@@ -64,26 +76,36 @@ public class PasswordResetService {
             return;
         }
 
-        // jti 생성 및 DB 저장(PasswordResetTokenEntity는 사실 상 jtiEntity)
         String jti = JwtUtil.newJti();
         LocalDateTime expiresAt = LocalDateTime.now().plusMinutes(RESET_TOKEN_MINUTES);
         PasswordResetTokenEntity tokenEntity = new PasswordResetTokenEntity(jti, member, expiresAt);
         tokenRepository.save(tokenEntity);
 
-        // jti를 넣어서 JWT 생성 (subject=memberId, jti 포함, 짧은 만료)
         String jwt = jwtUtil.generatePasswordResetToken(
             member.getId(), jti, 1000L * 60 * RESET_TOKEN_MINUTES
         );
 
-        // 링크 생성
         String link = resetBaseUrl + "?token=" + jwt;
 
-        // 메일 발송
         sendResetEmail(email, link);
     }
 
     /**
-     * 토큰 검증 후 비밀번호 변경(1회용)
+     * 1회용 재설정 토큰을 검증한 뒤 새 비밀번호로 변경합니다.
+     *
+     * <p>JWT 서명/만료 검증 → DB의 jti 조회로 1회성/만료/대상 일치 여부를 확인한 뒤
+     * 비밀번호를 인코딩하여 저장하고 토큰을 사용 처리합니다.</p>
+     *
+     * @param token       비밀번호 재설정 JWT(내부에 jti 포함)
+     * @param newPassword 새 비밀번호(평문)
+     * @throws edu.kangwon.university.taxicarpool.auth.authException.TokenInvalidException jti
+     *                                                                                     누락/불일치/이미
+     *                                                                                     사용된 토큰/대상
+     *                                                                                     불일치 등
+     *                                                                                     유효하지 않은
+     *                                                                                     토큰인 경우
+     * @throws edu.kangwon.university.taxicarpool.auth.authException.TokenExpiredException 토큰이 만료된
+     *                                                                                     경우
      */
     @Transactional
     public void resetPassword(String token, String newPassword) {
@@ -119,6 +141,18 @@ public class PasswordResetService {
         // JPA flush는 @Transactional 종료 시점에 자동으로 반영되어서 save 불필요
     }
 
+    /**
+     * 비밀번호 재설정 안내 메일을 전송합니다.
+     *
+     * <p>제목은 "[강원대 택시카풀] 비밀번호 재설정 안내"이며,
+     * 본문에는 재설정 링크와 유효시간(분)을 포함합니다.</p>
+     *
+     * @param to        수신자 이메일
+     * @param resetLink 재설정 링크(URL 쿼리스트링에 token 포함)
+     * @throws edu.kangwon.university.taxicarpool.email.exception.EmailSendFailedException 메일 구성/전송
+     *                                                                                     중 예외가 발생한
+     *                                                                                     경우
+     */
     private void sendResetEmail(String to, String resetLink) {
         try {
             MimeMessage message = mailSender.createMimeMessage();
@@ -133,8 +167,7 @@ public class PasswordResetService {
             );
             mailSender.send(message);
         } catch (Exception e) {
-            // 발송 실패 시에도 계정 존재 여부 노출을 피하기 위해 외부 응답은 동일하게 처리하지만,
-            // 서버 로그/모니터링으로는 원인 파악 가능해야 함.
+
             throw new EmailSendFailedException("비밀번호 재설정 메일 전송 실패");
         }
     }

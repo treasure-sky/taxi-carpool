@@ -14,7 +14,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-// 토큰의 유효성 검사하는 커스텀 필터임. Config에 등록해서 사용하면 됨. 또한 SecurityContextHolder에 등록도 함.
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtUtil jwtUtil;
@@ -53,21 +52,18 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                         return;
                     }
 
-                    // 4) 인증 객체 생성 (권한이 필요하면 loadUserByUsername() 등을 통해 가져올 수 있음)
+                    // 4) 인증 객체 생성
                     UsernamePasswordAuthenticationToken authentication =
                         new UsernamePasswordAuthenticationToken(id, null, null);
-                    // 참고로 인수는 다음과 같다.
-                    // Principal(사용자 식별 정보, 여기서는 id), Credentials(비밀번호 등 인증 수단, 여기서는 null), Authorities(권한 목록, 여기서는 null)
-
-                    // 5) SecurityContextHolder에 등록(그래야 한 번의 request에서 필요한 사용자 정보를 공유하여 꺼내쓸 수 있음.)
+                    
+                    // 5) SecurityContextHolder에 등록(한 번의 request에서 필요한 사용자 정보를 공유하여 꺼내쓰기)
                     SecurityContextHolder.getContext().setAuthentication(authentication);
                 }
             } catch (TokenExpiredException e) {
-                // 토큰 만료 시 401 응답 -> 프론트측에서 이거 받고 Axios를 통해 재요청 보내면 댐.
+                // 토큰 만료 시 401 응답 -> 프론트측에서 해당 예외처리 받고 Axios를 통해 재요청 보내기
                 writeUnauthorized(response, "AUTH-EXPIRED", "Access 토큰이 만료되었습니다.");
                 return;
             } catch (TokenInvalidException e) {
-                // 토큰이 위조되었거나 형식이 잘못됨
                 writeUnauthorized(response, "AUTH-INVALID", "유효하지 않은 토큰입니다.");
                 return;
             }

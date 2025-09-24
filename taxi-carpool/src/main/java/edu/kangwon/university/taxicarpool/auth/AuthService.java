@@ -46,7 +46,16 @@ public class AuthService {
         this.memberRepository = memberRepository;
     }
 
-    // 회원가입
+    /**
+     * 회원가입을 수행합니다.
+     *
+     * <p>사전에 이메일 인증이 완료되었는지 확인한 뒤, 회원 생성 로직을 위임합니다.</p>
+     *
+     * @param request 회원 생성 요청 DTO
+     * @return 생성된 회원의 상세 DTO
+     * @throws edu.kangwon.university.taxicarpool.email.exception.EmailVerificationNotFoundException
+     *         이메일 인증이 완료되지 않은 경우
+     */
     public MemberDetailDTO signUp(MemberCreateDTO request) {
 
         // 이메일 인증여부 확인
@@ -57,7 +66,19 @@ public class AuthService {
         return memberService.createMember(request);
     }
 
-    // 로그인
+    /**
+     * 로그인 처리 후 액세스/리프레시 토큰을 발급합니다.
+     *
+     * <p>이메일/비밀번호 검증 후, 멤버의 토큰 버전을 증가시켜 신규 액세스 토큰에 반영하고
+     * 리프레시 토큰을 DB에 저장(있으면 갱신)합니다.</p>
+     *
+     * @param request 로그인 요청 DTO(이메일/비밀번호)
+     * @return 액세스 토큰, 리프레시 토큰, 이메일을 담은 응답 DTO
+     * @throws edu.kangwon.university.taxicarpool.auth.authException.AuthenticationFailedException
+     *         비밀번호가 일치하지 않는 경우
+     * @throws edu.kangwon.university.taxicarpool.member.exception.MemberNotFoundException
+     *         이메일에 해당하는 회원을 찾을 수 없는 경우
+     */
     public LoginResponse login(LoginRequest request) {
 
         MemberEntity member = memberService.getMemberEntityByEmail(request.getEmail());
@@ -66,16 +87,12 @@ public class AuthService {
             throw new AuthenticationFailedException("비밀번호가 올바르지 않습니다.");
         }
 
-        // 회원가입 DB를 거쳐서 회원임이 검증된 이후.
-        // 엑세스 토큰, 리프래쉬 토큰 생성
         member.setTokenVersion(member.getTokenVersion() + 1);
-        memberRepository.save(member); // 같은 트랜잭션 내
+        memberRepository.save(member);
+        
         String accessToken = jwtUtil.generateAccessToken(member.getId(), member.getTokenVersion());
-
         String refreshToken = jwtUtil.generateRefreshToken(member.getId());
-
-        // 리프래쉬 토큰 만료 시점 (1주) generateRefreshToken()에서 생성한 거 말고
-        // 이중으로 하나 더 넣어둔 것임.(로그아웃 로직도 관리해야돼서)
+        
         LocalDateTime refreshExpiry = LocalDateTime.now().plusDays(7);
 
         // DB에 리프래쉬 토큰 저장(이미 있으면 업데이트)
@@ -89,21 +106,29 @@ public class AuthService {
                 refreshExpiry);
             refreshTokenRepository.save(newToken);
         }
-
-        // 응답 DTO
-        // 일단 액세스 토큰, 리프래쉬 토큰, 이메일 리턴
+        
         return new LoginResponse(accessToken, refreshToken, member.getEmail());
     }
 
-    // 리프래쉬 토큰으로 액세스 토큰 재발급
+    /**
+     * 리프레시 토큰으로 새 액세스 토큰을 재발급합니다.
+     *
+     * <p>요청된 리프레시 토큰을 DB에서 검증하고, 만료 여부를 확인한 뒤
+     * 멤버의 현재 토큰 버전으로 액세스 토큰을 생성합니다.</p>
+     *
+     * @param request 액세스 토큰 재발급 요청 DTO(리프레시 토큰 포함)
+     * @return 새 액세스 토큰과 기존 리프레시 토큰을 담은 응답 DTO
+     * @throws edu.kangwon.university.taxicarpool.auth.authException.TokenInvalidException
+     *         리프레시 토큰이 존재하지 않거나 회원 정보를 찾을 수 없는 경우
+     * @throws edu.kangwon.university.taxicarpool.auth.authException.TokenExpiredException
+     *         리프레시 토큰이 만료된 경우
+     */
     public RefreshResponseDTO refresh(RefreshRequestDTO request) {
-        // DB에서 리프래쉬 토큰 조회
+        
         RefreshTokenEntity tokenEntity = refreshTokenRepository.findByRefreshToken(
                 request.getRefreshToken())
             .orElseThrow(() -> new TokenInvalidException("리프래쉬 토큰이 만료되었습니다. 다시 로그인해주세요."));
-
-        // 리프래쉬 토큰이 만료됐는지 확인
-        // 리프래쉬도 만료되면 재로그인 요청해야함.
+        
         if (tokenEntity.getExpiryDate().isBefore(LocalDateTime.now())) {
             throw new TokenExpiredException("리프래쉬 토큰이 만료되었습니다. 다시 로그인해주세요.");
         }
@@ -115,20 +140,27 @@ public class AuthService {
 
         String newAccessToken = jwtUtil.generateAccessToken(id, fresh.getTokenVersion());
 
-        // 응답 DTO
         return new RefreshResponseDTO(newAccessToken, tokenEntity.getRefreshToken());
     }
 
-    // 로그아웃
+    /**
+     * 로그아웃 처리로 리프레시 토큰을 무효화합니다.
+     *
+     * <p>DB에서 리프레시 토큰을 조회해 만료 시간을 현재 시각으로 갱신합니다
+     * (또는 삭제 로직으로 대체 가능).</p>
+     *
+     * @param refreshToken 무효화할 리프레시 토큰
+     * @throws edu.kangwon.university.taxicarpool.auth.authException.TokenInvalidException
+     *         유효한 리프레시 토큰을 찾을 수 없는 경우(재로그인 필요)
+     */
     @Transactional
     public void logout(String refreshToken) {
 
-        // 리프레쉬 토큰 엔티티 조회
         Optional<RefreshTokenEntity> optionalToken = refreshTokenRepository.findByRefreshToken(refreshToken);
         if (optionalToken.isPresent()) {
             RefreshTokenEntity tokenEntity = optionalToken.get();
 
-            // 만료시간을 현재 시각으로 세팅하여 리프레쉬 토큰 무효화시키기 (걍 레포지토리에서 delete해도 되긴함)
+            // 리프레쉬 토큰 무효화
             tokenEntity.setExpiryDate(LocalDateTime.now());
             refreshTokenRepository.save(tokenEntity);
         } else {

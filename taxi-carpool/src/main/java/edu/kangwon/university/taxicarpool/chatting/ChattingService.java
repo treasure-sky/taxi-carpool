@@ -42,7 +42,14 @@ public class ChattingService {
     }
 
     /**
-     * 파티 입장/퇴장 시 시스템 메시지 생성 및 전송
+     * 파티 입장/퇴장 시 시스템 메시지를 생성하고 구독자에게 브로드캐스트합니다.
+     *
+     * <p>TALK 타입은 시스템 메시지로 허용되지 않습니다.</p>
+     *
+     * @param partyEntity 대상 파티 엔티티
+     * @param memberEntity 입·퇴장한 멤버 엔티티
+     * @param type 시스템 메시지 타입(ENTER/LEAVE)
+     * @throws java.lang.IllegalArgumentException type이 TALK인 경우
      */
     @Transactional
     public void createSystemMessage(PartyEntity partyEntity, MemberEntity memberEntity,
@@ -65,7 +72,20 @@ public class ChattingService {
     }
 
     /**
-     * 메시지 히스토리 조회
+     * 특정 파티의 메시지 히스토리를 조회합니다.
+     *
+     * <p>{@code afterMessageId}가 null이면 처음부터 {@code limit}개를, 값이 있으면 해당 ID보다 큰 메시지를
+     * 오름차순으로 최대 {@code limit}개 조회합니다.</p>
+     *
+     * @param partyId 파티 ID
+     * @param memberId 조회 요청 멤버 ID(파티 참여자여야 함)
+     * @param afterMessageId 기준 메시지 ID(null 가능)
+     * @param limit 최대 조회 개수
+     * @return 메시지 응답 DTO 목록(오름차순 정렬)
+     * @throws edu.kangwon.university.taxicarpool.party.partyException.PartyNotFoundException
+     *         파티가 존재하지 않는 경우
+     * @throws edu.kangwon.university.taxicarpool.party.partyException.MemberNotInPartyException
+     *         요청 멤버가 파티에 속해있지 않은 경우
      */
     @Transactional(readOnly = true)
     public List<MessageResponseDTO> getMessageHistory(Long partyId, Long memberId,
@@ -91,9 +111,14 @@ public class ChattingService {
     }
 
     /**
-     * 사용자가 파티에 속해 있는지 검증
+     * 사용자가 해당 파티에 속해 있는지 검증합니다.
      *
-     * @throws MemberNotInPartyException 사용자가 파티에 속해있지 않은 경우
+     * @param partyId 파티 ID
+     * @param memberId 멤버 ID
+     * @throws edu.kangwon.university.taxicarpool.party.partyException.PartyNotFoundException
+     *         파티가 존재하지 않는 경우
+     * @throws edu.kangwon.university.taxicarpool.party.partyException.MemberNotInPartyException
+     *         멤버가 파티에 속해있지 않은 경우
      */
     private void validateMemberInParty(Long partyId, Long memberId) {
         PartyEntity party = partyRepository.findById(partyId)
@@ -107,6 +132,23 @@ public class ChattingService {
         }
     }
 
+    /**
+     * 채팅 메시지를 전송(저장)합니다.
+     *
+     * <p>비속어는 {@link edu.kangwon.university.taxicarpool.profanity.ProfanityService#maskSmart(String)}
+     * 로 마스킹하여 저장합니다.</p>
+     *
+     * @param partyId 파티 ID
+     * @param memberId 발신자 멤버 ID(파티 참여자여야 함)
+     * @param content 원본 메시지 내용
+     * @return 저장된 메시지의 응답 DTO
+     * @throws edu.kangwon.university.taxicarpool.party.partyException.PartyNotFoundException
+     *         파티가 존재하지 않는 경우
+     * @throws edu.kangwon.university.taxicarpool.member.exception.MemberNotFoundException
+     *         발신자 멤버를 찾을 수 없는 경우
+     * @throws edu.kangwon.university.taxicarpool.party.partyException.MemberNotInPartyException
+     *         발신자가 파티에 속해있지 않은 경우
+     */
     @Transactional
     public MessageResponseDTO sendMessage(Long partyId, Long memberId, String content) {
         validateMemberInParty(partyId, memberId);
@@ -130,6 +172,17 @@ public class ChattingService {
         return messageMapper.convertToResponseDTO(message);
     }
 
+    /**
+     * 파티의 참가자 목록을 조회합니다.
+     *
+     * @param partyId 파티 ID
+     * @param memberId 요청자 멤버 ID(파티 참여자여야 함)
+     * @return 참가자 응답 DTO 목록(멤버 ID, 닉네임)
+     * @throws edu.kangwon.university.taxicarpool.party.partyException.PartyNotFoundException
+     *         파티가 존재하지 않는 경우
+     * @throws edu.kangwon.university.taxicarpool.party.partyException.MemberNotInPartyException
+     *         요청자가 파티에 속해있지 않은 경우
+     */
     @Transactional(readOnly = true)
     public List<ParticipantResponseDTO> getParticipants(Long partyId, Long memberId) {
         PartyEntity party = partyRepository.findById(partyId)
@@ -146,6 +199,22 @@ public class ChattingService {
             .toList();
     }
 
+    /**
+     * 파티 공지사항을 수정합니다.
+     *
+     * <p>호스트만 수정할 수 있습니다.</p>
+     *
+     * @param partyId 파티 ID
+     * @param memberId 요청자 멤버 ID(호스트여야 함)
+     * @param notification 변경할 공지사항 내용
+     * @return 수정된 공지사항 응답 DTO(파티 ID, 공지사항)
+     * @throws edu.kangwon.university.taxicarpool.party.partyException.PartyNotFoundException
+     *         파티가 존재하지 않는 경우
+     * @throws edu.kangwon.university.taxicarpool.party.partyException.MemberNotInPartyException
+     *         요청자가 파티에 속해있지 않은 경우
+     * @throws edu.kangwon.university.taxicarpool.party.partyException.UnauthorizedHostAccessException
+     *         요청자가 호스트가 아닌 경우
+     */
     @Transactional
     public NotificationResponseDTO updateNotification(Long partyId, Long memberId,
         String notification) {
@@ -159,12 +228,10 @@ public class ChattingService {
             throw new MemberNotInPartyException("멤버가 해당 파티의 구성원이 아닙니다.");
         }
 
-        // 호스트 여부 검사
         if (!party.getHostMemberId().equals(memberId)) {
             throw new UnauthorizedHostAccessException("호스트만 공지사항을 수정할 수 있습니다.");
         }
 
-        // 공지사항 업데이트
         party.setNotification(notification);
         PartyEntity saved = partyRepository.save(party);
 
