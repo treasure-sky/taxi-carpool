@@ -44,6 +44,7 @@ public class SecurityConfig {
         http
             .cors(withDefaults())
             .csrf(csrf -> csrf.disable())
+            .headers(h -> h.frameOptions(f -> f.sameOrigin()))
             .formLogin(form -> form.disable())
             .httpBasic(basic -> basic.disable())
             .logout(logout -> logout.disable())
@@ -60,7 +61,8 @@ public class SecurityConfig {
                     "/swagger-ui/**",           // 스웨거 UI리소스
                     "/api-docs/**",          // 스웨거 API 문서
                     "/swagger-resources/**",    // 스웨거 리소스
-                    "/webjars/**"              // 스웨거 관련 정적 리소스
+                    "/webjars/**",              // 스웨거 관련 정적 리소스
+                    "/h2-console/**"
                 ).permitAll()
 
                 .requestMatchers(HttpMethod.GET,
