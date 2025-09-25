@@ -45,17 +45,8 @@ public class PartyEntity {
     @Column(name = "end_date")
     private LocalDateTime endDate;
 
-    @Column(name = "same_gender_only")
-    private boolean sameGenderOnly;
-
-    @Column(name = "cost_share_before_drop_off")
-    private boolean costShareBeforeDropOff;
-
-    @Column(name = "quiet_mode")
-    private boolean quietMode;
-
-    @Column(name = "destination_change_5minutes")
-    private boolean destinationChangeIn5Minutes;
+    @Embedded
+    private PartyOption options;
 
     @Column(name = "start_date_time")
     private LocalDateTime startDateTime;
@@ -106,10 +97,7 @@ public class PartyEntity {
 
     public PartyEntity(
         Long hostMemberId,
-        boolean sameGenderOnly,
-        boolean costShareBeforeDropOff,
-        boolean quietMode,
-        boolean destinationChange5Minutes,
+        PartyOption options,
         LocalDateTime startDateTime,
         String comment,
         int currentParticipantCount,
@@ -118,10 +106,7 @@ public class PartyEntity {
         MapPlace endPlace
     ) {
         this.hostMemberId = hostMemberId;
-        this.sameGenderOnly = sameGenderOnly;
-        this.costShareBeforeDropOff = costShareBeforeDropOff;
-        this.quietMode = quietMode;
-        this.destinationChangeIn5Minutes = destinationChange5Minutes;
+        this.options = options;
         this.startDateTime = startDateTime;
         this.comment = comment;
         this.currentParticipantCount = currentParticipantCount;
@@ -151,10 +136,7 @@ public class PartyEntity {
     }
 
     public PartyEntity updateParty(
-        boolean sameGenderOnly,
-        boolean costShareBeforeDropOff,
-        boolean quietMode,
-        boolean destinationChangeIn5Minutes,
+        PartyOption options,
         LocalDateTime startDateTime,
         String comment,
         int maxParticipantCount,
@@ -162,10 +144,7 @@ public class PartyEntity {
         MapPlace endPlace,
         String notification
     ) {
-        this.sameGenderOnly = sameGenderOnly;
-        this.costShareBeforeDropOff = costShareBeforeDropOff;
-        this.quietMode = quietMode;
-        this.destinationChangeIn5Minutes = destinationChangeIn5Minutes;
+        this.options = options;
         this.startDateTime = startDateTime;
         this.comment = comment;
         this.maxParticipantCount = maxParticipantCount;
