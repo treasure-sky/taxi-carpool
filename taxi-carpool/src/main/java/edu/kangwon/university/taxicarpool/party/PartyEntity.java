@@ -3,6 +3,10 @@ package edu.kangwon.university.taxicarpool.party;
 import edu.kangwon.university.taxicarpool.chatting.MessageEntity;
 import edu.kangwon.university.taxicarpool.map.MapPlace;
 import edu.kangwon.university.taxicarpool.member.MemberEntity;
+import edu.kangwon.university.taxicarpool.party.partyException.MemberAlreadyInPartyException;
+import edu.kangwon.university.taxicarpool.party.partyException.MemberNotInPartyException;
+import edu.kangwon.university.taxicarpool.party.partyException.PartyAlreadyDeletedException;
+import edu.kangwon.university.taxicarpool.party.partyException.PartyFullException;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -153,4 +157,45 @@ public class PartyEntity {
         this.notification = notification;
         return this;
     }
+
+    public void join(MemberEntity member) {
+        if (this.isDeleted) {
+            throw new PartyAlreadyDeletedException("이미 삭제된 파티입니다.");
+        }
+        Long memberId = member.getId();
+        boolean alreadyIn = this.memberEntities.stream().anyMatch(m -> m.getId().equals(memberId));
+        if (alreadyIn) {
+            throw new MemberAlreadyInPartyException("이미 이 파티에 참여한 멤버입니다.");
+        }
+        if (this.currentParticipantCount >= this.maxParticipantCount) {
+            throw new PartyFullException("현재 파티의 참여 인원수가 가득찼습니다.");
+        }
+
+        this.memberEntities.add(member);
+        this.currentParticipantCount = this.memberEntities.size();
+    }
+
+    public void leave(Long memberId) {
+        boolean removed = this.memberEntities.removeIf(m -> m.getId().equals(memberId));
+        if (!removed) {
+            throw new MemberNotInPartyException("이 멤버는 해당 파티에 속해있지 않습니다.");
+        }
+
+        boolean hostLeaving = (this.hostMemberId != null && this.hostMemberId.equals(memberId));
+
+        this.currentParticipantCount = this.memberEntities.size();
+
+        // 마지막 멤버가 나가면 소프트 삭제
+        if (this.currentParticipantCount == 0) {
+            this.isDeleted = true;
+            return; // 저장은 서비스에서
+        }
+
+        // 호스트가 나갔으면 첫 번째 남은 멤버를 호스트로 승격
+        if (hostLeaving) {
+            MemberEntity nextHost = this.memberEntities.get(0);
+            this.hostMemberId = nextHost.getId();
+        }
+    }
+
 }

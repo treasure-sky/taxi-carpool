@@ -274,29 +274,14 @@ public class PartyService {
     public PartyResponseDTO joinParty(Long partyId, Long memberId) {
         PartyEntity party = partyRepository.findByIdAndIsDeletedFalse(partyId)
             .orElseThrow(() -> new PartyNotFoundException("해당 파티가 존재하지 않습니다."));
-        if (party.isDeleted()) {
-            throw new PartyAlreadyDeletedException("이미 삭제된 파티입니다.");
-        }
         MemberEntity member = memberRepository.findById(memberId)
             .orElseThrow(() -> new MemberNotFoundException("해당 멤버가 존재하지 않습니다."));
 
-        if (party.getMemberEntities().contains(member)) {
-            throw new MemberAlreadyInPartyException("이미 이 파티에 참여한 멤버입니다.");
-        }
+        party.join(member);
 
-        party.getMemberEntities().add(member);
-
-        int currentParticipantCount = party.getCurrentParticipantCount();
-        if (currentParticipantCount < party.getMaxParticipantCount()) {
-            currentParticipantCount += 1;
-            party.setCurrentParticipantCount(currentParticipantCount);
-        } else {
-            throw new PartyFullException("현재 파티의 참여중인 인원수가 가득찼습니다.");
-        }
-
-        PartyEntity savedParty = partyRepository.save(party);
-        chattingService.createSystemMessage(party, member, MessageType.ENTER);
-        return partyMapper.convertToResponseDTO(savedParty);
+        PartyEntity saved = partyRepository.save(party);
+        chattingService.createSystemMessage(saved, member, MessageType.ENTER);
+        return partyMapper.convertToResponseDTO(saved);
     }
 
     /**
@@ -322,38 +307,7 @@ public class PartyService {
         MemberEntity member = memberRepository.findById(memberId)
             .orElseThrow(() -> new MemberNotFoundException("해당 멤버가 존재하지 않습니다."));
 
-        if (!party.getMemberEntities().contains(member)) {
-            throw new MemberNotInPartyException("이 멤버는 해당 파티에 속해있지 않습니다.");
-        }
-
-        // 호스트인 멤버가 파티를 떠나려고 할 때
-        boolean isHostLeaving = (party.getHostMemberId() != null
-            && party.getHostMemberId().equals(memberId));
-
-        party.getMemberEntities().remove(member);
-
-        // 파티의 현재 인원 수 감소시키기
-        int currentParticipantCount = party.getCurrentParticipantCount();
-        if (currentParticipantCount > 1) {
-            currentParticipantCount -= 1;
-            party.setCurrentParticipantCount(currentParticipantCount);
-        } else {
-            party.setDeleted(true);
-            return partyMapper.convertToResponseDTO(party);
-        }
-
-        // 호스트인 멤버가 파티를 떠나려고 할 때
-        if (isHostLeaving) {
-            List<MemberEntity> remaining = party.getMemberEntities();
-            if (remaining.isEmpty()) {
-                party.setDeleted(true);
-                return partyMapper.convertToResponseDTO(party);
-            } else {
-                // 첫 멤버를 새 호스트로
-                MemberEntity nextHost = remaining.get(0);
-                party.setHostMemberId(nextHost.getId());
-            }
-        }
+        party.leave(memberId);
 
         PartyEntity saved = partyRepository.save(party);
         chattingService.createSystemMessage(party, member, MessageType.LEAVE);
