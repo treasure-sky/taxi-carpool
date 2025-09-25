@@ -19,13 +19,15 @@ public class MemberService {
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
     private final RefreshTokenRepository refreshTokenRepository;
+    private final MemberMapper memberMapper;
 
     @Autowired
     public MemberService(MemberRepository memberRepository, PasswordEncoder passwordEncoder,
-        RefreshTokenRepository refreshTokenRepository) {
+        RefreshTokenRepository refreshTokenRepository, MemberMapper memberMapper) {
         this.memberRepository = memberRepository;
         this.passwordEncoder = passwordEncoder;
         this.refreshTokenRepository = refreshTokenRepository;
+        this.memberMapper = memberMapper;
     }
 
     /**
@@ -61,16 +63,7 @@ public class MemberService {
         entity.setPassword(encodedPassword);
 
         MemberEntity saved = memberRepository.save(entity);
-
-        MemberDetailDTO responseDTO = new MemberDetailDTO(
-            saved.getId(),
-            saved.getEmail(),
-            saved.getNickname(),
-            saved.getGender(),
-            saved.getTotalSavedAmount()
-        );
-
-        return responseDTO;
+        return memberMapper.toDetailDTO(saved);
     }
 
     /**
@@ -113,14 +106,7 @@ public class MemberService {
         }
 
         MemberEntity updated = memberRepository.save(existedEntity);
-
-        return new MemberDetailDTO(
-            updated.getId(),
-            updated.getEmail(),
-            updated.getNickname(),
-            updated.getGender(),
-            updated.getTotalSavedAmount()
-        );
+        return memberMapper.toDetailDTO(updated);
     }
 
     /**
@@ -142,15 +128,7 @@ public class MemberService {
 
         memberRepository.delete(entity);
 
-        MemberDetailDTO responseDTO = new MemberDetailDTO(
-            entity.getId(),
-            entity.getEmail(),
-            entity.getNickname(),
-            entity.getGender(),
-            entity.getTotalSavedAmount()
-        );
-
-        return responseDTO;
+        return memberMapper.toDetailDTO(entity);
     }
 
     /**
@@ -169,12 +147,7 @@ public class MemberService {
         MemberEntity entity = memberRepository.findById(memberId)
             .orElseThrow(() -> new MemberNotFoundException("회원을 찾을 수 없습니다: " + memberId));
 
-        MemberPublicDTO responseDTO = new MemberPublicDTO(
-            entity.getId(),
-            entity.getNickname()
-        );
-
-        return responseDTO;
+        return memberMapper.toPublicDTO(entity);
     }
 
     /**
@@ -191,16 +164,7 @@ public class MemberService {
     public MemberDetailDTO getDetailMember(Long memberId) {
         MemberEntity entity = memberRepository.findById(memberId)
             .orElseThrow(() -> new MemberNotFoundException("회원을 찾을 수 없습니다: " + memberId));
-
-        MemberDetailDTO responseDTO = new MemberDetailDTO(
-            entity.getId(),
-            entity.getEmail(),
-            entity.getNickname(),
-            entity.getGender(),
-            entity.getTotalSavedAmount()
-        );
-
-        return responseDTO;
+        return memberMapper.toDetailDTO(entity);
     }
 
     /**
