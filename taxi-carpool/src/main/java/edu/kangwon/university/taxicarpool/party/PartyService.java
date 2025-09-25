@@ -122,72 +122,39 @@ public class PartyService {
         LocalDateTime userDepartureTime,
         Integer page, Integer size) {
 
+        PartySearchFilter f = new PartySearchFilter(
+            userDepartureLng, userDepartureLat,
+            userDestinationLng, userDestinationLat,
+            userDepartureTime
+        );
+
+        validateFilter(f);
+
         Pageable pageable = PageRequest.of(page, size);
+        SearchVariant variant = decideVariant(f);
 
-        if (userDepartureTime != null && userDepartureTime.isBefore(LocalDateTime.now())) {
-            throw new PartyGetCustomException("출발 시간은 현재 시간보다 이후여야 합니다.");
-        }
+        Page<PartyEntity> entities = switch (variant) {
+            case ALL -> partyRepository.findCustomPartyList(
+                f.getDepLng(), f.getDepLat(),
+                f.getDstLng(), f.getDstLat(),
+                f.getDepTime(), pageable
+            );
+            case NO_DEPARTURE -> partyRepository.findCustomPartyList(
+                f.getDstLng(), f.getDstLat(),
+                f.getDepTime(), pageable
+            );
+            case NO_DESTINATION -> partyRepository.findCustomPartyList(
+                f.getDepLng(), f.getDepLat(),
+                f.getDepTime(), pageable
+            );
+            case NO_TIME -> partyRepository.findCustomPartyList(
+                f.getDepLng(), f.getDepLat(),
+                f.getDstLng(), f.getDstLat(),
+                pageable
+            );
+        };
 
-        // 각 그룹(출발지, 도착지, 출발시간)의 누락 여부 확인
-        boolean missingDeparture = (userDepartureLng == null || userDepartureLat == null);
-        boolean missingDestination = (userDestinationLng == null || userDestinationLat == null);
-        boolean missingDepartureTime = (userDepartureTime == null);
-
-        int missingCount = 0;
-        if (missingDeparture) {
-            missingCount++;
-        }
-        if (missingDestination) {
-            missingCount++;
-        }
-        if (missingDepartureTime) {
-            missingCount++;
-        }
-
-        if (missingCount >= 2) {
-            throw new PartyGetCustomException("출발지, 도착지, 출발시간에 대한 정보 중 2개 이상 넣어주세요!");
-        }
-
-        Page<PartyEntity> partyEntities = null;
-
-        // 모든 정보가 있는 경우
-        if (!missingDeparture && !missingDestination && !missingDepartureTime) {
-            partyEntities = partyRepository.findCustomPartyList(
-                userDepartureLng,
-                userDepartureLat,
-                userDestinationLng,
-                userDestinationLat,
-                userDepartureTime,
-                pageable);
-
-        // 출발지 정보가 누락된 경우
-        } else if (missingDeparture) {
-            partyEntities = partyRepository.findCustomPartyList(
-                userDestinationLng,
-                userDestinationLat,
-                userDepartureTime,
-                pageable);
-
-        // 도착지 정보가 누락된 경우
-        } else if (missingDestination) {
-            partyEntities = partyRepository.findCustomPartyList(
-                userDepartureLng,
-                userDepartureLat,
-                userDepartureTime,
-                pageable);
-
-        // 출발시간이 누락된 경우
-        } else if (missingDepartureTime) {
-            partyEntities = partyRepository.findCustomPartyList(
-                userDepartureLng,
-                userDepartureLat,
-                userDestinationLng,
-                userDestinationLat,
-                pageable);
-
-        }
-
-        return partyEntities.map(partyMapper::convertToResponseDTO);
+        return entities.map(partyMapper::convertToResponseDTO);
 
     }
 
@@ -574,6 +541,65 @@ public class PartyService {
         if (y < 33 || y > 39) {
             throw new IllegalArgumentException(label + " 위도(y)가 한반도 범위를 벗어났습니다: y=" + y);
         }
+    }
+
+    /**
+     * 사용자 검색 필터의 유효성을 검사합니다.
+     * <p>
+     * 규칙:
+     * <ul>
+     *   <li>출발 시간이 현재 시각보다 이후여야 합니다(미입력 시 검사 생략).</li>
+     *   <li>출발지, 도착지, 출발시간 세 그룹 중 최소 2개 이상은 제공되어야 합니다
+     *       (즉, 누락 개수가 2 이상이면 예외).</li>
+     * </ul>
+     *
+     * @param f 파티 검색 조건을 담은 필터 객체
+     * @throws PartyGetCustomException
+     *         출발 시간이 과거이거나, 세 그룹 중 두 개 이상이 누락된 경우
+     */
+    private void validateFilter(PartySearchFilter f) {
+
+        if (f.hasTime() && !f.getDepTime().isAfter(LocalDateTime.now())) {
+            throw new PartyGetCustomException("출발 시간은 현재 시간보다 이후여야 합니다.");
+        }
+
+        // 그룹 누락 개수 계산
+        int missing = 0;
+        if (!f.hasDeparture())   missing++;
+        if (!f.hasDestination()) missing++;
+        if (!f.hasTime())        missing++;
+
+        if (missing >= 2) {
+            throw new PartyGetCustomException("출발지, 도착지, 출발시간 중 최소 2개는 제공되어야 합니다.");
+        }
+    }
+
+    /**
+     * 제공된 필터의 입력 유무에 따라 검색 분기(Variant)를 결정합니다.
+     * <p>
+     * 매핑 규칙:
+     * <ul>
+     *   <li>출발지·도착지·시간 모두 있음 → {@link SearchVariant#ALL}</li>
+     *   <li>출발지 없음 → {@link SearchVariant#NO_DEPARTURE}</li>
+     *   <li>도착지 없음 → {@link SearchVariant#NO_DESTINATION}</li>
+     *   <li>그 외(시간 없음) → {@link SearchVariant#NO_TIME}</li>
+     * </ul>
+     *
+     * @param f 파티 검색 조건을 담은 필터 객체
+     * @return 파라미터 구성에 따른 검색 분기 값
+     */
+    private SearchVariant decideVariant(PartySearchFilter f) {
+        if (f.hasDeparture() && f.hasDestination() && f.hasTime()) return SearchVariant.ALL;
+        if (!f.hasDeparture())   return SearchVariant.NO_DEPARTURE;
+        if (!f.hasDestination()) return SearchVariant.NO_DESTINATION;
+        return SearchVariant.NO_TIME;
+    }
+
+    private enum SearchVariant {
+        ALL,
+        NO_DEPARTURE,
+        NO_DESTINATION,
+        NO_TIME
     }
 
 }
