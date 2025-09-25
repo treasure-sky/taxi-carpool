@@ -4,7 +4,6 @@ import edu.kangwon.university.taxicarpool.map.MapPlaceDTO;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -19,10 +18,7 @@ public class PartyResponseDTO {
     private List<Long> memberIds;
     private Long hostMemberId;
     private LocalDateTime endDate;
-    private boolean sameGenderOnly;
-    private boolean costShareBeforeDropOff;
-    private boolean quietMode;
-    private boolean destinationChangeIn5Minutes;
+    private PartyOptionDTO options;
     private LocalDateTime startDateTime;
     private String comment;
     private int currentParticipantCount;

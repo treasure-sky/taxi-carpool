@@ -3,6 +3,7 @@ package edu.kangwon.university.taxicarpool.party;
 import edu.kangwon.university.taxicarpool.map.MapPlace;
 import edu.kangwon.university.taxicarpool.map.MapPlaceDTO;
 import edu.kangwon.university.taxicarpool.party.dto.PartyCreateRequestDTO;
+import edu.kangwon.university.taxicarpool.party.dto.PartyOptionDTO;
 import edu.kangwon.university.taxicarpool.party.dto.PartyResponseDTO;
 import edu.kangwon.university.taxicarpool.party.dto.PartyUpdateRequestDTO;
 import edu.kangwon.university.taxicarpool.member.MemberEntity;
@@ -34,6 +35,14 @@ public class PartyMapper {
             .map(MemberEntity::getId)
             .collect(Collectors.toList());
 
+        PartyOption opt = partyEntity.getOptions();
+        PartyOptionDTO optionDto = new PartyOptionDTO(
+            opt.isSameGenderOnly(),
+            opt.isCostShareBeforeDropOff(),
+            opt.isQuietMode(),
+            opt.isDestinationChangeIn5Minutes()
+        );
+
         return new PartyResponseDTO(
             partyEntity.getId(),
             partyEntity.getName(),
@@ -41,10 +50,7 @@ public class PartyMapper {
             memberIds,
             partyEntity.getHostMemberId(),
             partyEntity.getEndDate(),
-            partyEntity.isSameGenderOnly(),
-            partyEntity.isCostShareBeforeDropOff(),
-            partyEntity.isQuietMode(),
-            partyEntity.isDestinationChangeIn5Minutes(),
+            optionDto,
             partyEntity.getStartDateTime(),
             partyEntity.getComment(),
             partyEntity.getCurrentParticipantCount(),
@@ -65,12 +71,17 @@ public class PartyMapper {
         MapPlace endPlace = new MapPlace(ep.getName(), ep.getRoadAddressName(), ep.getX(),
             ep.getY());
 
+        PartyOptionDTO o = createRequestDTO.getOptions();
+        PartyOption options = new PartyOption(
+            o.isSameGenderOnly(),
+            o.isCostShareBeforeDropOff(),
+            o.isQuietMode(),
+            o.isDestinationChangeIn5Minutes()
+        );
+
         return new PartyEntity(
             null,
-            createRequestDTO.isSameGenderOnly(),
-            createRequestDTO.isCostShareBeforeDropOff(),
-            createRequestDTO.isQuietMode(),
-            createRequestDTO.isDestinationChangeIn5Minutes(),
+            options,
             createRequestDTO.getStartDateTime(),
             createRequestDTO.getComment(),
             createRequestDTO.getCurrentParticipantCount(),
@@ -89,11 +100,16 @@ public class PartyMapper {
         MapPlace endPlace = new MapPlace(ep.getName(), ep.getRoadAddressName(), ep.getX(),
             ep.getY());
 
+        PartyOptionDTO o = partyUpdateRequestDTO.getOptions();
+        PartyOption options = new PartyOption(
+            o.isSameGenderOnly(),
+            o.isCostShareBeforeDropOff(),
+            o.isQuietMode(),
+            o.isDestinationChangeIn5Minutes()
+        );
+
         return partyEntity.updateParty(
-            partyUpdateRequestDTO.isSameGenderOnly(),
-            partyUpdateRequestDTO.isCostShareBeforeDropOff(),
-            partyUpdateRequestDTO.isQuietMode(),
-            partyUpdateRequestDTO.isDestinationChangeIn5Minutes(),
+            options,
             partyUpdateRequestDTO.getStartDateTime(),
             partyUpdateRequestDTO.getComment(),
             partyUpdateRequestDTO.getMaxParticipantCount(),

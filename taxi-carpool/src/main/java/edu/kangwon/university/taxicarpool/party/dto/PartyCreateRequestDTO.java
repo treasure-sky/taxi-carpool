@@ -14,10 +14,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class PartyCreateRequestDTO {
 
-    private boolean sameGenderOnly;
-    private boolean costShareBeforeDropOff;
-    private boolean quietMode;
-    private boolean destinationChangeIn5Minutes;
+    private PartyOptionDTO options;
 
     @Future(message = "출발 시간은 현재 시간보다 이후여야 합니다.")
     @NotNull(message = "출발 시간 입력은 필수입니다.")
