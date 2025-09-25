@@ -54,10 +54,7 @@ public class MemberService {
                 "이미 사용 중인 닉네임입니다: " + memberCreateDTO.getNickname());
         }
 
-        MemberEntity entity = new MemberEntity();
-        entity.setEmail(memberCreateDTO.getEmail());
-        entity.setNickname(memberCreateDTO.getNickname());
-        entity.setGender(memberCreateDTO.getGender());
+        MemberEntity entity = memberMapper.toEntity(memberCreateDTO);
 
         String encodedPassword = passwordEncoder.encode(memberCreateDTO.getPassword());
         entity.setPassword(encodedPassword);
