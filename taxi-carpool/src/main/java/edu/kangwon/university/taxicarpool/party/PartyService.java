@@ -7,6 +7,10 @@ import edu.kangwon.university.taxicarpool.chatting.MessageType;
 import edu.kangwon.university.taxicarpool.member.MemberEntity;
 import edu.kangwon.university.taxicarpool.member.MemberRepository;
 import edu.kangwon.university.taxicarpool.member.exception.MemberNotFoundException;
+import edu.kangwon.university.taxicarpool.party.PartyUtil.PartySearchFilter;
+import edu.kangwon.university.taxicarpool.party.PartyUtil.PartySearchValidator;
+import edu.kangwon.university.taxicarpool.party.PartyUtil.SearchVariant;
+import edu.kangwon.university.taxicarpool.party.PartyUtil.CoordinateValidator;
 import edu.kangwon.university.taxicarpool.party.dto.PartyCreateRequestDTO;
 import edu.kangwon.university.taxicarpool.party.dto.PartyResponseDTO;
 import edu.kangwon.university.taxicarpool.party.dto.PartyUpdateRequestDTO;
@@ -15,7 +19,6 @@ import edu.kangwon.university.taxicarpool.party.partyException.MemberAlreadyInPa
 import edu.kangwon.university.taxicarpool.party.partyException.MemberNotInPartyException;
 import edu.kangwon.university.taxicarpool.party.partyException.PartyAlreadyDeletedException;
 import edu.kangwon.university.taxicarpool.party.partyException.PartyFullException;
-import edu.kangwon.university.taxicarpool.party.partyException.PartyGetCustomException;
 import edu.kangwon.university.taxicarpool.party.partyException.PartyInvalidMaxParticipantException;
 import edu.kangwon.university.taxicarpool.party.partyException.PartyNotFoundException;
 import edu.kangwon.university.taxicarpool.party.partyException.SavingsAlreadyCalculatedException;
@@ -128,10 +131,10 @@ public class PartyService {
             userDepartureTime
         );
 
-        validateFilter(f);
+        PartySearchValidator.validate(f);
+        SearchVariant variant = SearchVariant.fromFilter(f);
 
         Pageable pageable = PageRequest.of(page, size);
-        SearchVariant variant = decideVariant(f);
 
         Page<PartyEntity> entities = switch (variant) {
             case ALL -> partyRepository.findCustomPartyList(
@@ -433,8 +436,8 @@ public class PartyService {
         double sy = party.getStartPlace().getY();
         double ex = party.getEndPlace().getX();
         double ey = party.getEndPlace().getY();
-        validateCoordinates(sx, sy, "출발지");
-        validateCoordinates(ex, ey, "도착지");
+        CoordinateValidator.validate(sx, sy, "출발지");
+        CoordinateValidator.validate(ex, ey, "도착지");
 
         String origin = sx + "," + sy;
         String destination = ex + "," + ey;
@@ -524,82 +527,6 @@ public class PartyService {
         result.put("savingPerMember", savingPerMember);
 
         return result;
-    }
-
-    /**
-     * 좌표 유효성을 검증합니다(대략적인 한반도 범위).
-     *
-     * @param x 경도
-     * @param y 위도
-     * @param label 검증 대상 라벨(출발지/도착지 등)
-     * @throws java.lang.IllegalArgumentException 좌표가 허용 범위를 벗어난 경우
-     */
-    private void validateCoordinates(double x, double y, String label) {
-        if (x < 124 || x > 132) {
-            throw new IllegalArgumentException(label + " 경도(x)가 한반도 범위를 벗어났습니다: x=" + x);
-        }
-        if (y < 33 || y > 39) {
-            throw new IllegalArgumentException(label + " 위도(y)가 한반도 범위를 벗어났습니다: y=" + y);
-        }
-    }
-
-    /**
-     * 사용자 검색 필터의 유효성을 검사합니다.
-     * <p>
-     * 규칙:
-     * <ul>
-     *   <li>출발 시간이 현재 시각보다 이후여야 합니다(미입력 시 검사 생략).</li>
-     *   <li>출발지, 도착지, 출발시간 세 그룹 중 최소 2개 이상은 제공되어야 합니다
-     *       (즉, 누락 개수가 2 이상이면 예외).</li>
-     * </ul>
-     *
-     * @param f 파티 검색 조건을 담은 필터 객체
-     * @throws PartyGetCustomException
-     *         출발 시간이 과거이거나, 세 그룹 중 두 개 이상이 누락된 경우
-     */
-    private void validateFilter(PartySearchFilter f) {
-
-        if (f.hasTime() && !f.getDepTime().isAfter(LocalDateTime.now())) {
-            throw new PartyGetCustomException("출발 시간은 현재 시간보다 이후여야 합니다.");
-        }
-
-        // 그룹 누락 개수 계산
-        int missing = 0;
-        if (!f.hasDeparture())   missing++;
-        if (!f.hasDestination()) missing++;
-        if (!f.hasTime())        missing++;
-
-        if (missing >= 2) {
-            throw new PartyGetCustomException("출발지, 도착지, 출발시간 중 최소 2개는 제공되어야 합니다.");
-        }
-    }
-
-    /**
-     * 제공된 필터의 입력 유무에 따라 검색 분기(Variant)를 결정합니다.
-     * <p>
-     * 매핑 규칙:
-     * <ul>
-     *   <li>출발지·도착지·시간 모두 있음 → {@link SearchVariant#ALL}</li>
-     *   <li>출발지 없음 → {@link SearchVariant#NO_DEPARTURE}</li>
-     *   <li>도착지 없음 → {@link SearchVariant#NO_DESTINATION}</li>
-     *   <li>그 외(시간 없음) → {@link SearchVariant#NO_TIME}</li>
-     * </ul>
-     *
-     * @param f 파티 검색 조건을 담은 필터 객체
-     * @return 파라미터 구성에 따른 검색 분기 값
-     */
-    private SearchVariant decideVariant(PartySearchFilter f) {
-        if (f.hasDeparture() && f.hasDestination() && f.hasTime()) return SearchVariant.ALL;
-        if (!f.hasDeparture())   return SearchVariant.NO_DEPARTURE;
-        if (!f.hasDestination()) return SearchVariant.NO_DESTINATION;
-        return SearchVariant.NO_TIME;
-    }
-
-    private enum SearchVariant {
-        ALL,
-        NO_DEPARTURE,
-        NO_DESTINATION,
-        NO_TIME
     }
 
 }
