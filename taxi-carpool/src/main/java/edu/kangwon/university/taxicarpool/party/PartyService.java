@@ -1,31 +1,24 @@
 package edu.kangwon.university.taxicarpool.party;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+
 import edu.kangwon.university.taxicarpool.chatting.ChattingService;
 import edu.kangwon.university.taxicarpool.chatting.MessageType;
 import edu.kangwon.university.taxicarpool.member.MemberEntity;
 import edu.kangwon.university.taxicarpool.member.MemberRepository;
 import edu.kangwon.university.taxicarpool.member.exception.MemberNotFoundException;
 import edu.kangwon.university.taxicarpool.party.PartyUtil.PartySearchFilter;
-import edu.kangwon.university.taxicarpool.party.PartyUtil.PartySearchValidator;
+import edu.kangwon.university.taxicarpool.party.PartyUtil.PartyUtil;
 import edu.kangwon.university.taxicarpool.party.PartyUtil.SearchVariant;
-import edu.kangwon.university.taxicarpool.party.PartyUtil.CoordinateValidator;
 import edu.kangwon.university.taxicarpool.party.dto.PartyCreateRequestDTO;
 import edu.kangwon.university.taxicarpool.party.dto.PartyResponseDTO;
 import edu.kangwon.university.taxicarpool.party.dto.PartyUpdateRequestDTO;
-import edu.kangwon.university.taxicarpool.party.partyException.KakaoApiException;
 import edu.kangwon.university.taxicarpool.party.partyException.MemberAlreadyInPartyException;
 import edu.kangwon.university.taxicarpool.party.partyException.MemberNotInPartyException;
 import edu.kangwon.university.taxicarpool.party.partyException.PartyAlreadyDeletedException;
 import edu.kangwon.university.taxicarpool.party.partyException.PartyFullException;
 import edu.kangwon.university.taxicarpool.party.partyException.PartyInvalidMaxParticipantException;
 import edu.kangwon.university.taxicarpool.party.partyException.PartyNotFoundException;
-import edu.kangwon.university.taxicarpool.party.partyException.SavingsAlreadyCalculatedException;
 import edu.kangwon.university.taxicarpool.party.partyException.UnauthorizedHostAccessException;
-import java.io.IOException;
-import java.util.Optional;
-import org.springframework.http.HttpHeaders;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
@@ -37,13 +30,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.client.RestTemplate;
-import org.springframework.web.util.UriComponentsBuilder;
 
 @Service
 public class PartyService {
@@ -131,8 +119,8 @@ public class PartyService {
             userDepartureTime
         );
 
-        PartySearchValidator.validate(f);
-        SearchVariant variant = SearchVariant.fromFilter(f);
+        PartyUtil.validateSearchFilter(f);
+        SearchVariant variant = PartyUtil.toSearchVariant(f);
 
         Pageable pageable = PageRequest.of(page, size);
 
@@ -417,105 +405,45 @@ public class PartyService {
      */
     @Transactional
     public Map<String, Object> calculateSavings(Long partyId, Long requesterId) {
+        // 1) 파티 조회 & 권한/상태 검사
         PartyEntity party = partyRepository.findByIdAndIsDeletedFalse(partyId)
             .orElseThrow(() -> new PartyNotFoundException("해당 파티가 존재하지 않습니다."));
 
-        if (party.getHostMemberId() == null || !party.getHostMemberId().equals(requesterId)) {
-            throw new UnauthorizedHostAccessException("호스트만 절감 금액 계산을 수행할 수 있습니다.");
-        }
+        PartyUtil.assertHostAndRecalc(party, requesterId);
 
-        if (party.isSavingsCalculated()) {
-            throw new SavingsAlreadyCalculatedException("해당 파티("+ partyId +")는 이미 절감 계산이 완료되었습니다.");
-        }
+        // 2) 좌표 검증 & 문자열 변환
+        double[] coords = PartyUtil.getValidatedCoords(party);
+        double sx = coords[0], sy = coords[1], ex = coords[2], ey = coords[3];
+        String[] od = PartyUtil.toOriginDestination(sx, sy, ex, ey);
+        String origin = od[0], destination = od[1];
 
-        if (party.getStartPlace() == null || party.getEndPlace() == null) {
-            throw new IllegalArgumentException("출발/도착 좌표가 없습니다.");
-        }
+        // 3) 출발 시각 보정/포맷
+        LocalDateTime depTime = PartyUtil.ensureFutureDeparture(party.getStartDateTime());
+        String departureTime = PartyUtil.formatDeparture(depTime);
 
-        double sx = party.getStartPlace().getX();
-        double sy = party.getStartPlace().getY();
-        double ex = party.getEndPlace().getX();
-        double ey = party.getEndPlace().getY();
-        CoordinateValidator.validate(sx, sy, "출발지");
-        CoordinateValidator.validate(ex, ey, "도착지");
+        // 4) 외부 API 호출 (카카오 모빌리티)
+        String url = PartyUtil.buildFutureDirectionsUrl(origin, destination, departureTime);
+        String body = PartyUtil.fetchKakaoDirectionsJson(url, kakaoMobilityApiKey);
+        long totalTaxiFare = PartyUtil.extractTaxiFare(body);
 
-        String origin = sx + "," + sy;
-        String destination = ex + "," + ey;
-
-        LocalDateTime depTime = party.getStartDateTime() != null
-            ? party.getStartDateTime()
-            : LocalDateTime.now().plusMinutes(2);
-        if (!depTime.isAfter(LocalDateTime.now())) {
-            depTime = LocalDateTime.now().plusMinutes(2);
-        }
-        String departureTime = depTime.format(java.time.format.DateTimeFormatter.ofPattern("yyyyMMddHHmm"));
-
-        // 카카오 모빌리티 API 호출
-        String url = UriComponentsBuilder
-            .fromHttpUrl("https://apis-navi.kakaomobility.com/v1/future/directions")
-            .queryParam("origin", origin)
-            .queryParam("destination", destination)
-            .queryParam("departure_time", departureTime)
-            .build(true)
-            .toUriString();
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", "KakaoAK " + kakaoMobilityApiKey);
-        headers.set("Content-Type", "application/json");
-
-        RestTemplate restTemplate = new RestTemplate();
-        ResponseEntity<String> response =
-            restTemplate.exchange(url, HttpMethod.GET, new HttpEntity<>(headers), String.class);
-
-        response = Optional.ofNullable(response)
-            .filter(res -> res.getStatusCode().is2xxSuccessful())
-            .orElseThrow(() -> new KakaoApiException("카카오 API 호출 실패: 성공(2xx) 응답이 아님. URL=" + url));
-
-        if (response.getBody() == null || response.getBody().isBlank()) {
-            throw new KakaoApiException("카카오 API 호출 실패: 응답 본문이 비어있음. URL=" + url);
-        }
-
-        // taxi 요금 추출
-        ObjectMapper mapper = new ObjectMapper();
-        JsonNode root;
-        try {
-            root = mapper.readTree(response.getBody());
-        } catch (IOException e) {
-            throw new KakaoApiException("카카오 모빌리티 API 응답 파싱 실패: JSON 변환 불가", e);
-        }
-
-        JsonNode routes = Optional.ofNullable(root.path("routes"))
-            .filter(JsonNode::isArray)
-            .filter(r -> !r.isEmpty())
-            .orElseThrow(() -> new KakaoApiException("카카오 API 응답 오류: 경로 정보가 비어있습니다."));
-
-        JsonNode fare = Optional.ofNullable(routes.get(0).path("summary").path("fare"))
-            .filter(f -> !f.isMissingNode())
-            .orElseThrow(() -> new KakaoApiException("카카오 API 응답 오류: 요금 정보가 없습니다."));
-
-        long totalTaxiFare = Optional.of(fare.path("taxi").asLong(0L))
-            .filter(f -> f > 0L)
-            .orElseThrow(() -> new KakaoApiException("카카오 API 응답 오류: 유효한 택시 요금을 가져오지 못했습니다."));
-
-
-        // 절감 금액 계산 및 멤버 누적 반영
+        // 5) 참여 인원/절감액 계산
         List<MemberEntity> members = party.getMemberEntities();
-        int participants = (members != null) ? members.size() : 0;
-        if (participants <= 0) {
-            throw new MemberNotInPartyException("파티 참여 인원이 0명입니다.");
-        }
+        int participants = PartyUtil.ensureParticipants(members);
+        long[] shares = PartyUtil.calcShares(totalTaxiFare, participants);
+        long eachShare = shares[0];
+        long savingPerMember = shares[1];
 
-        long eachShare = totalTaxiFare / participants;
-        long savingPerMember = totalTaxiFare - eachShare; // "택시 비용 - (택시 비용 / 인원수)"
-
+        // 6) 멤버 누적 절감액 반영
         for (MemberEntity m : members) {
             m.addToTotalSavedAmount(savingPerMember);
         }
         memberRepository.saveAll(members);
 
+        // 7) 파티 상태 갱신
         party.setSavingsCalculated(true);
         partyRepository.save(party);
 
+        // 8) 응답 생성
         Map<String, Object> result = new HashMap<>();
         result.put("partyId", partyId);
         result.put("participants", participants);
@@ -525,8 +453,8 @@ public class PartyService {
         result.put("totalTaxiFare", totalTaxiFare);
         result.put("eachShare", eachShare);
         result.put("savingPerMember", savingPerMember);
-
         return result;
     }
+
 
 }

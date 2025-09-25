@@ -1,7 +1,6 @@
 package edu.kangwon.university.taxicarpool.party.PartyUtil;
 
 import java.time.LocalDateTime;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
