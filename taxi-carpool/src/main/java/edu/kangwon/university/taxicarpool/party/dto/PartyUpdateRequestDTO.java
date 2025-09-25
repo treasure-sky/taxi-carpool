@@ -13,10 +13,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class PartyUpdateRequestDTO {
 
-    private boolean sameGenderOnly;
-    private boolean costShareBeforeDropOff;
-    private boolean quietMode;
-    private boolean destinationChangeIn5Minutes;
+    private PartyOptionDTO options;
 
     @NotNull(message = "출발 시간 입력은 필수입니다.")
     private LocalDateTime startDateTime;
