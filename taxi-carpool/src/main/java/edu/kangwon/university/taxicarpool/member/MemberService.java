@@ -1,6 +1,7 @@
 package edu.kangwon.university.taxicarpool.member;
 
 import edu.kangwon.university.taxicarpool.auth.RefreshTokenRepository;
+import edu.kangwon.university.taxicarpool.fcm.FcmTokenRepository;
 import edu.kangwon.university.taxicarpool.member.dto.MemberCreateDTO;
 import edu.kangwon.university.taxicarpool.member.dto.MemberDetailDTO;
 import edu.kangwon.university.taxicarpool.member.dto.MemberPublicDTO;
@@ -8,27 +9,20 @@ import edu.kangwon.university.taxicarpool.member.dto.MemberUpdateDTO;
 import edu.kangwon.university.taxicarpool.member.exception.DuplicatedEmailException;
 import edu.kangwon.university.taxicarpool.member.exception.DuplicatedNicknameException;
 import edu.kangwon.university.taxicarpool.member.exception.MemberNotFoundException;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@RequiredArgsConstructor
 public class MemberService {
 
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
     private final RefreshTokenRepository refreshTokenRepository;
     private final MemberMapper memberMapper;
-
-    @Autowired
-    public MemberService(MemberRepository memberRepository, PasswordEncoder passwordEncoder,
-        RefreshTokenRepository refreshTokenRepository, MemberMapper memberMapper) {
-        this.memberRepository = memberRepository;
-        this.passwordEncoder = passwordEncoder;
-        this.refreshTokenRepository = refreshTokenRepository;
-        this.memberMapper = memberMapper;
-    }
+    private final FcmTokenRepository fcmTokenRepository;
 
     /**
      * 회원을 생성합니다.
@@ -122,6 +116,8 @@ public class MemberService {
             .orElseThrow(() -> new MemberNotFoundException("회원을 찾을 수 없습니다: " + memberId));
 
         refreshTokenRepository.findByMember(entity).ifPresent(refreshTokenRepository::delete);
+
+        fcmTokenRepository.revokeAllTokensByUserId(memberId);
 
         memberRepository.delete(entity);
 
