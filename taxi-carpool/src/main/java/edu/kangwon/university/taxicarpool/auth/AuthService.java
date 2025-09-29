@@ -9,6 +9,7 @@ import edu.kangwon.university.taxicarpool.auth.dto.RefreshRequestDTO;
 import edu.kangwon.university.taxicarpool.auth.dto.RefreshResponseDTO;
 import edu.kangwon.university.taxicarpool.email.EmailVerificationService;
 import edu.kangwon.university.taxicarpool.email.exception.EmailVerificationNotFoundException;
+import edu.kangwon.university.taxicarpool.fcm.FcmTokenRepository;
 import edu.kangwon.university.taxicarpool.member.MemberEntity;
 import edu.kangwon.university.taxicarpool.member.MemberRepository;
 import edu.kangwon.university.taxicarpool.member.MemberService;
@@ -16,12 +17,13 @@ import edu.kangwon.university.taxicarpool.member.dto.MemberCreateDTO;
 import edu.kangwon.university.taxicarpool.member.dto.MemberDetailDTO;
 import java.time.LocalDateTime;
 import java.util.Optional;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@RequiredArgsConstructor
 public class AuthService {
 
     private final MemberService memberService;
@@ -30,21 +32,7 @@ public class AuthService {
     private final JwtUtil jwtUtil;
     private final RefreshTokenRepository refreshTokenRepository;
     private final MemberRepository memberRepository;
-
-    @Autowired
-    public AuthService(MemberService memberService,
-        EmailVerificationService emailVerificationService,
-        PasswordEncoder passwordEncoder,
-        JwtUtil jwtUtil,
-        RefreshTokenRepository refreshTokenRepository,
-        MemberRepository memberRepository) {
-        this.memberService = memberService;
-        this.emailVerificationService = emailVerificationService;
-        this.passwordEncoder = passwordEncoder;
-        this.jwtUtil = jwtUtil;
-        this.refreshTokenRepository = refreshTokenRepository;
-        this.memberRepository = memberRepository;
-    }
+    private final FcmTokenRepository fcmTokenRepository;
 
     /**
      * 회원가입을 수행합니다.
@@ -89,10 +77,10 @@ public class AuthService {
 
         member.setTokenVersion(member.getTokenVersion() + 1);
         memberRepository.save(member);
-        
+
         String accessToken = jwtUtil.generateAccessToken(member.getId(), member.getTokenVersion());
         String refreshToken = jwtUtil.generateRefreshToken(member.getId());
-        
+
         LocalDateTime refreshExpiry = LocalDateTime.now().plusDays(7);
 
         // DB에 리프래쉬 토큰 저장(이미 있으면 업데이트)
@@ -106,7 +94,7 @@ public class AuthService {
                 refreshExpiry);
             refreshTokenRepository.save(newToken);
         }
-        
+
         return new LoginResponse(accessToken, refreshToken, member.getEmail());
     }
 
@@ -163,6 +151,10 @@ public class AuthService {
             // 리프레쉬 토큰 무효화
             tokenEntity.setExpiryDate(LocalDateTime.now());
             refreshTokenRepository.save(tokenEntity);
+
+            // FCM 토큰 폐기
+            Long userId = tokenEntity.getMember().getId();
+            fcmTokenRepository.revokeAllTokensByUserId(userId);
         } else {
             throw new TokenInvalidException("재로그인 후 로그아웃 해주세요.");
         }
