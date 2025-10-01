@@ -27,7 +27,7 @@ public class FcmTokenController {
      */
     @Operation(
         summary = "FCM 토큰 등록/갱신",
-        description = "클라이언트의 FCM 토큰을 등록하거나 갱신합니다. 동일한 플랫폼의 기존 토큰이 있으면 갱신하고, 없으면 새로 등록합니다."
+        description = "단일 기기 정책에 따라, 요청 사용자에 대한 기존 활성 토큰을 모두 무효화한 뒤 새 FCM 토큰 1개만 저장합니다."
     )
     @PostMapping("/token")
     public ResponseEntity<Void> upsertFcmToken(
