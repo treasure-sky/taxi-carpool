@@ -18,6 +18,9 @@ jobs:
       EMAIL_VERIFICATION_GOOGLE_ADDRESS: ${{ secrets.EMAIL_VERIFICATION_GOOGLE_ADDRESS }}
       KAKAO_APP_REST_KEY:                ${{ secrets.KAKAO_APP_REST_KEY }}
       JWT_SECRET:                        ${{ secrets.JWT_SECRET }}
+      APP_PASSWORD_RESET_BASE_URL:       ${{ secrets.APP_PASSWORD_RESET_BASE_URL }}
+      KAKAOMOBILITY_API_KEY:             ${{ secrets.KAKAOMOBILITY_API_KEY }}
+      FIREBASE_SERVICE_ACCOUNT_B64:      ${{ secrets.FIREBASE_SERVICE_ACCOUNT_B64 }}
 
     steps:
     - name: Checkout Code
@@ -59,7 +62,7 @@ jobs:
     - name: Start Spring App on EC2
       run: |
         ssh -i key.pem ec2-user@${{ secrets.EC2_HOST }} << 'EOF'
-        set -eux
+        set -euo pipefail
 
         # 현재 떠 있는 모든 Java 프로세스 PID 수집
         PIDS=$(ps -ef | grep java | grep -v grep | awk '{print $2}') || true
@@ -93,6 +96,9 @@ jobs:
         export EMAIL_VERIFICATION_GOOGLE_ADDRESS='${{ secrets.EMAIL_VERIFICATION_GOOGLE_ADDRESS }}'
         export KAKAO_APP_REST_KEY='${{ secrets.KAKAO_APP_REST_KEY }}'
         export JWT_SECRET='${{ secrets.JWT_SECRET }}'
+        export APP_PASSWORD_RESET_BASE_URL='${{ secrets.APP_PASSWORD_RESET_BASE_URL }}'
+        export KAKAOMOBILITY_API_KEY='${{ secrets.KAKAOMOBILITY_API_KEY }}'
+        export FIREBASE_SERVICE_ACCOUNT_B64='${{ secrets.FIREBASE_SERVICE_ACCOUNT_B64 }}'
         
         nohup java -Dspring.profiles.active=prod \
           -jar /home/ec2-user/deploys/taxi-carpool-0.0.1-SNAPSHOT.jar \

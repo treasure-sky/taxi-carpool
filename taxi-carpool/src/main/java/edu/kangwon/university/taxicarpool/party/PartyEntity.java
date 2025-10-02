@@ -99,6 +99,9 @@ public class PartyEntity {
     @Column(name = "savings_calculated", nullable = false)
     private boolean savingsCalculated = false;
 
+    @Column(name = "departure_notification_sent", nullable = false)
+    private boolean departureNotificationSent = false;
+
     public PartyEntity(
         Long hostMemberId,
         PartyOption options,
@@ -137,6 +140,10 @@ public class PartyEntity {
 
     public void setSavingsCalculated(boolean savingsCalculated) {
         this.savingsCalculated = savingsCalculated;
+    }
+
+    public void setDepartureNotificationSent(boolean departureNotificationSent) {
+        this.departureNotificationSent = departureNotificationSent;
     }
 
     public PartyEntity updateParty(

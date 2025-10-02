@@ -3,6 +3,8 @@ package edu.kangwon.university.taxicarpool.party;
 
 import edu.kangwon.university.taxicarpool.chatting.ChattingService;
 import edu.kangwon.university.taxicarpool.chatting.MessageType;
+import edu.kangwon.university.taxicarpool.fcm.FcmPushService;
+import edu.kangwon.university.taxicarpool.fcm.dto.PushMessageDTO;
 import edu.kangwon.university.taxicarpool.member.MemberEntity;
 import edu.kangwon.university.taxicarpool.member.MemberRepository;
 import edu.kangwon.university.taxicarpool.member.exception.MemberNotFoundException;
@@ -12,10 +14,6 @@ import edu.kangwon.university.taxicarpool.party.PartyUtil.SearchVariant;
 import edu.kangwon.university.taxicarpool.party.dto.PartyCreateRequestDTO;
 import edu.kangwon.university.taxicarpool.party.dto.PartyResponseDTO;
 import edu.kangwon.university.taxicarpool.party.dto.PartyUpdateRequestDTO;
-import edu.kangwon.university.taxicarpool.party.partyException.MemberAlreadyInPartyException;
-import edu.kangwon.university.taxicarpool.party.partyException.MemberNotInPartyException;
-import edu.kangwon.university.taxicarpool.party.partyException.PartyAlreadyDeletedException;
-import edu.kangwon.university.taxicarpool.party.partyException.PartyFullException;
 import edu.kangwon.university.taxicarpool.party.partyException.PartyInvalidMaxParticipantException;
 import edu.kangwon.university.taxicarpool.party.partyException.PartyNotFoundException;
 import edu.kangwon.university.taxicarpool.party.partyException.UnauthorizedHostAccessException;
@@ -42,16 +40,19 @@ public class PartyService {
     private final PartyMapper partyMapper;
     private final MemberRepository memberRepository;
     private final ChattingService chattingService;
+    private final FcmPushService fcmPushService;
 
     @Autowired
     PartyService(PartyRepository partyRepository,
         PartyMapper partyMapper,
-        MemberRepository memberRepository, ChattingService chattingService
+        MemberRepository memberRepository, ChattingService chattingService,
+        FcmPushService fcmPushService
     ) {
         this.partyRepository = partyRepository;
         this.partyMapper = partyMapper;
         this.memberRepository = memberRepository;
         this.chattingService = chattingService;
+        this.fcmPushService = fcmPushService;
     }
 
     /**
@@ -241,7 +242,25 @@ public class PartyService {
             throw new UnauthorizedHostAccessException("호스트만 삭제할 수 있습니다.");
         }
 
+        // 알림 대상: 남아있는 파티원(요청자/호스트 제외)
+        List<Long> targetIds = partyEntity.getMemberEntities().stream()
+            .map(MemberEntity::getId)
+            .filter(id -> !id.equals(memberId))
+            .toList();
+
         partyEntity.setDeleted(true);
+
+        // FCM 푸시 발송
+        if (!targetIds.isEmpty()) {
+            PushMessageDTO msg = PushMessageDTO.builder()
+                .title("파티가 삭제되었습니다")
+                .body("호스트가 파티를 삭제했어요.")
+                .type("PARTY_DELETED")
+                // 메시지 타입이 notification이지만 프론트의 딥링크/라우팅에서 사용하기 유용해서 data도 세팅
+                .data(Map.of("partyId", String.valueOf(partyId)))
+                .build();
+            fcmPushService.sendPushToUsers(targetIds, msg);
+        }
 
         Map<String, Object> response = new HashMap<>();
         response.put("message", "파티가 성공적으로 삭제되었습니다.");
