@@ -31,6 +31,4 @@ public class PartyCreateRequestDTO {
 
     private MapPlaceDTO startPlace;
     private MapPlaceDTO endPlace;
-
-    private int test;
 }

@@ -117,10 +117,9 @@ public class MemberService {
 
         refreshTokenRepository.findByMember(entity).ifPresent(refreshTokenRepository::delete);
 
-        fcmTokenRepository.revokeAllTokensByUserId(memberId);
+        fcmTokenRepository.deleteAllByUserId(memberId);
 
         memberRepository.delete(entity);
-
         return memberMapper.toDetailDTO(entity);
     }
 
