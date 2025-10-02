@@ -11,6 +11,8 @@ import com.google.firebase.messaging.Notification;
 import edu.kangwon.university.taxicarpool.fcm.dto.PushMessageDTO;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -20,6 +22,7 @@ public class FcmPushService {
     private final FcmTokenRepository fcmTokenRepository;
     private final FcmTokenService fcmTokenService;
     private final FirebaseMessaging firebaseMessaging;
+    private static final Logger log = LoggerFactory.getLogger(FcmPushService.class);
 
     /**
      * 특정 사용자에게 푸시 발송
@@ -30,8 +33,12 @@ public class FcmPushService {
         for (FcmTokenEntity token : tokens) {
             try {
                 Message fcmMessage = buildFcmMessage(token, message);
-                firebaseMessaging.send(fcmMessage);
+                //firebaseMessaging.send(fcmMessage);
+                String messageId = firebaseMessaging.send(fcmMessage);
+                log.info("✅ Successfully sent message to token {}: {}", token.getFcmToken(), messageId);
             } catch (FirebaseMessagingException e) {
+                //fcmTokenService.handleFcmError(token.getFcmToken(), e.getMessagingErrorCode());
+                log.error("❌ Failed to send message to token {}", token.getFcmToken(), e);
                 fcmTokenService.handleFcmError(token.getFcmToken(), e.getMessagingErrorCode());
             }
         }
