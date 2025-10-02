@@ -3,6 +3,8 @@ package edu.kangwon.university.taxicarpool.chatting;
 import edu.kangwon.university.taxicarpool.chatting.dto.MessageResponseDTO;
 import edu.kangwon.university.taxicarpool.chatting.dto.NotificationResponseDTO;
 import edu.kangwon.university.taxicarpool.chatting.dto.ParticipantResponseDTO;
+import edu.kangwon.university.taxicarpool.fcm.FcmPushService;
+import edu.kangwon.university.taxicarpool.fcm.dto.PushMessageDTO;
 import edu.kangwon.university.taxicarpool.member.MemberEntity;
 import edu.kangwon.university.taxicarpool.member.MemberRepository;
 import edu.kangwon.university.taxicarpool.member.exception.MemberNotFoundException;
@@ -13,6 +15,7 @@ import edu.kangwon.university.taxicarpool.party.partyException.PartyNotFoundExce
 import edu.kangwon.university.taxicarpool.party.partyException.UnauthorizedHostAccessException;
 import edu.kangwon.university.taxicarpool.profanity.ProfanityService;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -28,17 +31,19 @@ public class ChattingService {
     private final SimpMessagingTemplate messagingTemplate;
     private final MemberRepository memberRepository;
     private final ProfanityService profanityService;
+    private final FcmPushService fcmPushService;
 
     ChattingService(MessageRepository messageRepository,
         PartyRepository partyRepository, MessageMapper messageMapper,
         SimpMessagingTemplate messagingTemplate, MemberRepository memberRepository,
-        ProfanityService profanityService) {
+        ProfanityService profanityService, FcmPushService fcmPushService) {
         this.messageRepository = messageRepository;
         this.partyRepository = partyRepository;
         this.messageMapper = messageMapper;
         this.messagingTemplate = messagingTemplate;
         this.memberRepository = memberRepository;
         this.profanityService = profanityService;
+        this.fcmPushService = fcmPushService;
     }
 
     /**
@@ -133,7 +138,7 @@ public class ChattingService {
     }
 
     /**
-     * 채팅 메시지를 전송(저장)합니다.
+     * 채팅 메시지를 전송(저장)하고, 파티원들에게 FCM 푸시 알림을 발송합니다.
      *
      * <p>비속어는 {@link edu.kangwon.university.taxicarpool.profanity.ProfanityService#maskSmart(String)}
      * 로 마스킹하여 저장합니다.</p>
@@ -168,6 +173,28 @@ public class ChattingService {
 
         MessageEntity message = new MessageEntity(party, sender, masked, MessageType.TALK);
         messageRepository.save(message);
+
+        // FCM 푸시 알림 발송
+        // 1. 알림을 받을 파티원 목록 생성 (메시지 보낸 사람 제외)
+        List<Long> recipientIds = party.getMemberEntities().stream()
+            .map(MemberEntity::getId)
+            .filter(id -> !id.equals(memberId)) // 발신자 제외
+            .collect(Collectors.toList());
+
+        // 2. 알림 받을 사람이 있으면 푸시 발송
+        if (!recipientIds.isEmpty()) {
+            PushMessageDTO pushMessage = PushMessageDTO.builder()
+                .title(party.getName()) // 파티방 이름을 알림 제목으로
+                .body(String.format("%s: %s", sender.getNickname(), masked)) // "닉네임: 메시지 내용"
+                .type("CHAT_MESSAGE") // 클라이언트와 협의된 타입
+                .build();
+
+            // data 필드에 partyId, messageId 등을 추가하여 딥링크 및 추가 데이터 처리에 활용
+            pushMessage.getData().put("partyId", String.valueOf(partyId));
+            pushMessage.getData().put("senderNickname", sender.getNickname());
+
+            fcmPushService.sendPushToUsers(recipientIds, pushMessage);
+        }
 
         return messageMapper.convertToResponseDTO(message);
     }
