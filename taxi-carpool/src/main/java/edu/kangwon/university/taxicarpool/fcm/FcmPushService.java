@@ -32,7 +32,7 @@ public class FcmPushService {
                 Message fcmMessage = buildFcmMessage(token, message);
                 firebaseMessaging.send(fcmMessage);
             } catch (FirebaseMessagingException e) {
-                fcmTokenService.handleFcmError(token.getFcmToken(), e.getErrorCode());
+                fcmTokenService.handleFcmError(token.getFcmToken(), e.getMessagingErrorCode());
             }
         }
     }
@@ -68,6 +68,7 @@ public class FcmPushService {
                 .build());
         } else {
             messageBuilder.setAndroidConfig(AndroidConfig.builder()
+                .setPriority(AndroidConfig.Priority.HIGH)
                 .setNotification(AndroidNotification.builder()
                     .setChannelId("taxi_carpool_notifications")
                     .setDefaultSound(true)

@@ -93,4 +93,16 @@ public interface PartyRepository extends JpaRepository<PartyEntity, Long> {
     @Query("SELECT p FROM party p JOIN p.memberEntities m WHERE m.id = :memberId AND p.isDeleted = false ORDER BY p.startDateTime DESC")
     List<PartyEntity> findAllActivePartiesByMemberId(@Param("memberId") Long memberId);
 
+    /**
+     * 출발 알림을 보내야 하는 파티 목록을 조회합니다.
+     * @param after 지금으로부터 10분 뒤 시간
+     * @param before 지금으로부터 11분 뒤 시간
+     * @return 조건에 맞는 파티 엔티티 목록
+     */
+    @Query("SELECT p FROM party p WHERE p.isDeleted = false AND p.departureNotificationSent = false AND p.startDateTime > :after AND p.startDateTime <= :before")
+    List<PartyEntity> findPartiesForDepartureReminder(
+        @Param("after") LocalDateTime after,
+        @Param("before") LocalDateTime before
+    );
+
 }

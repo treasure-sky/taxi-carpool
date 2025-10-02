@@ -1,13 +1,17 @@
 package edu.kangwon.university.taxicarpool.fcm;
 
+import edu.kangwon.university.taxicarpool.member.MemberEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -27,8 +31,9 @@ public class FcmTokenEntity {
     @Column(name = "fcm_token_id")
     private Long id;
 
-    @Column(name = "user_id", nullable = false)
-    private Long userId;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "member_id", nullable = false)
+    private MemberEntity member;
 
     @Column(name = "fcm_token", nullable = false, length = 500)
     private String fcmToken;
@@ -58,14 +63,14 @@ public class FcmTokenEntity {
     private LocalDateTime updatedAt;
 
     public FcmTokenEntity(
-        Long userId,
+        MemberEntity member,
         String fcmToken,
         Platform platform,
         String deviceId,
         String appVersion,
         String bundleOrPackage
     ) {
-        this.userId = userId;
+        this.member = member;
         this.fcmToken = fcmToken;
         this.platform = platform;
         this.deviceId = deviceId;
