@@ -70,7 +70,7 @@ public class FcmPushService {
             messageBuilder.setAndroidConfig(AndroidConfig.builder()
                 .setPriority(AndroidConfig.Priority.HIGH)
                 .setNotification(AndroidNotification.builder()
-                    .setChannelId("taxi_carpool_notifications")
+                    .setChannelId("fcm_default_channel")
                     .setDefaultSound(true)
                     .setPriority(AndroidNotification.Priority.HIGH)
                     .build())
