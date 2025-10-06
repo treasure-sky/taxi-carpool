@@ -65,6 +65,10 @@ public class FcmPushService {
                 .build())
             .putAllData(message.getData());
 
+        if (message.getType() != null) {
+            messageBuilder.putData("type", message.getType());
+        }
+
         // iOS/Android별 다른 설정
         if (token.getPlatform() == Platform.IOS) {
             messageBuilder.setApnsConfig(ApnsConfig.builder()
